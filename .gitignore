@@ -1,5 +1,10 @@
-# Python virtualenv
-/backend/venv/
+
+ # Python virtualenv
+ 
+-/backend/venv/
++/backend/venv/
++/backend/.venv/
+
 
 # Flutter build + tool folders
 /frontend/build/
