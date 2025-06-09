@@ -1,0 +1,238 @@
+{
+    "info": {
+      "name": "HeyMachi Backend APIs",
+      "_postman_id": "heymachi-collection",
+      "description": "Basic CRUD and auth APIs for HeyMachi backend",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Register User",
+        "request": {
+          "method": "POST",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"password123\"\n}"
+          },
+          "url": { "raw": "http://localhost:8000/register", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["register"] }
+        }
+      },
+      {
+        "name": "Login",
+        "request": {
+          "method": "POST",
+          "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+          "body": {
+            "mode": "urlencoded",
+            "urlencoded": [
+              { "key": "username", "value": "testuser", "type": "text" },
+              { "key": "password", "value": "password123", "type": "text" }
+            ]
+          },
+          "url": { "raw": "http://localhost:8000/token", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["token"] }
+        }
+      },
+      {
+        "name": "Get Current User",
+        "request": {
+          "method": "GET",
+          "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+          "url": { "raw": "http://localhost:8000/me", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["me"] }
+        }
+      },
+      {
+        "name": "Category CRUD",
+        "item": [
+          {
+            "name": "Get Categories",
+            "request": {
+              "method": "GET",
+              "url": { "raw": "http://localhost:8000/categories/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["categories", ""] }
+            }
+          },
+          {
+            "name": "Create Category",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Electronics\",\n  \"gst_id\": 1\n}"
+              },
+              "url": { "raw": "http://localhost:8000/categories/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["categories", ""] }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Subcategory CRUD",
+        "item": [
+          {
+            "name": "Get Subcategories",
+            "request": {
+              "method": "GET",
+              "url": { "raw": "http://localhost:8000/subcategories/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["subcategories", ""] }
+            }
+          },
+          {
+            "name": "Create Subcategory",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Mobile Phones\",\n  \"category_id\": 1,\n  \"gst_id\": 1\n}"
+              },
+              "url": { "raw": "http://localhost:8000/subcategories/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["subcategories", ""] }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Product CRUD",
+        "item": [
+          {
+            "name": "Get Products",
+            "request": {
+              "method": "GET",
+              "url": { "raw": "http://localhost:8000/products/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["products", ""] }
+            }
+          },
+          {
+            "name": "Create Product",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"iPhone 13\",\n  \"price\": 59999.99,\n  \"category_id\": 1,\n  \"subcategory_id\": 1,\n  \"gst_id\": 1\n}"
+              },
+              "url": { "raw": "http://localhost:8000/products/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["products", ""] }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Tax CRUD",
+        "item": [
+          {
+            "name": "Get Taxes",
+            "request": {
+              "method": "GET",
+              "url": { "raw": "http://localhost:8000/taxes/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["taxes", ""] }
+            }
+          },
+          {
+            "name": "Create Tax",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"GST\",\n  \"rate\": 18.0\n}"
+              },
+              "url": { "raw": "http://localhost:8000/taxes/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["taxes", ""] }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Customer CRUD",
+        "item": [
+          {
+            "name": "List Customers",
+            "request": {
+              "method": "GET",
+              "url": { "raw": "http://localhost:8000/customers/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["customers", ""] }
+            }
+          },
+          {
+            "name": "Create Customer",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"John Doe\",\n  \"phone\": \"9999999999\",\n  \"email\": \"john@example.com\",\n  \"gst_number\": \"\",\n  \"address\": \"123 Street\"\n}"
+              },
+              "url": { "raw": "http://localhost:8000/customers/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["customers", ""] }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Vendor CRUD",
+        "item": [
+          {
+            "name": "List Vendors",
+            "request": {
+              "method": "GET",
+              "url": { "raw": "http://localhost:8000/vendors/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["vendors", ""] }
+            }
+          },
+          {
+            "name": "Create Vendor",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Vendor 1\",\n  \"phone\": \"8888888888\",\n  \"email\": \"vendor@example.com\",\n  \"gst_number\": \"\",\n  \"address\": \"456 Avenue\"\n}"
+              },
+              "url": { "raw": "http://localhost:8000/vendors/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["vendors", ""] }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Unit CRUD",
+        "item": [
+          {
+            "name": "Get Units",
+            "request": {
+              "method": "GET",
+              "url": { "raw": "http://localhost:8000/units/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["units", ""] }
+            }
+          },
+          {
+            "name": "Create Unit",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Kilogram\",\n  \"abbreviation\": \"kg\"\n}"
+              },
+              "url": { "raw": "http://localhost:8000/units/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["units", ""] }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Billing CRUD",
+        "item": [
+          {
+            "name": "List Bills",
+            "request": {
+              "method": "GET",
+              "url": { "raw": "http://localhost:8000/bills/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["bills", ""] }
+            }
+          },
+          {
+            "name": "Create Bill",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"customer_id\": 1,\n  \"payment_mode\": \"Cash\",\n  \"bill_items\": [\n    {\n      \"product_id\": 1,\n      \"quantity\": 2\n    }\n  ]\n}"
+              },
+              "url": { "raw": "http://localhost:8000/bills/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["bills", ""] }
+            }
+          }
+        ]
+      }
+    ]
+  }
+  
