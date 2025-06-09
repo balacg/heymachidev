@@ -1,12 +1,14 @@
-# Flutter (frontend)
-frontend/.dart_tool/
-frontend/build/
-frontend/.packages
-frontend/.pub/
-frontend/pubspec.lock
+# Python virtualenv
+/backend/venv/
 
-# Python (backend)
-backend/__pycache__/
-backend/*.pyc
-backend/.venv/
-backend/env/
+# Flutter build + tool folders
+/frontend/build/
+/frontend/.dart_tool/
+/frontend/.packages
+/frontend/.pub/
+/frontend/pubspec.lock
+
+# macOS + IDE cruft
+**/.DS_Store
+**/.idea/
+**/*.iml
