@@ -5,7 +5,7 @@ import '../../models/customer.dart';
 import '../../services/api.dart';
 
 class CustomerAddScreen extends StatefulWidget {
-  const CustomerAddScreen({super.key});
+  const CustomerAddScreen({Key? key}) : super(key: key);
 
   @override
   State<CustomerAddScreen> createState() => _CustomerAddScreenState();
@@ -13,28 +13,42 @@ class CustomerAddScreen extends StatefulWidget {
 
 class _CustomerAddScreenState extends State<CustomerAddScreen> {
   final _formKey = GlobalKey<FormState>();
-  final nameController = TextEditingController();
-  final mobileController = TextEditingController();
+  final nameController    = TextEditingController();
+  final phoneController   = TextEditingController();
+  final emailController   = TextEditingController();
+  final gstController     = TextEditingController();
   final addressController = TextEditingController();
 
   bool isSaving = false;
 
-  void saveCustomer() async {
+  @override
+  void dispose() {
+    nameController.dispose();
+    phoneController.dispose();
+    emailController.dispose();
+    gstController.dispose();
+    addressController.dispose();
+    super.dispose();
+  }
+
+  Future<void> saveCustomer() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => isSaving = true);
 
     final customer = Customer(
-      id: 0,
-      name: nameController.text.trim(),
-      mobile: mobileController.text.trim(),
+      id:      0,
+      name:    nameController.text.trim(),
+      phone:   phoneController.text.trim(),
+      email:   emailController.text.trim(),
+      gst:     gstController.text.trim(),
       address: addressController.text.trim(),
     );
 
     try {
       await ApiService.addCustomer(customer);
       if (!mounted) return;
-      Navigator.pop(context, customer); // Return to billing page
+      Navigator.pop(context, customer);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to save customer')),
@@ -66,10 +80,23 @@ class _CustomerAddScreenState extends State<CustomerAddScreen> {
               ),
               const SizedBox(height: 16),
               _buildField(
-                controller: mobileController,
-                label: 'Mobile Number',
+                controller: phoneController,
+                label: 'Phone Number',
                 keyboardType: TextInputType.phone,
-                validatorMsg: 'Enter valid number',
+                validatorMsg: 'Enter valid phone',
+              ),
+              const SizedBox(height: 16),
+              _buildField(
+                controller: emailController,
+                label: 'Email',
+                keyboardType: TextInputType.emailAddress,
+                validatorMsg: 'Enter valid email',
+              ),
+              const SizedBox(height: 16),
+              _buildField(
+                controller: gstController,
+                label: 'GST Number',
+                validatorMsg: 'Enter GST number',
               ),
               const SizedBox(height: 16),
               _buildField(
@@ -77,7 +104,7 @@ class _CustomerAddScreenState extends State<CustomerAddScreen> {
                 label: 'Address',
                 validatorMsg: 'Enter address',
               ),
-              const SizedBox(height: 30),
+              const Spacer(),
               ElevatedButton.icon(
                 onPressed: isSaving ? null : saveCustomer,
                 icon: const Icon(Icons.save),
@@ -90,7 +117,7 @@ class _CustomerAddScreenState extends State<CustomerAddScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

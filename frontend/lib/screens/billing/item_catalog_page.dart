@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../../services/api.dart';
+import '../../models/product.dart';
 import 'cart_page.dart';
 
 class ItemCatalogPage extends StatefulWidget {

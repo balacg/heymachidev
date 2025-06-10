@@ -107,7 +107,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                           style: theme.textTheme.bodyMedium),
                       const SizedBox(height: 4),
                       Text(
-                        '${_selectedCustomer!.mobile} · GST: ${_selectedCustomer!.gst}',
+                        '${_selectedCustomer!.phone} · GST: ${_selectedCustomer!.gst}',
                         style: theme.textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 4),
@@ -211,7 +211,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                             lineId: const Uuid().v4(),
                             date: now,
                             customerName: _selectedCustomer!.name,
-                            customerPhone: _selectedCustomer!.mobile,
+                            customerPhone: _selectedCustomer!.phone,
                             customerGst: _selectedCustomer!.gst,
                             productName: e.key,
                             category: '',

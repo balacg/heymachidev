@@ -52,7 +52,7 @@ class _CustomerSearchDropdownState extends State<CustomerSearchDropdown> {
     setState(() {
       _filteredCustomers = _allCustomers.where((c) {
         return c.name.toLowerCase().contains(lower) ||
-            c.mobile.toLowerCase().contains(lower);
+            c.phone.toLowerCase().contains(lower);
       }).toList();
     });
   }
@@ -99,7 +99,7 @@ class _CustomerSearchDropdownState extends State<CustomerSearchDropdown> {
                 return ListTile(
                   title: Text(c.name, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
                   subtitle: Text(
-                    '${c.mobile}\n${c.address}',
+                    '${c.phone}\n${c.address}',
                     style: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
                   ),
                   isThreeLine: true,

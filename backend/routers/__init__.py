@@ -11,5 +11,6 @@ from .customer import router as customer
 from .vendor import router as vendor
 from .unit import router as unit
 from .billing import router as billing
+from .payment_type import router as payment_type
 
 # Add other routers here as needed

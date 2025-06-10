@@ -3,39 +3,34 @@
 class Customer {
   final int id;
   final String name;
-  final String mobile;
+  final String phone;    // renamed from mobile
+  final String email;
+  final String gst;
   final String address;
-  final String gst;     // Optional GST number
-  final String email;   // ✅ Newly added email field
 
   Customer({
     required this.id,
     required this.name,
-    required this.mobile,
+    required this.phone,
+    required this.email,
+    required this.gst,
     required this.address,
-    this.gst = '',
-    this.email = '', // ✅ Default to empty string
   });
 
-  factory Customer.fromJson(Map<String, dynamic> json) {
-    return Customer(
-      id: json['id'],
-      name: json['name'] ?? '',
-      mobile: json['mobile'] ?? '',
-      address: json['address'] ?? '',
-      gst: json['gst'] ?? '',
-      email: json['email'] ?? '', // ✅ Safe parsing
-    );
-  }
+  factory Customer.fromJson(Map<String, dynamic> json) => Customer(
+        id:      json['id'] as int,
+        name:    json['name'] as String,
+        phone:   json['phone'] as String? ?? '',
+        email:   json['email'] as String? ?? '',
+        gst:     json['gst'] as String? ?? '',
+        address: json['address'] as String? ?? '',
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'mobile': mobile,
-      'address': address,
-      'gst': gst,
-      'email': email, // ✅ Include in API payload
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'name':    name,
+        'phone':   phone,
+        'email':   email,
+        'gst':     gst,
+        'address': address,
+      };
 }

@@ -22,3 +22,30 @@ def create_tax(tax: TaxCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_tax)
     return db_tax
+
+@router.put("/{tax_id}/", response_model=TaxOut)
+def update_tax(
+    tax_id: int,
+    tax_in: TaxCreate,
+    db: Session = Depends(get_db),
+):
+    db_tax = db.query(Tax).filter(Tax.id == tax_id).first()
+    if not db_tax:
+        raise HTTPException(status_code=404, detail="Tax not found")
+    db_tax.name = tax_in.name
+    db_tax.rate = tax_in.rate
+    db.commit()
+    db.refresh(db_tax)
+    return db_tax
+
+@router.delete("/{tax_id}/", status_code=204)
+def delete_tax(
+    tax_id: int,
+    db: Session = Depends(get_db),
+):
+    db_tax = db.query(Tax).filter(Tax.id == tax_id).first()
+    if not db_tax:
+        raise HTTPException(status_code=404, detail="Tax not found")
+    db.delete(db_tax)
+    db.commit()
+    return
