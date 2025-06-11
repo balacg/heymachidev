@@ -11,21 +11,12 @@ typedef FilterCallback = void Function(String field, String query);
 /// • filtering    (via header filter icon)
 /// • freeze-cols  (frozen=true columns pinned left)
 /// • hide/unhide  (via a column chooser)
-/// • horizontal scroll
+/// • two-axis scroll (vertical + horizontal)
 class GenericDataTable<T> extends StatefulWidget {
-  /// List of all columns (including hidden ones).
   final List<TableColumn<T>> columns;
-
-  /// All of your rows of data.
   final List<T> rows;
-
-  /// Called when user sorts a column.
   final SortCallback? onSort;
-
-  /// Called when user applies a filter.
   final FilterCallback? onFilter;
-
-  /// How many rows per page if you switch to a PaginatedDataTable.
   final int rowsPerPage;
 
   const GenericDataTable({
@@ -50,6 +41,19 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
   void initState() {
     super.initState();
     _cols = widget.columns;
+  }
+
+  /// Try map-style access, else try .toJson(), else empty string
+  dynamic _getValue(T row, String field) {
+    try {
+      return (row as dynamic)[field];
+    } catch (_) {
+      try {
+        return (row as dynamic).toJson()[field];
+      } catch (_) {
+        return '';
+      }
+    }
   }
 
   void _handleSort(int idx, bool asc) {
@@ -83,7 +87,7 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
               Navigator.pop(context);
             },
             child: Text('Apply'),
-          ),
+          )
         ],
       ),
     );
@@ -96,7 +100,6 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
   }
 
   List<TableColumn<T>> _visibleColumns() {
-    // Frozen ones first, then the rest, filtering out hidden.
     final frozen = _cols.where((c) => c.frozen && !c.hidden).toList();
     final normal = _cols.where((c) => !c.frozen && !c.hidden).toList();
     return [...frozen, ...normal];
@@ -109,7 +112,7 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Column-chooser button
+        // Column‐chooser button
         Align(
           alignment: Alignment.centerRight,
           child: PopupMenuButton<TableColumn<T>>(
@@ -125,39 +128,45 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
           ),
         ),
 
-        // Actual table
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            sortColumnIndex: _sortColumnIndex,
-            sortAscending: _sortAscending,
-            columns: [
-              for (int i = 0; i < visibleCols.length; i++)
-                DataColumn(
-                  label: Row(
-                    children: [
-                      Text(visibleCols[i].title),
-                      if (visibleCols[i].filterable)
-                        IconButton(
-                          icon: Icon(Icons.filter_list, size: 16),
-                          onPressed: () => _showFilterDialog(visibleCols[i]),
-                        ),
-                    ],
-                  ),
-                  onSort: visibleCols[i].sortable
-                      ? (colIndex, asc) => _handleSort(i, asc)
-                      : null,
-                ),
-            ],
-            rows: widget.rows.map((row) {
-              return DataRow(
-                cells: visibleCols.map((col) {
-                  final cell = col.cellBuilder?.call(row) ??
-                      Text('${(row as dynamic)[col.field] ?? ''}');
-                  return DataCell(cell);
+        // **Expanded** to fill available height,
+        // then **vertical scroll** wrapping a **horizontal scroll**.
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                sortColumnIndex: _sortColumnIndex,
+                sortAscending: _sortAscending,
+                columns: [
+                  for (int i = 0; i < visibleCols.length; i++)
+                    DataColumn(
+                      label: Row(
+                        children: [
+                          Text(visibleCols[i].title),
+                          if (visibleCols[i].filterable)
+                            IconButton(
+                              icon: Icon(Icons.filter_list, size: 16),
+                              onPressed: () => _showFilterDialog(visibleCols[i]),
+                            ),
+                        ],
+                      ),
+                      onSort: visibleCols[i].sortable
+                          ? (ci, asc) => _handleSort(i, asc)
+                          : null,
+                    ),
+                ],
+                rows: widget.rows.map((row) {
+                  return DataRow(
+                    cells: visibleCols.map((col) {
+                      final cell = col.cellBuilder?.call(row) ??
+                          Text('${_getValue(row, col.field)}');
+                      return DataCell(cell);
+                    }).toList(),
+                  );
                 }).toList(),
-              );
-            }).toList(),
+              ),
+            ),
           ),
         ),
       ],

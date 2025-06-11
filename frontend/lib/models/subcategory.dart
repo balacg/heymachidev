@@ -4,28 +4,29 @@ class Subcategory {
   final int id;
   final String name;
   final int categoryId;
+  final int gstId;
 
   Subcategory({
     required this.id,
     required this.name,
     required this.categoryId,
+    required this.gstId,
   });
 
-  /// Construct a Subcategory from JSON returned by the API
   factory Subcategory.fromJson(Map<String, dynamic> json) {
     return Subcategory(
-      id: json['id'] as int,
-      name: json['name'] as String,
+      id:         json['id'] as int,
+      name:       json['name'] as String,
       categoryId: json['category_id'] as int,
+      gstId:      json['gst_id'] as int,   // read gst_id
     );
   }
 
-  /// Convert this Subcategory into a JSON-compatible map (for POST/PUT)
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'name': name,
+      'name':        name,
       'category_id': categoryId,
+      'gst_id':      gstId,              // send gst_id
     };
   }
 }

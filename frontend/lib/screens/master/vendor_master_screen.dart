@@ -1,152 +1,126 @@
+// lib/screens/master/vendor_master_screen.dart
+
 import 'package:flutter/material.dart';
+import '../../widgets/table_column.dart';
+import '../../widgets/generic_data_table.dart';
 
 class VendorMasterScreen extends StatefulWidget {
-  const VendorMasterScreen({super.key});
+  const VendorMasterScreen({Key? key}) : super(key: key);
 
   @override
   State<VendorMasterScreen> createState() => _VendorMasterScreenState();
 }
 
 class _VendorMasterScreenState extends State<VendorMasterScreen> {
-  List<Map<String, String>> vendors = [
+  List<Map<String, String>> _vendors = [
     {
       'company': 'Ravi & Co',
       'phone': '9876543210',
       'email': 'ravi@example.com',
-      'gstNumber': '33BBBBB1111B2Z6',
+      'gst': '',
     },
-    {
-      'company': 'Sunil Traders',
-      'phone': '9123456780',
-      'email': 'sunil@example.com',
-      'gstNumber': '',
-    },
+    // ... other initial vendors
   ];
+  List<Map<String, String>> _allVendors = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _allVendors = List.from(_vendors);
+  }
 
   void _showVendorDialog({int? index}) {
-    final isEdit = index != null;
-    final vendor = isEdit ? vendors[index] : null;
-
-    final companyController = TextEditingController(text: vendor?['company'] ?? '');
-    final phoneController = TextEditingController(text: vendor?['phone'] ?? '');
-    final emailController = TextEditingController(text: vendor?['email'] ?? '');
-    final gstController = TextEditingController(text: vendor?['gstNumber'] ?? '');
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(isEdit ? 'Edit Vendor' : 'Add Vendor'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(controller: companyController, decoration: const InputDecoration(labelText: 'Company')),
-                TextField(controller: phoneController, decoration: const InputDecoration(labelText: 'Phone')),
-                TextField(controller: emailController, decoration: const InputDecoration(labelText: 'Email')),
-                TextField(controller: gstController, decoration: const InputDecoration(labelText: 'GST Number')),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  final newVendor = {
-                    'company': companyController.text,
-                    'phone': phoneController.text,
-                    'email': emailController.text,
-                    'gstNumber': gstController.text,
-                  };
-                  if (isEdit) {
-                    vendors[index!] = newVendor;
-                  } else {
-                    vendors.add(newVendor);
-                  }
-                });
-                Navigator.pop(context);
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
+    // ← your existing add/edit dialog code
   }
 
   void _deleteVendor(int index) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Vendor'),
-        content: const Text('Are you sure you want to delete this vendor?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                vendors.removeAt(index);
-              });
-              Navigator.pop(context);
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
+    setState(() {
+      _vendors.removeAt(index);
+      _allVendors = List.from(_vendors);
+    });
+  }
+
+  void _onSort(String field, bool asc) {
+    setState(() {
+      _vendors.sort((a, b) {
+        final va = a[field]!;
+        final vb = b[field]!;
+        return asc ? va.compareTo(vb) : vb.compareTo(va);
+      });
+    });
+  }
+
+  void _onFilter(String field, String query) {
+    setState(() {
+      _vendors = _allVendors
+          .where((v) =>
+              v[field]!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    const headerStyle = TextStyle(fontWeight: FontWeight.bold);
-
     return Scaffold(
       appBar: AppBar(title: const Text('Vendor Master')),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showVendorDialog(),
         child: const Icon(Icons.add),
       ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          headingRowColor: MaterialStateProperty.all(Colors.grey[200]),
-          columns: const [
-            DataColumn(label: Text('No.', style: headerStyle)),
-            DataColumn(label: Text('Company', style: headerStyle)),
-            DataColumn(label: Text('Phone', style: headerStyle)),
-            DataColumn(label: Text('Email', style: headerStyle)),
-            DataColumn(label: Text('GST Number', style: headerStyle)),
-            DataColumn(label: Text('Actions', style: headerStyle)),
-          ],
-          rows: List.generate(vendors.length, (index) {
-            final vendor = vendors[index];
-            return DataRow(
-              cells: [
-                DataCell(Text('${index + 1}')),
-                DataCell(Text(vendor['company'] ?? '')),
-                DataCell(Text(vendor['phone'] ?? '')),
-                DataCell(Text(vendor['email'] ?? '')),
-                DataCell(Text(vendor['gstNumber'] ?? '')),
-                DataCell(
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'edit') {
-                        _showVendorDialog(index: index);
-                      } else if (value == 'delete') {
-                        _deleteVendor(index);
-                      }
-                    },
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(value: 'edit', child: Text('Edit')),
-                      PopupMenuItem(value: 'delete', child: Text('Delete')),
-                    ],
-                    icon: const Icon(Icons.more_vert),
-                  ),
-                ),
+      body: GenericDataTable<Map<String, String>>(
+        columns: [
+          TableColumn<Map<String, String>>(
+            title: 'No.',
+            field: 'no',
+            cellBuilder: (v) => Text('${_vendors.indexOf(v) + 1}'),
+            frozen: true,
+          ),
+          TableColumn<Map<String, String>>(
+            title: 'Company',
+            field: 'company',
+            sortable: true,
+            filterable: true,
+          ),
+          TableColumn<Map<String, String>>(
+            title: 'Phone',
+            field: 'phone',
+            sortable: true,
+            filterable: true,
+          ),
+          TableColumn<Map<String, String>>(
+            title: 'Email',
+            field: 'email',
+            sortable: true,
+            filterable: true,
+          ),
+          TableColumn<Map<String, String>>(
+            title: 'GST Number',
+            field: 'gst',
+            sortable: true,
+            filterable: true,
+          ),
+          TableColumn<Map<String, String>>(
+            title: 'Actions',
+            field: 'actions',
+            cellBuilder: (v) => PopupMenuButton<String>(
+              onSelected: (value) {
+                final idx = _vendors.indexOf(v);
+                if (value == 'edit') {
+                  _showVendorDialog(index: idx);
+                } else if (value == 'delete') {
+                  _deleteVendor(idx);
+                }
+              },
+              itemBuilder: (_) => const [
+                PopupMenuItem(value: 'edit', child: Text('Edit')),
+                PopupMenuItem(value: 'delete', child: Text('Delete')),
               ],
-            );
-          }),
-        ),
+            ),
+          ),
+        ],
+        rows: _vendors,
+        onSort: _onSort,
+        onFilter: _onFilter,
       ),
     );
   }

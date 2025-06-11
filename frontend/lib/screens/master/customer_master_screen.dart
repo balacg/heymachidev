@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import '../../services/api.dart';
 import '../../models/customer.dart';
+import '../../widgets/table_column.dart';
+import '../../widgets/generic_data_table.dart';
 
 class CustomerMasterScreen extends StatefulWidget {
   const CustomerMasterScreen({Key? key}) : super(key: key);
@@ -12,9 +14,10 @@ class CustomerMasterScreen extends StatefulWidget {
 }
 
 class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
-  List<Customer> _customers = [];
-  bool _loading = true;
-  String? _error;
+  List<Customer> _customers    = [];
+  List<Customer> _allCustomers = [];
+  bool           _loading      = true;
+  String?        _error;
 
   @override
   void initState() {
@@ -25,10 +28,11 @@ class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
   Future<void> _loadCustomers() async {
     setState(() {
       _loading = true;
-      _error = null;
+      _error   = null;
     });
     try {
-      _customers = await ApiService.fetchCustomers();
+      _allCustomers = await ApiService.fetchCustomers();
+      _customers    = List.of(_allCustomers);
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -38,18 +42,35 @@ class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
     }
   }
 
-  Future<void> _deleteCustomer(int id) async {
-    await ApiService.deleteCustomer(id);
-    _loadCustomers();
+  void _onSort(String field, bool asc) {
+    setState(() {
+      _customers.sort((a, b) {
+        final va = (a.toJson())[field];
+        final vb = (b.toJson())[field];
+        if (va is Comparable && vb is Comparable) {
+          return asc ? va.compareTo(vb) : vb.compareTo(va);
+        }
+        return 0;
+      });
+    });
+  }
+
+  void _onFilter(String field, String query) {
+    setState(() {
+      _customers = _allCustomers.where((c) {
+        final val = (c.toJson())[field]?.toString().toLowerCase() ?? '';
+        return val.contains(query.toLowerCase());
+      }).toList();
+    });
   }
 
   void _showForm({Customer? customer}) {
-    final isEdit = customer != null;
-    final nameCtrl    = TextEditingController(text: customer?.name ?? '');
-    final phoneCtrl   = TextEditingController(text: customer?.phone ?? '');
-    final emailCtrl   = TextEditingController(text: customer?.email ?? '');
-    final gstCtrl     = TextEditingController(text: customer?.gst ?? '');
-    final addressCtrl = TextEditingController(text: customer?.address ?? '');
+    final isEdit   = customer != null;
+    final nameCtl  = TextEditingController(text: customer?.name ?? '');
+    final phoneCtl = TextEditingController(text: customer?.phone ?? '');
+    final emailCtl = TextEditingController(text: customer?.email ?? '');
+    final gstCtl   = TextEditingController(text: customer?.gst ?? '');
+    final addrCtl  = TextEditingController(text: customer?.address ?? '');
 
     showDialog(
       context: context,
@@ -59,33 +80,71 @@ class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: nameCtrl,    decoration: const InputDecoration(labelText: 'Name')),
-              TextField(controller: phoneCtrl,   decoration: const InputDecoration(labelText: 'Phone')),
-              TextField(controller: emailCtrl,   decoration: const InputDecoration(labelText: 'Email')),
-              TextField(controller: gstCtrl,     decoration: const InputDecoration(labelText: 'GST Number')),
-              TextField(controller: addressCtrl, decoration: const InputDecoration(labelText: 'Address')),
+              TextField(
+                controller: nameCtl,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: phoneCtl,
+                decoration: const InputDecoration(labelText: 'Phone'),
+              ),
+              TextField(
+                controller: emailCtl,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+              TextField(
+                controller: gstCtl,
+                decoration: const InputDecoration(labelText: 'GST Number'),
+              ),
+              TextField(
+                controller: addrCtl,
+                decoration: const InputDecoration(labelText: 'Address'),
+              ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
           ElevatedButton(
             onPressed: () async {
-              final model = Customer(
-                id:      customer?.id ?? 0,
-                name:    nameCtrl.text,
-                phone:  phoneCtrl.text,
-                email:   emailCtrl.text,
-                gst:     gstCtrl.text,
-                address: addressCtrl.text,
-              );
-              Navigator.of(ctx).pop();
-              if (isEdit) {
-                await ApiService.updateCustomer(model);
-              } else {
-                await ApiService.addCustomer(model);
+              final name    = nameCtl.text.trim();
+              final phone   = phoneCtl.text.trim();
+              final email   = emailCtl.text.trim();
+              final gstNum  = gstCtl.text.trim();
+              final address = addrCtl.text.trim();
+
+              if (name.isEmpty || phone.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Name & phone are required')),
+                );
+                return;
               }
-              _loadCustomers();
+
+              final model = Customer(
+                id:        customer?.id ?? 0,
+                name:      name,
+                phone:     phone,
+                email:     email.isEmpty ? null : email,
+                gst: gstNum.isEmpty ? null : gstNum,
+                address:   address.isEmpty ? null : address,
+              );
+
+              try {
+                if (isEdit) {
+                  await ApiService.updateCustomer(model);
+                } else {
+                  await ApiService.addCustomer(model);
+                }
+                Navigator.of(ctx).pop();
+              } catch (e) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('Error: $e')));
+                return;
+              }
+              await _loadCustomers();
             },
             child: const Text('Save'),
           ),
@@ -94,55 +153,81 @@ class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
     );
   }
 
+  void _deleteCustomer(int id) async {
+    try {
+      await ApiService.deleteCustomer(id);
+      await _loadCustomers();
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Delete failed: $e')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    const headerStyle = TextStyle(fontWeight: FontWeight.bold);
-
     return Scaffold(
       appBar: AppBar(title: const Text('Customer Master')),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Text('Error: $_error'))
-              : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingRowColor: MaterialStateProperty.all(Colors.grey[200]),
-                    columns: const [
-                      DataColumn(label: Text('No.',        style: headerStyle)),
-                      DataColumn(label: Text('ID',         style: headerStyle)),
-                      DataColumn(label: Text('Name',       style: headerStyle)),
-                      DataColumn(label: Text('Phone',      style: headerStyle)),
-                      DataColumn(label: Text('Email',      style: headerStyle)),
-                      DataColumn(label: Text('GST No.',    style: headerStyle)),
-                      DataColumn(label: Text('Address',    style: headerStyle)),
-                      DataColumn(label: Text('Actions',    style: headerStyle)),
-                    ],
-                    rows: List<DataRow>.generate(_customers.length, (i) {
-                      final c = _customers[i];
-                      return DataRow(cells: [
-                        DataCell(Text('${i + 1}')),
-                        DataCell(Text('${c.id}')),
-                        DataCell(Text(c.name)),
-                        DataCell(Text(c.phone)),
-                        DataCell(Text(c.email)),
-                        DataCell(Text(c.gst.isEmpty ? '-' : c.gst)),
-                        DataCell(Text(c.address.isEmpty ? '-' : c.address)),
-                        DataCell(
-                          PopupMenuButton<String>(
-                            onSelected: (v) {
-                              if (v == 'edit') _showForm(customer: c);
-                              else if (v == 'delete') _deleteCustomer(c.id);
-                            },
-                            itemBuilder: (_) => const [
-                              PopupMenuItem(value: 'edit',   child: Text('Edit')),
-                              PopupMenuItem(value: 'delete', child: Text('Delete')),
-                            ],
-                          ),
-                        ),
-                      ]);
-                    }),
-                  ),
+              : GenericDataTable<Customer>(
+                  columns: [
+                    TableColumn<Customer>(
+                      title: 'ID',
+                      field: 'id',
+                      sortable: true,
+                      frozen: true,
+                      cellBuilder: (c) => Text('${c.id}'),
+                    ),
+                    TableColumn<Customer>(
+                      title: 'Name',
+                      field: 'name',
+                      sortable: true,
+                      filterable: true,
+                    ),
+                    TableColumn<Customer>(
+                      title: 'Phone',
+                      field: 'phone',
+                      sortable: true,
+                      filterable: true,
+                    ),
+                    TableColumn<Customer>(
+                      title: 'Email',
+                      field: 'email',
+                      sortable: true,
+                      filterable: true,
+                    ),
+                    TableColumn<Customer>(
+                      title: 'GST No.',
+                      field: 'gst',
+                      sortable: true,
+                      filterable: true,
+                    ),
+                    TableColumn<Customer>(
+                      title: 'Address',
+                      field: 'address',
+                      sortable: true,
+                      filterable: true,
+                    ),
+                    TableColumn<Customer>(
+                      title: 'Actions',
+                      field: 'actions',
+                      cellBuilder: (c) => PopupMenuButton<String>(
+                        onSelected: (v) {
+                          if (v == 'edit') _showForm(customer: c);
+                          else if (v == 'delete') _deleteCustomer(c.id);
+                        },
+                        itemBuilder: (_) => const [
+                          PopupMenuItem(value: 'edit', child: Text('Edit')),
+                          PopupMenuItem(value: 'delete', child: Text('Delete')),
+                        ],
+                      ),
+                    ),
+                  ],
+                  rows: _customers,
+                  onSort: _onSort,
+                  onFilter: _onFilter,
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showForm(),

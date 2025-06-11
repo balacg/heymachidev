@@ -154,7 +154,7 @@
               "header": [{ "key": "Content-Type", "value": "application/json" }],
               "body": {
                 "mode": "raw",
-                "raw": "{\n  \"name\": \"John Doe\",\n  \"phone\": \"9999999999\",\n  \"email\": \"john@example.com\",\n  \"gst_number\": \"\",\n  \"address\": \"123 Street\"\n}"
+                "raw": "{\n  \"name\": \"John Doe\",\n  \"phone\": \"9999999999\",\n  \"email\": \"john@example.com\",\n  \"gst\": \"\",\n  \"address\": \"123 Street\"\n}"
               },
               "url": { "raw": "http://localhost:8000/customers/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["customers", ""] }
             }
@@ -178,7 +178,7 @@
               "header": [{ "key": "Content-Type", "value": "application/json" }],
               "body": {
                 "mode": "raw",
-                "raw": "{\n  \"name\": \"Vendor 1\",\n  \"phone\": \"8888888888\",\n  \"email\": \"vendor@example.com\",\n  \"gst_number\": \"\",\n  \"address\": \"456 Avenue\"\n}"
+                "raw": "{\n  \"name\": \"Vendor 1\",\n  \"phone\": \"8888888888\",\n  \"email\": \"vendor@example.com\",\n  \"gst\": \"\",\n  \"address\": \"456 Avenue\"\n}"
               },
               "url": { "raw": "http://localhost:8000/vendors/", "protocol": "http", "host": ["localhost"], "port": "8000", "path": ["vendors", ""] }
             }
