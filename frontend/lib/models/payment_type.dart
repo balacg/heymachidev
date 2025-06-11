@@ -1,12 +1,22 @@
+// lib/models/payment_type.dart
+
 class PaymentType {
-  final String id;
+  final int id;
   final String name;
 
-  PaymentType({required this.id, required this.name});
+  PaymentType({
+    required this.id,
+    required this.name,
+  });
 
   factory PaymentType.fromJson(Map<String, dynamic> json) {
-    return PaymentType(id: json['id'], name: json['name']);
+    return PaymentType(
+      id: json['id'] as int? ?? 0,
+      name: json['name'] as String? ?? '',
+    );
   }
 
-  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+  Map<String, dynamic> toJson() => {
+        'name': name,
+      };
 }

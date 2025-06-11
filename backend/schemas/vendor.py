@@ -7,7 +7,7 @@ class VendorBase(BaseModel):
     name: str
     phone: str
     email: Optional[EmailStr] = None
-    gst_number: Optional[str] = None
+    gst: Optional[str] = None
     address: Optional[str] = None
 
 class VendorCreate(VendorBase):

@@ -11,7 +11,7 @@ class Customer(Base):
     name = Column(String, nullable=False)
     phone = Column(String, nullable=False, unique=True)
     email = Column(String, nullable=True)
-    gst_number = Column(String, nullable=True)
+    gst = Column(String, nullable=True)
     address = Column(String, nullable=True)
 
     bills = relationship("Bill", back_populates="customer")

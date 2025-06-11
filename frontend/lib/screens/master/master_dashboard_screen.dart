@@ -9,27 +9,27 @@ import 'category_master_screen.dart';
 import 'subcategory_master_screen.dart';
 import 'unit_master_screen.dart';
 import 'tax_master_screen.dart';
-import 'payment_type_master_screen.dart';      // moved below Taxes
+import 'payment_type_master_screen.dart';
 import 'product_field_config_screen.dart';
 
 class MasterDashboardScreen extends StatelessWidget {
-  const MasterDashboardScreen({super.key});
+  const MasterDashboardScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Masters')),
       body: ListView(
-        children: [
-          _MasterTile('Products', Icons.inventory, const ProductMasterScreen()),
-          _MasterTile('Customers', Icons.person, const CustomerMasterScreen()),
-          _MasterTile('Vendors', Icons.store, const VendorMasterScreen()),
-          _MasterTile('Categories', Icons.category, const CategoryMasterScreen()),
-          _MasterTile('Subcategories', Icons.subtitles, const SubcategoryMasterScreen()),
-          _MasterTile('Units', Icons.straighten, const UnitMasterScreen()),
-          _MasterTile('Taxes', Icons.percent, const TaxMasterScreen()),
-          _MasterTile('Payment Types', Icons.payment, const PaymentTypeMasterScreen()),
-          _MasterTile('Product Field Config', Icons.settings, const ProductFieldConfigScreen()),
+        children: const [
+          _MasterTile('Products', Icons.inventory, ProductMasterScreen()),
+          _MasterTile('Customers', Icons.person, CustomerMasterScreen()),
+          _MasterTile('Vendors', Icons.store, VendorMasterScreen()),
+          _MasterTile('Categories', Icons.category, CategoryMasterScreen()),
+          _MasterTile('Subcategories', Icons.subtitles, SubcategoryMasterScreen()),
+          _MasterTile('Units', Icons.straighten, UnitMasterScreen()),
+          _MasterTile('Taxes', Icons.percent, TaxMasterScreen()),
+          _MasterTile('Payment Types', Icons.payment, PaymentTypeMasterScreen()),
+          _MasterTile('Product Field Config', Icons.settings, ProductFieldConfigScreen()),
         ],
       ),
     );

@@ -11,7 +11,7 @@ class Vendor(Base):
     name = Column(String, nullable=False)
     phone = Column(String, nullable=False, unique=True)
     email = Column(String, nullable=True)
-    gst_number = Column(String, nullable=True)
+    gst = Column(String, nullable=True)
     address = Column(String, nullable=True)
 
     # Removed purchase_orders relationship since PurchaseOrder model doesn't exist yet

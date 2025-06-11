@@ -79,7 +79,8 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                   icon: const Icon(Icons.person_add),
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const CustomerAddScreen()),
+                    MaterialPageRoute(
+                        builder: (_) => const CustomerAddScreen()),
                   ),
                 ),
               ],
@@ -103,16 +104,20 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                             .copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
-                      Text(_selectedCustomer!.email,
-                          style: theme.textTheme.bodyMedium),
-                      const SizedBox(height: 4),
                       Text(
-                        '${_selectedCustomer!.mobile} · GST: ${_selectedCustomer!.gst}',
+                        _selectedCustomer!.email ?? '',
                         style: theme.textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 4),
-                      Text(_selectedCustomer!.address,
-                          style: theme.textTheme.bodyMedium),
+                      Text(
+                        '${_selectedCustomer!.phone} · GST: ${_selectedCustomer!.gst ?? ''}',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _selectedCustomer!.address ?? '',
+                        style: theme.textTheme.bodyMedium,
+                      ),
                     ],
                   ),
                 ),
@@ -197,6 +202,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                 onPressed: _selectedCustomer != null &&
                         _selectedPayment != null
                     ? () async {
+                        final cust = _selectedCustomer!;
                         final billId = const Uuid().v4();
                         final now = DateTime.now();
 
@@ -207,22 +213,22 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                           final taxAmt = price * qty * 0.18;
                           final lineTotal = price * qty + taxAmt;
                           return TransactionRecord(
-                            billId: billId,
-                            lineId: const Uuid().v4(),
-                            date: now,
-                            customerName: _selectedCustomer!.name,
-                            customerPhone: _selectedCustomer!.mobile,
-                            customerGst: _selectedCustomer!.gst,
+                            billId:      billId,
+                            lineId:      const Uuid().v4(),
+                            date:        now,
+                            customerName: cust.name,
+                            customerPhone: cust.phone,
+                            customerGst:  cust.gst ?? '',
                             productName: e.key,
-                            category: '',
-                            quantity: qty,
-                            unitPrice: price,
-                            gstSlab: 'GST 18%',
-                            gstRate: 18.0,
-                            taxAmount: taxAmt,
+                            category:    '',
+                            quantity:    qty,
+                            unitPrice:   price,
+                            gstSlab:     'GST 18%',
+                            gstRate:     18.0,
+                            taxAmount:   taxAmt,
                             totalAmount: lineTotal,
                             paymentMode: _selectedPayment!,
-                            branch: 'Main Branch',
+                            branch:      'Main Branch',
                           );
                         }).toList();
 
@@ -232,7 +238,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                           context,
                           MaterialPageRoute(
                             builder: (_) => OrderConfirmationScreen(
-                              customer: _selectedCustomer!,
+                              customer:    cust,
                               paymentMode: _selectedPayment!,
                               totalAmount: _total,
                             ),

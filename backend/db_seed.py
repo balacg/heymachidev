@@ -162,8 +162,8 @@ def seed_customers(db: Session):
 
     customers_to_add = []
     for cust_data in [
-        {"name": "John Doe", "phone": "1234567890", "email": "john@example.com", "gst_number": None, "address": "123 Elm St"},
-        {"name": "Jane Smith", "phone": "0987654321", "email": "jane@example.com", "gst_number": None, "address": "456 Oak St"},
+        {"name": "John Doe", "phone": "1234567890", "email": "john@example.com", "gst": None, "address": "123 Elm St"},
+        {"name": "Jane Smith", "phone": "0987654321", "email": "jane@example.com", "gst": None, "address": "456 Oak St"},
     ]:
         if cust_data["name"] not in existing_customer_names:
             customers_to_add.append(Customer(**cust_data))
@@ -181,8 +181,8 @@ def seed_vendors(db: Session):
 
     vendors_to_add = []
     for vendor_data in [
-        {"name": "Acme Supplies", "phone": "1112223333", "email": "contact@acme.com", "gst_number": None, "address": "789 Maple Ave"},
-        {"name": "Best Goods", "phone": "4445556666", "email": "sales@bestgoods.com", "gst_number": None, "address": "321 Pine St"},
+        {"name": "Acme Supplies", "phone": "1112223333", "email": "contact@acme.com", "gst": None, "address": "789 Maple Ave"},
+        {"name": "Best Goods", "phone": "4445556666", "email": "sales@bestgoods.com", "gst": None, "address": "321 Pine St"},
     ]:
         if vendor_data["name"] not in existing_vendor_names:
             vendors_to_add.append(Vendor(**vendor_data))
