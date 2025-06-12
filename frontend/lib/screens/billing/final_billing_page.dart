@@ -95,7 +95,6 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
             ),
           ),
 
-          // Compact customer card
           if (_selectedCustomer != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -123,7 +122,6 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
               ),
             ),
 
-          // Line items
           Expanded(
             child: ListView(
               children: widget.cartItems.entries.map((e) {
@@ -138,7 +136,6 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
             ),
           ),
 
-          // Summary rows
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
@@ -154,12 +151,10 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
         ],
       ),
 
-      // Bottom bar
       bottomNavigationBar: SizedBox(
         height: 70,
         child: Row(
           children: [
-            // Payment dropdown
             Expanded(
               child: Container(
                 color: theme.cardColor,
@@ -181,7 +176,6 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
               ),
             ),
 
-            // Pay button
             Container(
               margin: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -243,6 +237,12 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                               customer: cust,
                               paymentMode: _selectedPayment!,
                               totalAmount: _total,
+                              orderId: billId,
+                              items: widget.cartItems.entries.map((e) => {
+                                'name': e.key,
+                                'qty': e.value['qty'],
+                                'price': e.value['price'],
+                              }).toList(),
                             ),
                           ),
                         );

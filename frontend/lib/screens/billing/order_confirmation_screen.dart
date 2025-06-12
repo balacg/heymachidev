@@ -1,20 +1,89 @@
 // lib/screens/billing/order_confirmation_screen.dart
 
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
 import '../../models/customer.dart';
+import '../../modules/restaurant/templates/pdf/thermal_bill_template.dart';
+import '../../services/email_service.dart';
+import '../../services/api.dart'; // ✅ Fix: Import ApiService
 
 class OrderConfirmationScreen extends StatelessWidget {
   final Customer customer;
   final String paymentMode;
   final double totalAmount;
+  final List<Map<String, dynamic>> items;
+  final String orderId;
 
   const OrderConfirmationScreen({
     Key? key,
     required this.customer,
     required this.paymentMode,
     required this.totalAmount,
+    required this.items,
+    required this.orderId,
   }) : super(key: key);
+
+  Future<Uint8List> _generatePdfBytes() async {
+    final business = await ApiService.fetchBusinessProfile(); // ✅ Add business
+
+    final pdfDoc = buildThermalPDF(
+      orderId: orderId,
+      customer: customer.toJson(),
+      items: items,
+      totalAmount: totalAmount,
+      paymentMode: paymentMode,
+      business: business, // ✅ Fix missing param
+    );
+    return pdfDoc.save();
+  }
+
+  Future<void> _handleExport(BuildContext context) async {
+    try {
+      final business = await ApiService.fetchBusinessProfile();
+
+      final pdfDoc = buildThermalPDF(
+        orderId: orderId,
+        customer: customer.toJson(),
+        items: items,
+        totalAmount: totalAmount,
+        paymentMode: paymentMode,
+        business: business,
+      );
+
+      final pdfBytes = await pdfDoc.save();
+
+      // Email to customer
+      if ((customer.email ?? '').isNotEmpty) {
+        await EmailService.sendEmailWithPDF(
+          toEmail: customer.email!,
+          subject: 'Your Order Confirmation',
+          body: 'Hi ${customer.name},\n\nHere’s your bill from ${business['name'] ?? 'HeyMachi'} 💖',
+          pdfBytes: pdfBytes,
+          filename: 'order_$orderId.pdf',
+        );
+      }
+
+      // Email to business
+      await EmailService.sendEmailWithPDF(
+        toEmail: 'owner@yourbiz.com',
+        subject: 'New Order Placed - $orderId',
+        body: 'Customer: ${customer.name}\nAmount: ₹${totalAmount.toStringAsFixed(2)}\nOrder ID: $orderId',
+        pdfBytes: pdfBytes,
+        filename: 'order_$orderId.pdf',
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Emails sent (if addresses are valid)")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Export failed: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +101,13 @@ class OrderConfirmationScreen extends StatelessWidget {
           onPressed: () => Navigator.pushNamedAndRemoveUntil(
               context, '/dashboard', (r) => false),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'Export PDF / Email',
+            onPressed: () => _handleExport(context),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -101,7 +177,40 @@ class OrderConfirmationScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
             Divider(color: theme.dividerColor),
-            const Spacer(),
+
+            // Print / Save / Email Again Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.print),
+                  label: const Text("Print"),
+                  onPressed: () async {
+                    final pdfBytes = await _generatePdfBytes();
+                    await Printing.layoutPdf(onLayout: (format) async => pdfBytes);
+                  },
+                ),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.download),
+                  label: const Text("Save"),
+                  onPressed: () async {
+                    final pdfBytes = await _generatePdfBytes();
+                    final file = await EmailService.savePDFToFile(pdfBytes, 'order_$orderId.pdf');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Saved to: ${file.path}")),
+                    );
+                  },
+                ),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.send),
+                  label: const Text("Email"),
+                  onPressed: () async {
+                    await _handleExport(context);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
 
             // Done Button
             SizedBox(

@@ -13,5 +13,7 @@ from .unit import router as unit
 from .billing import router as billing
 from .payment_type import router as payment_type
 from .transaction import router as transaction
+from .email import router as email
+from .business_profile import router as business_profile
 
 # Add other routers here as needed
