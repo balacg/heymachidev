@@ -6,12 +6,6 @@ import 'table_column.dart';
 typedef SortCallback = void Function(String field, bool ascending);
 typedef FilterCallback = void Function(String field, String query);
 
-/// A reusable, feature-rich table widget supporting:
-/// • sorting      (on sortable columns)
-/// • filtering    (via header filter icon)
-/// • freeze-cols  (frozen=true columns pinned left)
-/// • hide/unhide  (via a column chooser)
-/// • two-axis scroll (vertical + horizontal)
 class GenericDataTable<T> extends StatefulWidget {
   final List<TableColumn<T>> columns;
   final List<T> rows;
@@ -43,7 +37,7 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
     _cols = widget.columns;
   }
 
-  /// Try map-style access, else try .toJson(), else empty string
+  /// Gracefully retrieve a field from map or object
   dynamic _getValue(T row, String field) {
     try {
       return (row as dynamic)[field];
@@ -73,20 +67,20 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
         title: Text('Filter ${col.title}'),
         content: TextField(
           controller: ctrl,
-          decoration: InputDecoration(hintText: 'Enter filter…'),
+          decoration: const InputDecoration(hintText: 'Enter filter…'),
           onSubmitted: (v) {
             widget.onFilter?.call(col.field, v);
             Navigator.pop(context);
           },
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           TextButton(
             onPressed: () {
               widget.onFilter?.call(col.field, ctrl.text);
               Navigator.pop(context);
             },
-            child: Text('Apply'),
+            child: const Text('Apply'),
           )
         ],
       ),
@@ -112,11 +106,10 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Column‐chooser button
         Align(
           alignment: Alignment.centerRight,
           child: PopupMenuButton<TableColumn<T>>(
-            icon: Icon(Icons.view_column),
+            icon: const Icon(Icons.view_column),
             itemBuilder: (_) => _cols
                 .map((c) => CheckedPopupMenuItem<TableColumn<T>>(
                       value: c,
@@ -127,9 +120,7 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
             onSelected: _toggleVisibility,
           ),
         ),
-
-        // **Expanded** to fill available height,
-        // then **vertical scroll** wrapping a **horizontal scroll**.
+        const SizedBox(height: 8),
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
@@ -138,30 +129,30 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
               child: DataTable(
                 sortColumnIndex: _sortColumnIndex,
                 sortAscending: _sortAscending,
-                columns: [
-                  for (int i = 0; i < visibleCols.length; i++)
-                    DataColumn(
-                      label: Row(
-                        children: [
-                          Text(visibleCols[i].title),
-                          if (visibleCols[i].filterable)
-                            IconButton(
-                              icon: Icon(Icons.filter_list, size: 16),
-                              onPressed: () => _showFilterDialog(visibleCols[i]),
-                            ),
-                        ],
-                      ),
-                      onSort: visibleCols[i].sortable
-                          ? (ci, asc) => _handleSort(i, asc)
-                          : null,
+                columns: List.generate(visibleCols.length, (i) {
+                  final col = visibleCols[i];
+                  return DataColumn(
+                    label: Row(
+                      children: [
+                        Text(col.title),
+                        if (col.filterable)
+                          IconButton(
+                            icon: const Icon(Icons.filter_list, size: 16),
+                            onPressed: () => _showFilterDialog(col),
+                          ),
+                      ],
                     ),
-                ],
+                    onSort: col.sortable ? (index, asc) => _handleSort(i, asc) : null,
+                  );
+                }),
                 rows: widget.rows.map((row) {
                   return DataRow(
                     cells: visibleCols.map((col) {
-                      final cell = col.cellBuilder?.call(row) ??
-                          Text('${_getValue(row, col.field)}');
-                      return DataCell(cell);
+                      final value = _getValue(row, col.field);
+                      final cellWidget = col.cellBuilder != null
+                          ? col.cellBuilder!(row)
+                          : Text('$value');
+                      return DataCell(cellWidget);
                     }).toList(),
                   );
                 }).toList(),

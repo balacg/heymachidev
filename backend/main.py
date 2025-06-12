@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from database import get_db, engine
 from models import Base
 from models.user import User
-from routers import users, roles, category, subcategory, product, tax, customer, vendor, unit, billing, payment_type
+from routers import users, roles, category, subcategory, product, tax, customer, vendor, unit, billing, payment_type, transaction
 from routers.auth import router as auth_router, get_current_user
 from schemas.user import UserCreate, UserOut
 from schemas.auth import Token
@@ -70,4 +70,5 @@ app.include_router(customer)   # /customer
 app.include_router(vendor)     # /vendor
 app.include_router(unit)       # /unit
 app.include_router(billing)    # /billing
-app.include_router(payment_type)   # → mounts /payment_types/*
+app.include_router(payment_type)   # /payment_types
+app.include_router(transaction)   # /transactions

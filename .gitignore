@@ -18,3 +18,17 @@
 **/.idea/
 **/*.iml
 .vscode/settings.json
+frontend/ios/Podfile
+frontend/ios/Podfile.lock
+frontend/ios/Flutter/Debug.xcconfig
+frontend/ios/Flutter/Release.xcconfig
+frontend/ios/Runner.xcodeproj/project.pbxproj
+frontend/ios/Runner.xcworkspace/contents.xcworkspacedata
+frontend/linux/flutter/generated_plugin_registrant.cc
+frontend/linux/flutter/generated_plugins.cmake
+frontend/macos/Podfile
+frontend/macos/Flutter/Flutter-Debug.xcconfig
+frontend/macos/Flutter/Flutter-Release.xcconfig
+frontend/macos/Flutter/GeneratedPluginRegistrant.swift
+frontend/windows/flutter/generated_plugin_registrant.cc
+frontend/windows/flutter/generated_plugins.cmake

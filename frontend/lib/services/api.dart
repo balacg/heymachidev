@@ -375,4 +375,17 @@ class ApiService {
       throw Exception('deleteUnit ${resp.statusCode}: ${resp.body}');
     }
   }
+
+  // ─── TRANSACTIONS (/transactions/) ────────────────────────────────────────────────────────
+  static Future<void> postTransaction(Map<String, dynamic> data) async {
+  final uri = Uri.parse('$baseUrl/transactions/');
+  final resp = await http.post(uri,
+    headers: _jsonHeaders,
+    body: jsonEncode(data),
+  );
+  if (resp.statusCode != 200 && resp.statusCode != 201) {
+    throw Exception('postTransaction ${resp.statusCode}: ${resp.body}');
+  }
 }
+}
+

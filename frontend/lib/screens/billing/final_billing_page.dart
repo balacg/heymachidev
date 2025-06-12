@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
+import '../../services/api.dart';
 
 import '../../models/customer.dart';
 import '../../models/transaction_record.dart';
@@ -206,6 +207,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                             customerName: cust.name,
                             customerPhone: cust.phone,
                             customerGst: cust.gst ?? '',
+                            address: cust.address ?? '',
                             productName: e.key,
                             category: '',
                             quantity: qty,
@@ -219,7 +221,20 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                           );
                         }).toList();
 
-                        await TransactionService.saveAll(lines);
+                        await ApiService.postTransaction({
+                          "bill": {
+                            "id": billId,
+                            "date": now.toIso8601String(),
+                            "customer_name": cust.name,
+                            "customer_phone": cust.phone,
+                            "customer_gst": cust.gst ?? '',
+                            "address": cust.address ?? '',
+                            "payment_mode": _selectedPayment!,
+                            "total_amount": _total,
+                            "branch": "Main Branch"
+                          },
+                          "bill_items": lines.map((e) => e.toJson()).toList(),
+                        });
 
                         Navigator.push(
                           context,

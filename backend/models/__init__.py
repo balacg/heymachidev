@@ -12,6 +12,7 @@ from .tax import Tax
 from .unit import Unit
 from .billing import Bill, BillItem
 from .payment_type import PaymentType
+from .transaction import Transaction  
 
 from .association_tables import user_roles
 
