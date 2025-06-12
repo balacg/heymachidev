@@ -1,5 +1,3 @@
-// lib/screens/transactions/transaction_history_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart'; // Optional: For sharing files
@@ -9,6 +7,12 @@ import '../../models/transaction_record.dart';
 import '../../services/transaction_service.dart';
 import '../../widgets/generic_data_table.dart';
 
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+
 class TransactionHistoryScreen extends StatefulWidget {
   const TransactionHistoryScreen({super.key});
 
@@ -17,8 +21,9 @@ class TransactionHistoryScreen extends StatefulWidget {
 }
 
 class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
-  final formatter = NumberFormat('#,##0.00', 'en_IN');
   final _searchCtrl = TextEditingController();
+  final currencyFormat = NumberFormat('#,##0.00', 'en_IN');
+  final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
   List<TransactionRecord> _all = [];
   List<TransactionRecord> _filtered = [];
@@ -50,7 +55,11 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
     });
   }
 
-  void _exportCsv() {
+  Future<void> _exportCsv() async {
+    final now = DateTime.now();
+    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(now);
+    final filename = 'transactions_export_$timestamp.csv';
+
     final buffer = StringBuffer();
     buffer.writeln([
       'Date','Bill ID','Line ID','Customer','Phone','GST No.',
@@ -79,16 +88,57 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       ].join(','));
     }
 
-    // Output CSV (you can save or share)
-    debugPrint(buffer.toString());
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("CSV Export logic complete (check console)"))
-    );
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final path = '${directory.path}/$filename';
+      final file = File(path);
+      await file.writeAsString(buffer.toString());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("CSV exported to:\n$path"))
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to export CSV"))
+      );
+    }
   }
 
-  void _exportPdf() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("PDF export coming soon..."))
+  Future<void> _exportPdf() async {
+    final pdf = pw.Document();
+    final now = DateTime.now();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text('Transaction Report', style: pw.TextStyle(fontSize: 24)),
+              pw.SizedBox(height: 10),
+              pw.Text('Generated on ${dateFormat.format(now)}'),
+              pw.SizedBox(height: 20),
+              pw.Table.fromTextArray(
+                headers: ['Date', 'Customer', 'Product', 'Qty', 'Total', 'Payment'],
+                data: _filtered.map((r) => [
+                  dateFormat.format(r.date),
+                  r.customerName,
+                  r.productName,
+                  r.quantity.toString(),
+                  '₹${currencyFormat.format(r.totalAmount)}',
+                  r.paymentMode
+                ]).toList(),
+                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                cellAlignment: pw.Alignment.centerLeft,
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (format) async => pdf.save(),
     );
   }
 
@@ -123,11 +173,11 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       'product_name': r.productName,
       'category': r.category,
       'quantity': r.quantity.toString(),
-      'unit_price': '₹${formatter.format(r.unitPrice)}',
+      'unit_price': '₹${currencyFormat.format(r.unitPrice)}',
       'gst_slab': r.gstSlab,
       'gst_rate': r.gstRate.toString(),
-      'tax_amount': '₹${formatter.format(r.taxAmount)}',
-      'total_amount': '₹${formatter.format(r.totalAmount)}',
+      'tax_amount': '₹${currencyFormat.format(r.taxAmount)}',
+      'total_amount': '₹${currencyFormat.format(r.totalAmount)}',
       'payment_mode': r.paymentMode,
       'branch': r.branch,
     }).toList();
@@ -141,39 +191,14 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            TextField(
-              controller: _searchCtrl,
-              onChanged: _filter,
-              decoration: const InputDecoration(
-                labelText: 'Search by customer, product, etc.',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _exportCsv,
-                  icon: const Icon(Icons.download),
-                  label: const Text('Export CSV'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton.icon(
-                  onPressed: _exportPdf,
-                  icon: const Icon(Icons.picture_as_pdf),
-                  label: const Text('Export PDF'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
             Expanded(
               child: GenericDataTable<Map<String, String>>(
                 columns: columns,
                 rows: rows,
+                onExportCsv: _exportCsv,
+                onExportPdf: _exportPdf,
+                onSearch: _filter,
+                searchHint: 'Search by customer, product, etc.',
               ),
             ),
           ],

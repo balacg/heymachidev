@@ -5,12 +5,18 @@ import 'table_column.dart';
 
 typedef SortCallback = void Function(String field, bool ascending);
 typedef FilterCallback = void Function(String field, String query);
+typedef VoidCallback = void Function();
+typedef SearchCallback = void Function(String query);
 
 class GenericDataTable<T> extends StatefulWidget {
   final List<TableColumn<T>> columns;
   final List<T> rows;
   final SortCallback? onSort;
   final FilterCallback? onFilter;
+  final SearchCallback? onSearch;
+  final VoidCallback? onExportCsv;
+  final VoidCallback? onExportPdf;
+  final String? searchHint;
   final int rowsPerPage;
 
   const GenericDataTable({
@@ -19,6 +25,10 @@ class GenericDataTable<T> extends StatefulWidget {
     required this.rows,
     this.onSort,
     this.onFilter,
+    this.onSearch,
+    this.onExportCsv,
+    this.onExportPdf,
+    this.searchHint,
     this.rowsPerPage = PaginatedDataTable.defaultRowsPerPage,
   }) : super(key: key);
 
@@ -37,7 +47,6 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
     _cols = widget.columns;
   }
 
-  /// Gracefully retrieve a field from map or object
   dynamic _getValue(T row, String field) {
     try {
       return (row as dynamic)[field];
@@ -88,9 +97,7 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
   }
 
   void _toggleVisibility(TableColumn<T> col) {
-    setState(() {
-      col.hidden = !col.hidden;
-    });
+    setState(() => col.hidden = !col.hidden);
   }
 
   List<TableColumn<T>> _visibleColumns() {
@@ -106,21 +113,58 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Align(
-          alignment: Alignment.centerRight,
-          child: PopupMenuButton<TableColumn<T>>(
-            icon: const Icon(Icons.view_column),
-            itemBuilder: (_) => _cols
-                .map((c) => CheckedPopupMenuItem<TableColumn<T>>(
-                      value: c,
-                      checked: !c.hidden,
-                      child: Text(c.title),
-                    ))
-                .toList(),
-            onSelected: _toggleVisibility,
-          ),
+        // Top bar: Search + Column selector + More menu
+        Row(
+          children: [
+            if (widget.onSearch != null)
+              Expanded(
+                child: TextField(
+                  onChanged: widget.onSearch,
+                  decoration: InputDecoration(
+                    hintText: widget.searchHint ?? 'Search…',
+                    prefixIcon: const Icon(Icons.search),
+                    border: const OutlineInputBorder(),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  ),
+                ),
+              ),
+            const SizedBox(width: 8),
+
+            // Column Chooser
+            PopupMenuButton<TableColumn<T>>(
+              icon: const Icon(Icons.view_column),
+              itemBuilder: (_) => _cols
+                  .map((c) => CheckedPopupMenuItem<TableColumn<T>>(
+                        value: c,
+                        checked: !c.hidden,
+                        child: Text(c.title),
+                      ))
+                  .toList(),
+              onSelected: _toggleVisibility,
+            ),
+
+            // Export menu
+            if (widget.onExportCsv != null || widget.onExportPdf != null)
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                onSelected: (value) {
+                  if (value == 'csv') widget.onExportCsv?.call();
+                  if (value == 'pdf') widget.onExportPdf?.call();
+                },
+                itemBuilder: (_) => [
+                  if (widget.onExportCsv != null)
+                    const PopupMenuItem(value: 'csv', child: Text('Export CSV')),
+                  if (widget.onExportPdf != null)
+                    const PopupMenuItem(value: 'pdf', child: Text('Export PDF')),
+                ],
+              ),
+          ],
         ),
-        const SizedBox(height: 8),
+
+        const SizedBox(height: 10),
+
+        // Table content
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
@@ -129,30 +173,30 @@ class _GenericDataTableState<T> extends State<GenericDataTable<T>> {
               child: DataTable(
                 sortColumnIndex: _sortColumnIndex,
                 sortAscending: _sortAscending,
-                columns: List.generate(visibleCols.length, (i) {
-                  final col = visibleCols[i];
-                  return DataColumn(
-                    label: Row(
-                      children: [
-                        Text(col.title),
-                        if (col.filterable)
-                          IconButton(
-                            icon: const Icon(Icons.filter_list, size: 16),
-                            onPressed: () => _showFilterDialog(col),
-                          ),
-                      ],
+                columns: [
+                  for (int i = 0; i < visibleCols.length; i++)
+                    DataColumn(
+                      label: Row(
+                        children: [
+                          Text(visibleCols[i].title),
+                          if (visibleCols[i].filterable)
+                            IconButton(
+                              icon: const Icon(Icons.filter_list, size: 16),
+                              onPressed: () => _showFilterDialog(visibleCols[i]),
+                            ),
+                        ],
+                      ),
+                      onSort: visibleCols[i].sortable
+                          ? (ci, asc) => _handleSort(i, asc)
+                          : null,
                     ),
-                    onSort: col.sortable ? (index, asc) => _handleSort(i, asc) : null,
-                  );
-                }),
+                ],
                 rows: widget.rows.map((row) {
                   return DataRow(
                     cells: visibleCols.map((col) {
-                      final value = _getValue(row, col.field);
-                      final cellWidget = col.cellBuilder != null
-                          ? col.cellBuilder!(row)
-                          : Text('$value');
-                      return DataCell(cellWidget);
+                      final cell = col.cellBuilder?.call(row) ??
+                          Text('${_getValue(row, col.field)}');
+                      return DataCell(cell);
                     }).toList(),
                   );
                 }).toList(),
