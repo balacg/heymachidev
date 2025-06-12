@@ -1,8 +1,9 @@
 // lib/screens/billing/final_billing_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
+import 'package:intl/intl.dart';
+
 import '../../models/customer.dart';
 import '../../models/transaction_record.dart';
 import '../../services/transaction_service.dart';
@@ -14,8 +15,7 @@ import 'order_confirmation_screen.dart';
 class FinalBillingPage extends StatefulWidget {
   final Map<String, dynamic> cartItems;
 
-  const FinalBillingPage({Key? key, required this.cartItems})
-      : super(key: key);
+  const FinalBillingPage({Key? key, required this.cartItems}) : super(key: key);
 
   @override
   State<FinalBillingPage> createState() => _FinalBillingPageState();
@@ -68,6 +68,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Customer picker + add
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -79,16 +80,21 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.person_add),
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const CustomerAddScreen()),
-                  ),
+                  onPressed: () async {
+                    final newCustomer = await Navigator.push<Customer>(
+                      context,
+                      MaterialPageRoute(builder: (_) => const CustomerAddScreen()),
+                    );
+                    if (newCustomer != null) {
+                      setState(() => _selectedCustomer = newCustomer);
+                    }
+                  },
                 ),
               ],
             ),
           ),
 
+          // Compact customer card
           if (_selectedCustomer != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -101,30 +107,22 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                     children: [
                       Text(
                         _selectedCustomer!.name,
-                        style: theme.textTheme.titleMedium!
-                            .copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        _selectedCustomer!.email ?? '',
-                        style: theme.textTheme.bodyMedium,
-                      ),
+                      Text(_selectedCustomer!.email ?? '', style: theme.textTheme.bodyMedium),
                       const SizedBox(height: 4),
-                      Text(
-                        '${_selectedCustomer!.phone} · GST: ${_selectedCustomer!.gst ?? ''}',
-                        style: theme.textTheme.bodyMedium,
-                      ),
+                      Text('${_selectedCustomer!.phone} · GST: ${_selectedCustomer!.gst ?? ''}',
+                          style: theme.textTheme.bodyMedium),
                       const SizedBox(height: 4),
-                      Text(
-                        _selectedCustomer!.address ?? '',
-                        style: theme.textTheme.bodyMedium,
-                      ),
+                      Text(_selectedCustomer!.address ?? '', style: theme.textTheme.bodyMedium),
                     ],
                   ),
                 ),
               ),
             ),
 
+          // Line items
           Expanded(
             child: ListView(
               children: widget.cartItems.entries.map((e) {
@@ -133,15 +131,13 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                 return ListTile(
                   tileColor: theme.cardColor,
                   title: Text(e.key, style: theme.textTheme.bodyLarge),
-                  subtitle: Text(
-                    '₹${formatter.format(price)} x $qty',
-                    style: theme.textTheme.bodyMedium,
-                  ),
+                  subtitle: Text('₹${formatter.format(price)} x $qty', style: theme.textTheme.bodyMedium),
                 );
               }).toList(),
             ),
           ),
 
+          // Summary rows
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
@@ -156,10 +152,13 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
           ),
         ],
       ),
+
+      // Bottom bar
       bottomNavigationBar: SizedBox(
         height: 70,
         child: Row(
           children: [
+            // Payment dropdown
             Expanded(
               child: Container(
                 color: theme.cardColor,
@@ -174,21 +173,18 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                     children: [
                       const Icon(Icons.payment),
                       const SizedBox(width: 8),
-                      Text(
-                        _selectedPayment ?? 'Payment',
-                        style: theme.textTheme.bodyMedium,
-                      ),
+                      Text(_selectedPayment ?? 'Payment', style: theme.textTheme.bodyMedium),
                     ],
                   ),
                 ),
               ),
             ),
+
+            // Pay button
             Container(
               margin: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.deepOrange, Colors.pinkAccent],
-                ),
+                gradient: const LinearGradient(colors: [Colors.deepOrange, Colors.pinkAccent]),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: TextButton(
@@ -239,10 +235,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                     : null,
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
-                  textStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 child: Text('Pay ₹${formatter.format(_total)}'),
