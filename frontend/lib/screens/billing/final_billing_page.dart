@@ -1,6 +1,7 @@
 // lib/screens/billing/final_billing_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/customer.dart';
 import '../../models/transaction_record.dart';
@@ -24,6 +25,8 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
   Customer? _selectedCustomer;
   String? _selectedPayment;
   List<String> _paymentTypes = [];
+
+  final formatter = NumberFormat('#,##0.00', 'en_IN');
 
   @override
   void initState() {
@@ -65,7 +68,6 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Customer picker + add
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -87,7 +89,6 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
             ),
           ),
 
-          // Compact customer card
           if (_selectedCustomer != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -124,7 +125,6 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
               ),
             ),
 
-          // Line items
           Expanded(
             child: ListView(
               children: widget.cartItems.entries.map((e) {
@@ -134,7 +134,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                   tileColor: theme.cardColor,
                   title: Text(e.key, style: theme.textTheme.bodyLarge),
                   subtitle: Text(
-                    '₹${price.toStringAsFixed(0)} x $qty',
+                    '₹${formatter.format(price)} x $qty',
                     style: theme.textTheme.bodyMedium,
                   ),
                 );
@@ -142,7 +142,6 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
             ),
           ),
 
-          // Summary rows
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
@@ -157,18 +156,14 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
           ),
         ],
       ),
-
-      // Bottom bar: payment selector + small “Pay” button
       bottomNavigationBar: SizedBox(
         height: 70,
         child: Row(
           children: [
-            // Payment dropdown
             Expanded(
               child: Container(
                 color: theme.cardColor,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: PopupMenuButton<String>(
                   initialValue: _selectedPayment,
                   onSelected: (v) => setState(() => _selectedPayment = v),
@@ -188,8 +183,6 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                 ),
               ),
             ),
-
-            // Pay button
             Container(
               margin: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -199,36 +192,34 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: TextButton(
-                onPressed: _selectedCustomer != null &&
-                        _selectedPayment != null
+                onPressed: _selectedCustomer != null && _selectedPayment != null
                     ? () async {
                         final cust = _selectedCustomer!;
                         final billId = const Uuid().v4();
                         final now = DateTime.now();
 
-                        // build and save line‐records
                         final lines = widget.cartItems.entries.map((e) {
                           final price = e.value['price'] as double;
                           final qty = e.value['qty'] as int;
                           final taxAmt = price * qty * 0.18;
                           final lineTotal = price * qty + taxAmt;
                           return TransactionRecord(
-                            billId:      billId,
-                            lineId:      const Uuid().v4(),
-                            date:        now,
+                            billId: billId,
+                            lineId: const Uuid().v4(),
+                            date: now,
                             customerName: cust.name,
                             customerPhone: cust.phone,
-                            customerGst:  cust.gst ?? '',
+                            customerGst: cust.gst ?? '',
                             productName: e.key,
-                            category:    '',
-                            quantity:    qty,
-                            unitPrice:   price,
-                            gstSlab:     'GST 18%',
-                            gstRate:     18.0,
-                            taxAmount:   taxAmt,
+                            category: '',
+                            quantity: qty,
+                            unitPrice: price,
+                            gstSlab: 'GST 18%',
+                            gstRate: 18.0,
+                            taxAmount: taxAmt,
                             totalAmount: lineTotal,
                             paymentMode: _selectedPayment!,
-                            branch:      'Main Branch',
+                            branch: 'Main Branch',
                           );
                         }).toList();
 
@@ -238,7 +229,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                           context,
                           MaterialPageRoute(
                             builder: (_) => OrderConfirmationScreen(
-                              customer:    cust,
+                              customer: cust,
                               paymentMode: _selectedPayment!,
                               totalAmount: _total,
                             ),
@@ -252,10 +243,9 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
-                child: Text('Pay ₹${_total.toStringAsFixed(2)}'),
+                child: Text('Pay ₹${formatter.format(_total)}'),
               ),
             ),
           ],
@@ -264,9 +254,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
     );
   }
 
-  Widget _buildRow(
-      ThemeData theme, String label, double amt,
-      {bool isTotal = false}) {
+  Widget _buildRow(ThemeData theme, String label, double amt, {bool isTotal = false}) {
     final style = isTotal
         ? theme.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)
         : theme.textTheme.bodyMedium;
@@ -276,7 +264,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: style),
-          Text('₹${amt.toStringAsFixed(2)}', style: style),
+          Text('₹${formatter.format(amt)}', style: style),
         ],
       ),
     );

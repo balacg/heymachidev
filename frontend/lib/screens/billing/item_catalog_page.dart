@@ -1,6 +1,5 @@
-// lib/screens/billing/item_catalog_page.dart
-
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../services/api.dart';
 import '../../models/product.dart';
 import 'cart_page.dart';
@@ -14,7 +13,9 @@ class ItemCatalogPage extends StatefulWidget {
 
 class _ItemCatalogPageState extends State<ItemCatalogPage> {
   List<Product> _products = [];
+  List<Product> _filteredProducts = [];
   Map<String, Map<String, dynamic>> _cartItems = {};
+  final TextEditingController _searchCtl = TextEditingController();
 
   @override
   void initState() {
@@ -25,10 +26,19 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
   Future<void> _fetchProducts() async {
     try {
       _products = await ApiService.fetchProducts();
+      _filteredProducts = List.from(_products);
       setState(() {});
     } catch (e) {
       debugPrint('Error fetching products: $e');
     }
+  }
+
+  void _onSearch(String query) {
+    setState(() {
+      _filteredProducts = _products
+          .where((p) => p.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   void _add(Product p) {
@@ -57,15 +67,16 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
   int get totalItems =>
       _cartItems.values.fold(0, (sum, v) => sum + (v['qty'] as int));
 
-  int get totalAmount {
-    return _cartItems.entries.fold<int>(
+  String get totalAmount {
+    final amount = _cartItems.entries.fold<double>(
       0,
       (sum, entry) {
         final price = entry.value['price'] as double;
         final qty = entry.value['qty'] as int;
-        return sum + (price * qty).toInt();
+        return sum + (price * qty);
       },
     );
+    return NumberFormat.decimalPattern().format(amount);
   }
 
   void _goToCart() {
@@ -95,15 +106,12 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
           children: [
             // Header
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
               child: Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back,
-                        color: theme.iconTheme.color),
-                    onPressed: () =>
-                        Navigator.pushNamed(context, '/dashboard'),
+                    icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
+                    onPressed: () => Navigator.pushNamed(context, '/dashboard'),
                   ),
                   const SizedBox(width: 8),
                   Text('Item Catalog',
@@ -113,37 +121,53 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
               ),
             ),
 
-            // Products
+            // Search Box
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: TextField(
+                controller: _searchCtl,
+                onChanged: _onSearch,
+                decoration: const InputDecoration(
+                  hintText: 'Search product...',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                ),
+              ),
+            ),
+
+            // Products List
             Expanded(
               child: ListView.builder(
-                itemCount: _products.length,
+                itemCount: _filteredProducts.length,
                 itemBuilder: (_, i) {
-                  final p = _products[i];
-                  final qty =
-                      (_cartItems[p.name]?['qty'] as int?) ?? 0;
+                  final p = _filteredProducts[i];
+                  final qty = (_cartItems[p.name]?['qty'] as int?) ?? 0;
 
                   return ListTile(
                     tileColor: theme.cardColor,
-                    title:
-                        Text(p.name, style: theme.textTheme.bodyLarge),
-                    subtitle: Text('₹${p.price.toStringAsFixed(0)}',
-                        style: theme.textTheme.bodyMedium),
+                    title: Text(p.name, style: theme.textTheme.bodyLarge),
+                    subtitle: Text(
+                      '₹${NumberFormat.decimalPattern().format(p.price)}',
+                      style: theme.textTheme.bodyMedium,
+                    ),
                     trailing: qty > 0
                         ? Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.remove),
-                                color: Colors.black,
+                                color: theme.iconTheme.color,
                                 onPressed: () => _dec(p),
                               ),
                               Text('$qty',
-                                  style: const TextStyle(
-                                      color: Colors.black,
+                                  style: TextStyle(
+                                      color: theme.textTheme.bodyLarge?.color,
                                       fontWeight: FontWeight.bold)),
                               IconButton(
                                 icon: const Icon(Icons.add),
-                                color: Colors.black,
+                                color: theme.iconTheme.color,
                                 onPressed: () => _add(p),
                               ),
                             ],
@@ -155,10 +179,7 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                                   horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [
-                                    Colors.deepOrange,
-                                    Colors.pinkAccent
-                                  ],
+                                  colors: [Colors.deepOrange, Colors.pinkAccent],
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -184,16 +205,14 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                 onTap: _goToCart,
                 child: Container(
                   height: 70,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.deepOrange, Colors.pinkAccent],
                     ),
                   ),
                   child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         '$totalItems item(s) | ₹$totalAmount',
@@ -202,8 +221,7 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Icon(Icons.arrow_forward,
-                          color: Colors.white),
+                      const Icon(Icons.arrow_forward, color: Colors.white),
                     ],
                   ),
                 ),

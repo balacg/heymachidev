@@ -1,6 +1,11 @@
 // lib/screens/billing/cart_page.dart
+// ✅ FIXED:
+// 1. Dark mode support for (- 1 +) counter using theme color.
+// 2. Comma separators for item prices and total amount using intl.
+// 📦 Make sure to include `intl: ^0.18.1` in pubspec.yaml.
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'final_billing_page.dart';
 
 class CartPage extends StatefulWidget {
@@ -40,6 +45,8 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final numberFormat = NumberFormat.decimalPattern('en_IN');
+    final itemColor = theme.colorScheme.onSurface;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -47,8 +54,7 @@ class _CartPageState extends State<CartPage> {
         backgroundColor: theme.scaffoldBackgroundColor,
         foregroundColor: theme.iconTheme.color,
         leading: IconButton(
-          icon:
-              Icon(Icons.arrow_back, color: theme.iconTheme.color),
+          icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
           onPressed: () {
             widget.onCartUpdated(_local);
             Navigator.pop(context);
@@ -60,8 +66,7 @@ class _CartPageState extends State<CartPage> {
           ? Center(
               child: Text(
                 'Your cart is empty',
-                style: theme.textTheme.bodyMedium!
-                    .copyWith(color: theme.hintColor),
+                style: theme.textTheme.bodyMedium!.copyWith(color: theme.hintColor),
               ),
             )
           : Column(
@@ -76,17 +81,17 @@ class _CartPageState extends State<CartPage> {
                       final qty = item['qty'] as int;
                       return ListTile(
                         tileColor: theme.cardColor,
-                        title: Text(key,
-                            style: theme.textTheme.bodyLarge),
+                        title: Text(key, style: theme.textTheme.bodyLarge),
                         subtitle: Text(
-                            '₹${price.toStringAsFixed(0)} x $qty',
-                            style: theme.textTheme.bodyMedium),
+                          '₹${numberFormat.format(price)} x $qty',
+                          style: theme.textTheme.bodyMedium,
+                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
                               icon: const Icon(Icons.remove),
-                              color: Colors.black,
+                              color: itemColor,
                               onPressed: () {
                                 setState(() {
                                   if (qty > 1) {
@@ -98,12 +103,12 @@ class _CartPageState extends State<CartPage> {
                               },
                             ),
                             Text('$qty',
-                                style: const TextStyle(
-                                    color: Colors.black,
+                                style: TextStyle(
+                                    color: itemColor,
                                     fontWeight: FontWeight.bold)),
                             IconButton(
                               icon: const Icon(Icons.add),
-                              color: Colors.black,
+                              color: itemColor,
                               onPressed: () {
                                 setState(() {
                                   _local[key]!['qty'] = qty + 1;
@@ -116,7 +121,6 @@ class _CartPageState extends State<CartPage> {
                     },
                   ),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: GestureDetector(
@@ -125,8 +129,7 @@ class _CartPageState extends State<CartPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              FinalBillingPage(cartItems: _local),
+                          builder: (_) => FinalBillingPage(cartItems: _local),
                         ),
                       );
                     },
@@ -134,15 +137,12 @@ class _CartPageState extends State<CartPage> {
                       height: 50,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                            colors: [
-                              Colors.deepOrange,
-                              Colors.pinkAccent
-                            ]),
+                            colors: [Colors.deepOrange, Colors.pinkAccent]),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Center(
                         child: Text(
-                          'Proceed | ₹$totalAmount',
+                          'Proceed | ₹${numberFormat.format(totalAmount)}',
                           style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,

@@ -1,6 +1,7 @@
 // lib/screens/billing/order_confirmation_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../models/customer.dart';
 
 class OrderConfirmationScreen extends StatelessWidget {
@@ -17,16 +18,19 @@ class OrderConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final formatter = NumberFormat('#,##0.00', 'en_IN');
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Order Confirmed'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: theme.iconTheme.color,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () =>
-              Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (r) => false),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context, '/dashboard', (r) => false),
         ),
       ),
       body: Center(
@@ -36,19 +40,25 @@ class OrderConfirmationScreen extends StatelessWidget {
             const Icon(Icons.check_circle, size: 80, color: Colors.green),
             const SizedBox(height: 16),
             Text(
-              'Thank you, ${customer.name}!',
-              style:
-                  const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              'Order Confirmed!',
+              style: theme.textTheme.headlineSmall!
+                  .copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
+            Text(
+              'Customer: ${customer.name}',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 4),
             Text(
               'Payment: $paymentMode',
-              style: const TextStyle(fontSize: 16, color: Colors.black54),
+              style: theme.textTheme.bodyMedium,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
-              'Total: ₹${totalAmount.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 20, color: Colors.black),
+              'Total: ₹${formatter.format(totalAmount)}',
+              style: theme.textTheme.titleMedium!
+                  .copyWith(fontWeight: FontWeight.bold),
             ),
           ],
         ),
