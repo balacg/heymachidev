@@ -6,12 +6,12 @@ from .base import Base
 
 class Subcategory(Base):
     __tablename__ = "subcategories"
-    __table_args__ = {'extend_existing': True}
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
-    gst_id = Column(Integer, ForeignKey("taxes.id"), nullable=False)
+    name = Column(String, index=True)
+    category_id = Column(Integer, ForeignKey("categories.id"))
+    gst_id = Column(Integer, nullable=True)
 
-    category = relationship("Category")
-    gst = relationship("Tax")
+    # ✅ This line caused the error before — now fixed by defining the other side in Category
+    category = relationship("Category", back_populates="subcategories")
+    products = relationship("Product", back_populates="subcategory")

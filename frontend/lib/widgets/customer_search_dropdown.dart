@@ -5,12 +5,12 @@ import '../models/customer.dart';
 import '../services/api.dart';
 
 class CustomerSearchDropdown extends StatefulWidget {
-  final void Function(Customer) onSelected;
+  final void Function(Customer) onCustomerSelected;
   final Customer? initialCustomer;
 
   const CustomerSearchDropdown({
     Key? key,
-    required this.onSelected,
+    required this.onCustomerSelected,
     this.initialCustomer,
   }) : super(key: key);
 
@@ -104,7 +104,7 @@ class _CustomerSearchDropdownState extends State<CustomerSearchDropdown> {
                   ),
                   isThreeLine: true,
                   onTap: () {
-                    widget.onSelected(c);
+                    widget.onCustomerSelected(c); // ✅ renamed to match FinalBillingPage
                     _controller.text = c.name;
                     setState(() {
                       _filteredCustomers = [];

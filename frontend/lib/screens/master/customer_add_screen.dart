@@ -18,8 +18,19 @@ class _CustomerAddScreenState extends State<CustomerAddScreen> {
   final emailController   = TextEditingController();
   final gstController     = TextEditingController();
   final addressController = TextEditingController();
+  String? selectedState;
 
   bool isSaving = false;
+
+  final List<String> states = [
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+    "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya",
+    "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim",
+    "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand",
+    "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli",
+    "Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+  ];
 
   @override
   void dispose() {
@@ -32,7 +43,12 @@ class _CustomerAddScreenState extends State<CustomerAddScreen> {
   }
 
   Future<void> saveCustomer() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate() || selectedState == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all fields and select state")),
+      );
+      return;
+    }
 
     setState(() => isSaving = true);
 
@@ -43,6 +59,7 @@ class _CustomerAddScreenState extends State<CustomerAddScreen> {
       email:   emailController.text.trim(),
       gst:     gstController.text.trim(),
       address: addressController.text.trim(),
+      state:   selectedState,
     );
 
     try {
@@ -73,7 +90,7 @@ class _CustomerAddScreenState extends State<CustomerAddScreen> {
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
-          child: Column(
+          child: ListView(
             children: [
               _buildField(
                 controller: nameController,
@@ -106,7 +123,24 @@ class _CustomerAddScreenState extends State<CustomerAddScreen> {
                 label: 'Address',
                 validatorMsg: 'Enter address',
               ),
-              const Spacer(),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedState,
+                decoration: const InputDecoration(
+                  labelText: 'State',
+                  border: OutlineInputBorder(),
+                ),
+                items: states.map((s) {
+                  return DropdownMenuItem(
+                    value: s,
+                    child: Text(s),
+                  );
+                }).toList(),
+                onChanged: (val) => setState(() => selectedState = val),
+                validator: (val) =>
+                    (val == null || val.isEmpty) ? 'Select a state' : null,
+              ),
+              const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: isSaving ? null : saveCustomer,
                 icon: const Icon(Icons.save),

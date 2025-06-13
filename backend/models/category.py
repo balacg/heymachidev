@@ -5,10 +5,11 @@ from sqlalchemy.orm import relationship
 from .base import Base
 
 class Category(Base):
-    __tablename__ = "categories"  # Correct table name
+    __tablename__ = "categories"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    gst_id = Column(Integer, ForeignKey("taxes.id"), nullable=False)  # No category_id here for Category
+    name = Column(String, unique=True, index=True)
+    gst_id = Column(Integer, nullable=True)
 
-    gst = relationship("Tax")
+    # ✅ Add this:
+    subcategories = relationship("Subcategory", back_populates="category")

@@ -269,7 +269,7 @@ class ApiService {
   }
 
   static Future<Tax> updateTax(Tax t) async {
-    final uri  = Uri.parse('$baseUrl/taxes/${t.id}');
+    final uri  = Uri.parse('$baseUrl/taxes/${t.id}/');
     final resp = await http.put(uri,
       headers: _jsonHeaders,
       body: jsonEncode(t.toJson()),
@@ -281,7 +281,7 @@ class ApiService {
   }
 
   static Future<void> deleteTax(int id) async {
-    final uri  = Uri.parse('$baseUrl/taxes/$id');
+    final uri  = Uri.parse('$baseUrl/taxes/$id/');
     final resp = await http.delete(uri);
     if (resp.statusCode != 204) {
       throw Exception('deleteTax ${resp.statusCode}: ${resp.body}');
@@ -386,6 +386,13 @@ class ApiService {
     if (resp.statusCode != 200 && resp.statusCode != 201) {
       throw Exception('postTransaction ${resp.statusCode}: ${resp.body}');
     }
+  }
+
+  static Future<List<Map<String, dynamic>>> fetchTransactionItemsForCustomer(String customerName) async {
+    final response = await http.get(Uri.parse('$baseUrl/transactions'));
+    if (response.statusCode != 200) throw Exception("Failed to fetch transactions");
+    final data = jsonDecode(response.body) as List;
+    return data.where((item) => item['customer_name'] == customerName).toList().cast<Map<String, dynamic>>();
   }
 
   static Future<Map<String, dynamic>> fetchBusinessProfile() async {

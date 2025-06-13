@@ -1,3 +1,5 @@
+// lib/screens/master/tax_master_screen.dart
+
 import 'package:flutter/material.dart';
 import '../../services/api.dart';
 import '../../models/tax.dart';
@@ -12,10 +14,10 @@ class TaxMasterScreen extends StatefulWidget {
 }
 
 class _TaxMasterScreenState extends State<TaxMasterScreen> {
-  List<Tax> _taxes    = [];
+  List<Tax> _taxes = [];
   List<Tax> _allTaxes = [];
-  bool     _loading   = true;
-  String?  _error;
+  bool _loading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -24,14 +26,19 @@ class _TaxMasterScreenState extends State<TaxMasterScreen> {
   }
 
   Future<void> _loadTaxes() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       _allTaxes = await ApiService.fetchTaxes();
-      _taxes    = List.of(_allTaxes);
+      _taxes = List.of(_allTaxes);
     } catch (e) {
       _error = e.toString();
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -58,7 +65,7 @@ class _TaxMasterScreenState extends State<TaxMasterScreen> {
   }
 
   void _showForm({Tax? tax}) {
-    final isEdit  = tax != null;
+    final isEdit = tax != null;
     final typeCtl = TextEditingController(text: tax?.type ?? '');
     final rateCtl = TextEditingController(text: tax?.rate.toString() ?? '');
 
@@ -66,16 +73,18 @@ class _TaxMasterScreenState extends State<TaxMasterScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(isEdit ? 'Edit Tax' : 'Add Tax'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: typeCtl, decoration: const InputDecoration(labelText: 'Type')),
-            TextField(
-              controller: rateCtl,
-              decoration: const InputDecoration(labelText: 'Rate (%)'),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: typeCtl, decoration: const InputDecoration(labelText: 'Type')),
+              TextField(
+                controller: rateCtl,
+                decoration: const InputDecoration(labelText: 'Total Rate (%)'),
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
@@ -83,17 +92,20 @@ class _TaxMasterScreenState extends State<TaxMasterScreen> {
             onPressed: () async {
               final type = typeCtl.text.trim();
               final rate = double.tryParse(rateCtl.text.trim()) ?? 0;
+
               if (type.isEmpty || rate <= 0) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Valid type & rate required')),
                 );
                 return;
               }
+
               final model = Tax(
-                id:   tax?.id ?? 0,
+                id: tax?.id ?? 0,
                 type: type,
                 rate: rate,
               );
+
               try {
                 if (isEdit) {
                   await ApiService.updateTax(model);
@@ -101,12 +113,10 @@ class _TaxMasterScreenState extends State<TaxMasterScreen> {
                   await ApiService.createTax(model);
                 }
                 Navigator.of(ctx).pop();
+                await _loadTaxes();
               } catch (e) {
-                ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text('Error: $e')));
-                return;
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
               }
-              await _loadTaxes();
             },
             child: const Text('Save'),
           ),
@@ -120,8 +130,7 @@ class _TaxMasterScreenState extends State<TaxMasterScreen> {
       await ApiService.deleteTax(id);
       await _loadTaxes();
     } catch (e) {
-      ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('Delete failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Delete failed: $e')));
     }
   }
 
@@ -149,7 +158,7 @@ class _TaxMasterScreenState extends State<TaxMasterScreen> {
                       filterable: true,
                     ),
                     TableColumn<Tax>(
-                      title: 'Rate (%)',
+                      title: 'Total Rate',
                       field: 'rate',
                       sortable: true,
                       cellBuilder: (t) => Text('${t.rate.toStringAsFixed(2)}%'),

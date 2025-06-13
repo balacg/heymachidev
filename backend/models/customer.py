@@ -13,5 +13,6 @@ class Customer(Base):
     email = Column(String, nullable=True)
     gst = Column(String, nullable=True)
     address = Column(String, nullable=True)
+    state = Column(String, nullable=True)
 
     bills = relationship("Bill", back_populates="customer")

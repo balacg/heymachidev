@@ -4,7 +4,7 @@ class Subcategory {
   final int id;
   final String name;
   final int categoryId;
-  final int gstId;
+  final int? gstId;
 
   Subcategory({
     required this.id,
@@ -18,7 +18,7 @@ class Subcategory {
       id:         json['id'] as int,
       name:       json['name'] as String,
       categoryId: json['category_id'] as int,
-      gstId:      json['gst_id'] as int,   // read gst_id
+      gstId: json['gst_id'] != null ? json['gst_id'] as int : null,
     );
   }
 

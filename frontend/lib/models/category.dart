@@ -3,7 +3,7 @@
 class Category {
   final int id;
   final String name;
-  final int gstId;
+  final int? gstId;
 
   Category({
     required this.id,
@@ -16,7 +16,7 @@ class Category {
     return Category(
       id: json['id'] as int,
       name: json['name'] as String,
-      gstId: json['gst_id'] as int,   // read gst_id
+      gstId: json['gst_id'] != null ? json['gst_id'] as int : null,
     );
   }
 

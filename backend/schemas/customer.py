@@ -9,7 +9,7 @@ class CustomerBase(BaseModel):
     email: Optional[EmailStr] = None
     gst: Optional[str] = None
     address: Optional[str] = None
-
+    state: Optional[str] = None
 class CustomerCreate(CustomerBase):
     pass
 

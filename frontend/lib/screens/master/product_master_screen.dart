@@ -19,21 +19,27 @@ class ProductMasterScreen extends StatefulWidget {
 class _ProductMasterScreenState extends State<ProductMasterScreen> {
   List<Product> _products = [];
   List<Product> _allProducts = [];
+  List<Category> _categories = [];
+  List<Subcategory> _subcategories = [];
+  List<Tax> _taxes = [];
+
   bool _loading = true;
   String? _error;
 
   @override
   void initState() {
     super.initState();
-    _loadProducts();
+    _loadAllData();
   }
 
-  Future<void> _loadProducts() async {
+  Future<void> _loadAllData() async {
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
+      _categories = await ApiService.fetchCategories();
+      _taxes = await ApiService.fetchTaxes();
       final list = await ApiService.fetchProducts();
       _allProducts = list;
       _products = list;
@@ -49,10 +55,9 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
   void _deleteProduct(int id) async {
     try {
       await ApiService.deleteProduct(id);
-      _loadProducts();
+      _loadAllData();
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Delete failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Delete failed: $e')));
     }
   }
 
@@ -67,9 +72,7 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
           case 'price':
             return asc ? a.price.compareTo(b.price) : b.price.compareTo(a.price);
           case 'categoryName':
-            return asc
-                ? a.categoryName.compareTo(b.categoryName)
-                : b.categoryName.compareTo(a.categoryName);
+            return asc ? a.categoryName.compareTo(b.categoryName) : b.categoryName.compareTo(a.categoryName);
           default:
             return 0;
         }
@@ -84,9 +87,7 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
           case 'name':
             return p.name.toLowerCase().contains(query.toLowerCase());
           case 'categoryName':
-            return p.categoryName
-                .toLowerCase()
-                .contains(query.toLowerCase());
+            return p.categoryName.toLowerCase().contains(query.toLowerCase());
           default:
             return false;
         }
@@ -95,7 +96,101 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
   }
 
   void _showForm({Product? product}) {
-    // ← your existing add/edit dialog code
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController(text: product?.name ?? '');
+    final priceController = TextEditingController(text: product?.price.toString() ?? '');
+    int? selectedCategoryId = product?.categoryId;
+    int? selectedSubcategoryId = product?.subcategoryId;
+    int? selectedGstId = product?.gstId;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(product == null ? 'Add Product' : 'Edit Product'),
+        content: StatefulBuilder(
+          builder: (context, setModalState) => Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                TextFormField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Product Name'),
+                  validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                ),
+                TextFormField(
+                  controller: priceController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Price'),
+                  validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                ),
+                DropdownButtonFormField<int>(
+                  value: selectedCategoryId,
+                  items: _categories.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
+                  onChanged: (val) async {
+                    setModalState(() => selectedCategoryId = val);
+                    final subs = await ApiService.fetchSubcategories(categoryId: val!);
+                    setModalState(() => _subcategories = subs);
+                  },
+                  decoration: const InputDecoration(labelText: 'Category'),
+                  validator: (val) => val == null ? 'Select Category' : null,
+                ),
+                DropdownButtonFormField<int>(
+                  value: selectedSubcategoryId,
+                  items: _subcategories.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name))).toList(),
+                  onChanged: (val) => setModalState(() => selectedSubcategoryId = val),
+                  decoration: const InputDecoration(labelText: 'Subcategory'),
+                ),
+                DropdownButtonFormField<int>(
+                  value: selectedGstId,
+                  items: _taxes.map((t) {
+                    final label = '${t.type} (${t.rate.toStringAsFixed(1)}%)';
+                    return DropdownMenuItem(value: t.id, child: Text(label));
+                  }).toList(),
+                  onChanged: (val) => setModalState(() => selectedGstId = val),
+                  decoration: const InputDecoration(labelText: 'GST'),
+                  validator: (val) => val == null ? 'Select GST' : null,
+                ),
+              ]),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              if (formKey.currentState?.validate() ?? false) {
+                final newProduct = Product(
+                  id: product?.id ?? 0,
+                  name: nameController.text.trim(),
+                  price: double.tryParse(priceController.text) ?? 0,
+                  categoryId: selectedCategoryId,
+                  subcategoryId: selectedSubcategoryId,
+                  gstId: selectedGstId,
+                  categoryName: '', // not needed on post
+                );
+                try {
+                  if (product == null) {
+                    await ApiService.createProduct(newProduct);
+                  } else {
+                    await ApiService.updateProduct(newProduct);
+                  }
+                  Navigator.pop(context);
+                  _loadAllData();
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+                }
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getGstLabel(int? gstId) {
+    final tax = _taxes.firstWhere((t) => t.id == gstId, orElse: () => Tax(id: 0, type: '', rate: 0));
+    return tax.id == 0 ? '' : '${tax.type} (${tax.rate.toStringAsFixed(1)}%)';
   }
 
   @override
@@ -131,8 +226,7 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
                       title: 'Price',
                       field: 'price',
                       sortable: true,
-                      cellBuilder: (p) =>
-                          Text('₹${p.price.toStringAsFixed(2)}'),
+                      cellBuilder: (p) => Text('₹${p.price.toStringAsFixed(2)}'),
                     ),
                     TableColumn<Product>(
                       title: 'Category',
@@ -140,6 +234,11 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
                       sortable: true,
                       filterable: true,
                       cellBuilder: (p) => Text(p.categoryName),
+                    ),
+                    TableColumn<Product>(
+                      title: 'GST',
+                      field: 'gst',
+                      cellBuilder: (p) => Text(_getGstLabel(p.gstId)),
                     ),
                     TableColumn<Product>(
                       title: 'Actions',

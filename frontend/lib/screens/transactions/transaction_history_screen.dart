@@ -1,6 +1,8 @@
+// lib/screens/transactions/transaction_history_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart'; // Optional: For sharing files
+import 'package:share_plus/share_plus.dart';
 import '../../widgets/table_column.dart';
 
 import '../../models/transaction_record.dart';
@@ -27,6 +29,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   List<TransactionRecord> _all = [];
   List<TransactionRecord> _filtered = [];
+  bool _loading = true;
 
   @override
   void initState() {
@@ -35,10 +38,12 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   }
 
   Future<void> _loadRecords() async {
+    setState(() => _loading = true);
     final data = await TransactionService.getAll();
     setState(() {
       _all = data;
       _filtered = data;
+      _loading = false;
     });
   }
 
@@ -69,7 +74,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
     for (var r in _filtered) {
       buffer.writeln([
-        r.date.toIso8601String(),
+        dateFormat.format(r.date),
         r.billId,
         r.lineId,
         r.customerName,
@@ -187,23 +192,25 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         title: const Text('Transaction History'),
         leading: const BackButton(),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Expanded(
-              child: GenericDataTable<Map<String, String>>(
-                columns: columns,
-                rows: rows,
-                onExportCsv: _exportCsv,
-                onExportPdf: _exportPdf,
-                onSearch: _filter,
-                searchHint: 'Search by customer, product, etc.',
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: GenericDataTable<Map<String, String>>(
+                      columns: columns,
+                      rows: rows,
+                      onExportCsv: _exportCsv,
+                      onExportPdf: _exportPdf,
+                      onSearch: _filter,
+                      searchHint: 'Search by customer, product, etc.',
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

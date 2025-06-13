@@ -66,88 +66,101 @@ class _SubcategoryMasterScreenState extends State<SubcategoryMasterScreen> {
     });
   }
 
-  void _showForm({Subcategory? subcategory}) {
-    final isEdit = subcategory != null;
-    final nameCtrl = TextEditingController(text: subcategory?.name ?? '');
-    Category? selectedCat = isEdit
-        ? _categories.firstWhere((c) => c.id == subcategory!.categoryId)
-        : null;
-    Tax? selectedTax = isEdit
-        ? _taxes.firstWhere((t) => t.id == subcategory!.gstId)
-        : null;
+    void _showForm({Subcategory? subcategory}) {
+      final isEdit = subcategory != null;
+      final nameCtrl = TextEditingController(text: subcategory?.name ?? '');
 
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(isEdit ? 'Edit Subcategory' : 'Add Subcategory'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl,
-              decoration: const InputDecoration(labelText: 'Name'),
+      Category? selectedCat = isEdit
+          ? _categories.cast<Category?>().firstWhere(
+              (c) => c?.id == subcategory!.categoryId,
+              orElse: () => null,
+            )
+          : null;
+
+      Tax? selectedTax = isEdit
+          ? _taxes.cast<Tax?>().firstWhere(
+              (t) => t?.id == subcategory!.gstId,
+              orElse: () => null,
+            )
+          : null;
+
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(isEdit ? 'Edit Subcategory' : 'Add Subcategory'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<Category>(
+                decoration: const InputDecoration(labelText: 'Category'),
+                value: selectedCat,
+                items: _categories
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
+                    .toList(),
+                onChanged: (c) => selectedCat = c,
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<Tax>(
+                decoration: const InputDecoration(labelText: 'GST Slab'),
+                value: selectedTax,
+                items: _taxes
+                    .map((t) => DropdownMenuItem(
+                          value: t,
+                          child: Text('${t.rate.toStringAsFixed(2)}%'),
+                        ))
+                    .toList(),
+                onChanged: (t) => selectedTax = t,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
             ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<Category>(
-              decoration: const InputDecoration(labelText: 'Category'),
-              value: selectedCat,
-              items: _categories
-                  .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
-                  .toList(),
-              onChanged: (c) => selectedCat = c,
-            ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<Tax>(
-              decoration: const InputDecoration(labelText: 'GST Slab'),
-              value: selectedTax,
-              items: _taxes
-                  .map((t) => DropdownMenuItem(
-                        value: t,
-                        child: Text('${t.rate.toStringAsFixed(2)}%'),
-                      ))
-                  .toList(),
-              onChanged: (t) => selectedTax = t,
+            ElevatedButton(
+              onPressed: () async {
+                if (nameCtrl.text.trim().isEmpty ||
+                    selectedCat == null ||
+                    selectedTax == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please fill all fields')),
+                  );
+                  return;
+                }
+                final model = Subcategory(
+                  id: subcategory?.id ?? 0,
+                  name: nameCtrl.text.trim(),
+                  categoryId: selectedCat!.id, // non-null assertion
+                  gstId: selectedTax!.id,      // non-null assertion
+                );
+
+                try {
+                  if (isEdit) {
+                    await ApiService.updateSubcategory(model);
+                  } else {
+                    await ApiService.createSubcategory(model);
+                  }
+                  Navigator.of(ctx).pop();
+                  _loadDeps();
+                } catch (e) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Error: $e')));
+                }
+              },
+              child: const Text('Save'),
             ),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () async {
-              if (nameCtrl.text.trim().isEmpty ||
-                  selectedCat == null ||
-                  selectedTax == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please fill all fields')),
-                );
-                return;
-              }
-              final model = Subcategory(
-                id: subcategory?.id ?? 0,
-                name: nameCtrl.text.trim(),
-                categoryId: selectedCat!.id,
-                gstId: selectedTax!.id,
-              );
-              try {
-                if (isEdit) {
-                  await ApiService.updateSubcategory(model);
-                } else {
-                  await ApiService.createSubcategory(model);
-                }
-                Navigator.of(ctx).pop();
-                
-              } catch (e) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Error: $e')));
-              }
-              _loadDeps();
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
+      );
+    }
+
+
 
   void _deleteSubcategory(int id) async {
     try {
@@ -181,12 +194,16 @@ class _SubcategoryMasterScreenState extends State<SubcategoryMasterScreen> {
                       field: 'name',
                       sortable: true,
                       filterable: true,
+                      cellBuilder: (s) => Text(s.name),
                     ),
                     TableColumn<Subcategory>(
                       title: 'Category',
                       field: 'categoryId',
                       cellBuilder: (s) {
-                        final c = _categories.firstWhere((c) => c.id == s.categoryId);
+                        final c = _categories.firstWhere(
+                          (c) => c.id == s.categoryId,
+                          orElse: () => Category(id: 0, name: 'Unknown', gstId: null),
+                        );
                         return Text(c.name);
                       },
                       sortable: false,
@@ -195,7 +212,10 @@ class _SubcategoryMasterScreenState extends State<SubcategoryMasterScreen> {
                       title: 'GST %',
                       field: 'gstId',
                       cellBuilder: (s) {
-                        final t = _taxes.firstWhere((t) => t.id == s.gstId);
+                        final t = _taxes.firstWhere(
+                          (t) => t.id == s.gstId,
+                          orElse: () => Tax(id: 0, rate: 0.0, type: 'Unknown'),
+                        );
                         return Text('${t.rate.toStringAsFixed(2)}%');
                       },
                       sortable: false,
