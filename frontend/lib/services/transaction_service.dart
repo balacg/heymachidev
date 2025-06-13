@@ -1,19 +1,26 @@
 // lib/services/transaction_service.dart
 
-import 'package:uuid/uuid.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../models/transaction_record.dart';
 
 class TransactionService {
-  static final _uuid = Uuid();
-  static final List<TransactionRecord> _records = [];
+  static const _baseUrl = 'http://localhost:8000';  // or use ApiService.baseUrl if centralized
 
-  /// Save one or more line‐level records
-  static Future<void> saveAll(List<TransactionRecord> lines) async {
-    _records.addAll(lines);
+  static Future<List<TransactionRecord>> getAll() async {
+    final uri = Uri.parse('$_baseUrl/transactions/');
+    final resp = await http.get(uri);
+
+    if (resp.statusCode == 200) {
+      final List data = jsonDecode(resp.body);
+      return data.map((e) => TransactionRecord.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to load transactions: ${resp.statusCode}');
+    }
   }
 
-  /// Fetch every transaction line
-  static Future<List<TransactionRecord>> getAll() async {
-    return List.from(_records);
+  static Future<void> saveAll(List<TransactionRecord> lines) async {
+    // You already handle posting individually in final_billing_page.dart
+    // so nothing is needed here for now
   }
 }

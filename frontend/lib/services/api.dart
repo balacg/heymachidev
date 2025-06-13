@@ -375,4 +375,27 @@ class ApiService {
       throw Exception('deleteUnit ${resp.statusCode}: ${resp.body}');
     }
   }
+
+  // ─── TRANSACTIONS (/transactions/) ────────────────────────────────────────────────────────
+  static Future<void> postTransaction(Map<String, dynamic> data) async {
+    final uri = Uri.parse('$baseUrl/transactions/');
+    final resp = await http.post(uri,
+      headers: _jsonHeaders,
+      body: jsonEncode(data),
+    );
+    if (resp.statusCode != 200 && resp.statusCode != 201) {
+      throw Exception('postTransaction ${resp.statusCode}: ${resp.body}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchBusinessProfile() async {
+    final uri = Uri.parse('$baseUrl/business-profile/');
+    final resp = await http.get(uri);
+    if (resp.statusCode == 200) {
+      return jsonDecode(resp.body);
+    }
+    throw Exception('fetchBusinessProfile ${resp.statusCode}: ${resp.body}');
+  }
+
 }
+
