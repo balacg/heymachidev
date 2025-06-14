@@ -35,7 +35,7 @@ class OrderConfirmationScreen extends StatelessWidget {
 
   Future<Uint8List> _generatePdfBytes() async {
     final business = await ApiService.fetchBusinessProfile();
-    final pdfDoc = buildThermalPDF(
+    final pdfDoc = await buildThermalPDF(
       orderId: orderId,
       customer: customer.toJson(),
       items: items,
@@ -43,13 +43,13 @@ class OrderConfirmationScreen extends StatelessWidget {
       paymentMode: paymentMode,
       business: business,
     );
-    return pdfDoc.save();
+    return await pdfDoc.save();
   }
 
   Future<void> _handleExport(BuildContext context) async {
     try {
       final business = await ApiService.fetchBusinessProfile();
-      final pdfDoc = buildThermalPDF(
+      final pdfDoc = await buildThermalPDF(
         orderId: orderId,
         customer: customer.toJson(),
         items: items,
