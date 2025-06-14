@@ -3,6 +3,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import List
+from typing import Optional
 
 class TransactionRecord(BaseModel):
     bill_id:         str
@@ -22,7 +23,9 @@ class TransactionRecord(BaseModel):
     total_amount:    float
     payment_mode:    str
     branch:          str
-
+    promo_title: Optional[str] = None
+    promo_discount_percentage: Optional[float] = None
+    promo_discount_value: Optional[float] = None
     class Config:
         orm_mode = True
 
@@ -36,6 +39,9 @@ class BillSchema(BaseModel):
     payment_mode:    str
     total_amount:    float
     branch:          str
+    promo_title: Optional[str] = None
+    promo_discount_percentage: Optional[float] = None
+    promo_discount_value: Optional[float] = None
 
     class Config:
         orm_mode = True

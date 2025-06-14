@@ -1,4 +1,3 @@
-
 // lib/screens/billing/order_confirmation_screen.dart
 
 import 'dart:typed_data';
@@ -21,6 +20,10 @@ class OrderConfirmationScreen extends StatelessWidget {
   final double sgst;
   final double igst;
 
+  final String? promoTitle;
+  final double? promoPercentage;
+  final double? promoDiscount;
+
   const OrderConfirmationScreen({
     Key? key,
     required this.customer,
@@ -31,6 +34,9 @@ class OrderConfirmationScreen extends StatelessWidget {
     required this.cgst,
     required this.sgst,
     required this.igst,
+    this.promoTitle,
+    this.promoPercentage,
+    this.promoDiscount,
   }) : super(key: key);
 
   Future<Uint8List> _generatePdfBytes() async {
@@ -42,6 +48,9 @@ class OrderConfirmationScreen extends StatelessWidget {
       totalAmount: totalAmount,
       paymentMode: paymentMode,
       business: business,
+      promoTitle: promoTitle,
+      promoDiscountPercentage: promoPercentage,
+      promoDiscountValue: promoDiscount,
     );
     return await pdfDoc.save();
   }
@@ -56,6 +65,9 @@ class OrderConfirmationScreen extends StatelessWidget {
         totalAmount: totalAmount,
         paymentMode: paymentMode,
         business: business,
+        promoTitle: promoTitle,
+        promoDiscountPercentage: promoPercentage,
+        promoDiscountValue: promoDiscount,
       );
 
       final pdfBytes = await pdfDoc.save();
@@ -83,7 +95,7 @@ class OrderConfirmationScreen extends StatelessWidget {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Export failed: \$e")),
+        SnackBar(content: Text("Export failed: $e")),
       );
     }
   }
@@ -96,17 +108,17 @@ class OrderConfirmationScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (r) => false),
-      ),
-      title: Row(
-        children: const [
-          Icon(Icons.check_circle, color: Colors.green),
-          SizedBox(width: 8),
-          Text('Order Confirmed'),
-        ],
-      ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (r) => false),
+        ),
+        title: Row(
+          children: const [
+            Icon(Icons.check_circle, color: Colors.green),
+            SizedBox(width: 8),
+            Text('Order Confirmed'),
+          ],
+        ),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) async {
@@ -117,7 +129,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                 final pdfBytes = await _generatePdfBytes();
                 final file = await EmailService.savePDFToFile(pdfBytes, 'order_$orderId.pdf');
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Saved to: \${file.path}")),
+                  SnackBar(content: Text("Saved to: ${file.path}")),
                 );
               } else if (value == 'email') {
                 await _handleExport(context);
@@ -160,16 +172,40 @@ class OrderConfirmationScreen extends StatelessWidget {
             }).toList(),
             const Divider(),
             if (igst > 0) ...[
-              Text('Total IGST: ₹${formatter.format(igst)}'),
+              _buildAlignedRow('Total IGST', igst, theme),
             ] else ...[
-              Text('Total CGST: ₹${formatter.format(cgst)}'),
-              Text('Total SGST: ₹${formatter.format(sgst)}'),
+              _buildAlignedRow('Total CGST', cgst, theme),
+              _buildAlignedRow('Total SGST', sgst, theme),
             ],
             const Divider(),
-            Text('Grand Total: ₹${formatter.format(totalAmount)}',
-                style: theme.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold)),
+            if ((promoTitle ?? '').isNotEmpty && (promoDiscount ?? 0) > 0)
+              _buildAlignedRow('Promo "$promoTitle" Discount', -promoDiscount!, theme),
+            _buildAlignedRow(
+              'Grand Total',
+              totalAmount,
+              theme,
+              isBold: true,
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAlignedRow(String label, double value, ThemeData theme, {bool isBold = false}) {
+    final textStyle = isBold
+        ? theme.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold)
+        : theme.textTheme.bodyMedium!;
+    final formatter = NumberFormat('#,##0.00', 'en_IN');
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: textStyle),
+          Text('₹${formatter.format(value)}', style: textStyle),
+        ],
       ),
     );
   }

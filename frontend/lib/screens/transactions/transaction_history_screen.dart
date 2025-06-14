@@ -165,8 +165,12 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       TableColumn<Map<String, String>>(title: 'Tax Amt', field: 'tax_amount'),
       TableColumn<Map<String, String>>(title: 'Total', field: 'total_amount'),
       TableColumn<Map<String, String>>(title: 'Payment', field: 'payment_mode'),
+      TableColumn<Map<String, String>>(title: 'Promo Title', field: 'promo_title'),
+      TableColumn<Map<String, String>>(title: 'Promo %', field: 'promo_discount_percentage'),
+      TableColumn<Map<String, String>>(title: 'Discount ₹', field: 'promo_discount_value'),
       TableColumn<Map<String, String>>(title: 'Branch', field: 'branch'),
     ];
+
 
     final rows = _filtered.map((r) => {
       'date': r.date.toIso8601String(),
@@ -184,8 +188,12 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       'tax_amount': '₹${currencyFormat.format(r.taxAmount)}',
       'total_amount': '₹${currencyFormat.format(r.totalAmount)}',
       'payment_mode': r.paymentMode,
+      'promo_title': r.promoTitle ?? '-',
+      'promo_discount_percentage': r.promoDiscountPercentage?.toString() ?? '-',
+      'promo_discount_value': r.promoDiscountValue != null ? '₹${currencyFormat.format(r.promoDiscountValue!)}' : '-',
       'branch': r.branch,
     }).toList();
+
 
     return Scaffold(
       appBar: AppBar(

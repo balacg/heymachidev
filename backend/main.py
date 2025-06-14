@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from database import get_db, engine
 from models import Base
 from models.user import User
-from routers import users, roles, category, subcategory, product, tax, customer, vendor, unit, billing, payment_type, transaction, email, business_profile
+from routers import users, roles, category, subcategory, product, tax, customer, vendor, unit, billing, payment_type, transaction, email, business_profile, promotion
 from routers.auth import router as auth_router, get_current_user
 from schemas.user import UserCreate, UserOut
 from schemas.auth import Token
@@ -76,3 +76,4 @@ app.include_router(payment_type)   # /payment_types
 app.include_router(transaction)   # /transactions
 app.include_router(email)   # /email
 app.include_router(business_profile)
+app.include_router(promotion)

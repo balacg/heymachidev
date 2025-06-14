@@ -1,4 +1,3 @@
-
 // lib/modules/restaurant/templates/pdf/thermal_bill_template.dart
 
 import 'package:flutter/services.dart' show rootBundle;
@@ -12,9 +11,11 @@ Future<pw.Document> buildThermalPDF({
   required double totalAmount,
   required String paymentMode,
   required Map<String, dynamic> business,
+  String? promoTitle,
+  double? promoDiscountPercentage,
+  double? promoDiscountValue,
 }) async {
   final pdf = pw.Document();
-
   final notoFont = pw.Font.ttf(await rootBundle.load('assets/fonts/NotoSans-Regular.ttf'));
 
   pdf.addPage(
@@ -38,16 +39,21 @@ Future<pw.Document> buildThermalPDF({
 
             pw.Text("Order ID: $orderId", style: pw.TextStyle(font: notoFont, fontSize: 10)),
             pw.Text("Payment Mode: $paymentMode", style: pw.TextStyle(font: notoFont, fontSize: 10)),
-
             pw.SizedBox(height: 10),
-            pw.Text("Items:", style: pw.TextStyle(font: notoFont, decoration: pw.TextDecoration.underline)),
 
+            pw.Text("Items:", style: pw.TextStyle(font: notoFont, decoration: pw.TextDecoration.underline)),
             ...items.map((item) => pw.Text(
               "${item['productName'] ?? 'Item'} x${item['quantity'] ?? 0}  ₹${(item['unitPrice'] ?? 0).toStringAsFixed(2)}",
               style: pw.TextStyle(font: notoFont, fontSize: 10),
             )),
 
             pw.Divider(),
+
+            if (promoTitle != null && promoDiscountPercentage != null && promoDiscountValue != null) ...[
+              pw.Text("Promo Applied: $promoTitle", style: pw.TextStyle(font: notoFont, fontSize: 10)),
+              pw.Text("Discount (${promoDiscountPercentage.toStringAsFixed(0)}%): - ₹${promoDiscountValue.toStringAsFixed(2)}",
+                  style: pw.TextStyle(font: notoFont, fontSize: 10)),
+            ],
 
             pw.Text("Total Amount: ₹${totalAmount.toStringAsFixed(2)}",
                 style: pw.TextStyle(font: notoFont, fontSize: 12, fontWeight: pw.FontWeight.bold)),

@@ -1,4 +1,3 @@
-
 // lib/screens/billing/final_billing_page.dart
 
 import 'package:flutter/material.dart';
@@ -11,6 +10,8 @@ import '../../services/payment_type_service.dart';
 import '../../widgets/customer_search_dropdown.dart';
 import '../master/customer_add_screen.dart';
 import 'order_confirmation_screen.dart';
+import '../../models/promotion.dart';
+import '../../services/promotion_service.dart';
 
 class FinalBillingPage extends StatefulWidget {
   final Map<String, dynamic> cartItems;
@@ -26,6 +27,8 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
   List<String> _paymentTypes = [];
   String businessState = 'Tamil Nadu';
   final formatter = NumberFormat('#,##0.00', 'en_IN');
+
+  Promotion? _selectedPromo;
 
   @override
   void initState() {
@@ -49,16 +52,21 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
         },
       );
 
-  double get _discount => 0;
+  double get _discount {
+    if (_selectedPromo != null) {
+      return _subtotal * (_selectedPromo!.discountPercentage / 100);
+    }
+    return 0;
+  }
 
   bool get isInterstate {
     if (_selectedCustomer?.state == null) return false;
     return _selectedCustomer!.state!.toLowerCase().trim() != businessState.toLowerCase().trim();
   }
 
-  double get _igst => isInterstate ? _subtotal * 0.18 : 0;
-  double get _cgst => isInterstate ? 0 : _subtotal * 0.09;
-  double get _sgst => isInterstate ? 0 : _subtotal * 0.09;
+  double get _igst => isInterstate ? (_subtotal - _discount) * 0.18 : 0;
+  double get _cgst => isInterstate ? 0 : (_subtotal - _discount) * 0.09;
+  double get _sgst => isInterstate ? 0 : (_subtotal - _discount) * 0.09;
   double get _totalGst => _cgst + _sgst + _igst;
   double get _total => _subtotal + _totalGst - _discount;
 
@@ -109,7 +117,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                     ],
                   ),
                 ),
-                if (_selectedCustomer != null)
+                if (_selectedCustomer != null) ...[
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     child: Card(
@@ -127,6 +135,52 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                       ),
                     ),
                   ),
+                ],
+              ],
+            ),
+          ),
+                    Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_selectedPromo != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.verified, size: 20, color: Colors.green),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Promo: ${_selectedPromo!.title} (${_selectedPromo!.discountPercentage}%)',
+                          style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: _applyPromotion,
+                      child: Row(
+                        children: const [
+                          Text("View All Promotions", style: TextStyle(fontSize: 16)),
+                          SizedBox(width: 4),
+                          Icon(Icons.chevron_right),
+                        ],
+                      ),
+                    ),
+                    if (_selectedPromo != null)
+                      TextButton.icon(
+                        onPressed: () {
+                          setState(() => _selectedPromo = null);
+                        },
+                        icon: const Icon(Icons.cancel, size: 18, color: Colors.red),
+                        label: const Text("Remove", style: TextStyle(color: Colors.red)),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -154,7 +208,12 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                 if (_sgst > 0) _buildRow(theme, 'SGST (9%)', _sgst),
                 if (_igst > 0) _buildRow(theme, 'IGST (18%)', _igst),
                 _buildRow(theme, 'Total GST', _totalGst),
-                _buildRow(theme, 'Discount', _discount),
+                if (_discount > 0)
+                  _buildRow(
+                    theme,
+                    'Promo: ${_selectedPromo!.title} (${_selectedPromo!.discountPercentage}%)',
+                    -_discount,
+                  ),
                 const Divider(),
                 _buildRow(theme, 'Total', _total, isTotal: true),
               ],
@@ -198,7 +257,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                         final lines = widget.cartItems.entries.map((e) {
                           final price = e.value['price'] as double;
                           final qty = e.value['qty'] as int;
-                          final taxAmt = isInterstate ? price * qty * 0.18 : price * qty * 0.18;
+                          final taxAmt = isInterstate ? (price * qty - (price * qty * (_selectedPromo?.discountPercentage ?? 0) / 100)) * 0.18 : (price * qty - (price * qty * (_selectedPromo?.discountPercentage ?? 0) / 100)) * 0.18;
                           final cgst = isInterstate ? 0 : taxAmt / 2;
                           final sgst = isInterstate ? 0 : taxAmt / 2;
                           final igst = isInterstate ? taxAmt : 0;
@@ -250,6 +309,9 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                           "total_amount": _total,
                           "payment_mode": _selectedPayment!,
                           "branch": "Main Branch",
+                          "promo_title": _selectedPromo?.title,
+                          "promo_discount_percentage": _selectedPromo?.discountPercentage,
+                          "promo_discount_value": _discount,
                         };
 
                         await ApiService.postTransaction({
@@ -269,6 +331,9 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
                               sgst: _sgst,
                               igst: _igst,
                               items: displayItems,
+                              promoTitle: _selectedPromo?.title,
+                              promoPercentage: _selectedPromo?.discountPercentage,
+                              promoDiscount: _discount,
                             ),
                           ),
                         );
@@ -301,5 +366,44 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _applyPromotion() async {
+    final promos = await PromotionService.fetchPromotions();
+    final now = DateTime.now();
+    final activePromos = promos.where((p) {
+      final from = DateTime.parse(p.startDate.toString());
+      final to = DateTime.parse(p.endDate.toString());
+      return now.isAfter(from) && now.isBefore(to);
+    }).toList();
+
+    if (activePromos.isEmpty) return;
+
+    final selected = await showDialog<Promotion>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Select Promotion"),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: activePromos.length,
+            itemBuilder: (_, i) {
+              final promo = activePromos[i];
+              return ListTile(
+                title: Text(promo.title),
+                subtitle: Text(promo.description),
+                trailing: Text('${promo.discountPercentage}%'),
+                onTap: () => Navigator.pop(ctx, promo),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    if (selected != null) {
+      setState(() => _selectedPromo = selected);
+    }
   }
 }

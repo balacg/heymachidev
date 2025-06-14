@@ -18,6 +18,9 @@ class Bill(Base):
     payment_mode   = Column(String, nullable=False)
     total_amount   = Column(Float, nullable=False)
     branch         = Column(String, nullable=False)
+    promo_title     = Column(String, nullable=True)
+    promo_discount_percentage = Column(Float, nullable=True)
+    promo_discount_value = Column(Float, nullable=True)
 
     items    = relationship("BillItem", back_populates="bill", cascade="all, delete-orphan")
     customer = relationship("Customer", back_populates="bills")  # ✅ Added relationship

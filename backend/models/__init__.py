@@ -16,5 +16,5 @@ from .transaction import Transaction
 #from .email import Email
 from .business_profile import BusinessProfile
 from .association_tables import user_roles
-
+from .promotion import Promotion
 

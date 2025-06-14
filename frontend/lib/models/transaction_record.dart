@@ -21,6 +21,9 @@ class TransactionRecord {
   final double totalAmount;
   final String paymentMode;
   final String branch;
+  final String? promoTitle;
+  final double? promoDiscountPercentage;
+  final double? promoDiscountValue;
 
   TransactionRecord({
     required this.billId,
@@ -43,6 +46,9 @@ class TransactionRecord {
     required this.totalAmount,
     required this.paymentMode,
     required this.branch,
+    this.promoTitle,
+    this.promoDiscountPercentage,
+    this.promoDiscountValue,
   });
 
   factory TransactionRecord.fromJson(Map<String, dynamic> json) {
@@ -67,6 +73,9 @@ class TransactionRecord {
       totalAmount: (json['total_amount'] as num?)?.toDouble() ?? 0.0,
       paymentMode: json['payment_mode'] ?? '',
       branch: json['branch'] ?? '',
+      promoTitle: json['promo_title'],
+      promoDiscountPercentage: (json['promo_discount_percentage'] as num?)?.toDouble(),
+      promoDiscountValue: (json['promo_discount_value'] as num?)?.toDouble(),
     );
   }
 
