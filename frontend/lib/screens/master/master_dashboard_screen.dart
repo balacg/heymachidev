@@ -11,6 +11,8 @@ import 'unit_master_screen.dart';
 import 'tax_master_screen.dart';
 import 'payment_type_master_screen.dart';
 import 'product_field_config_screen.dart';
+import 'promotion_master_screen.dart';
+
 
 class MasterDashboardScreen extends StatelessWidget {
   const MasterDashboardScreen({Key? key}) : super(key: key);
@@ -29,6 +31,7 @@ class MasterDashboardScreen extends StatelessWidget {
           _MasterTile('Units', Icons.straighten, UnitMasterScreen()),
           _MasterTile('Taxes', Icons.percent, TaxMasterScreen()),
           _MasterTile('Payment Types', Icons.payment, PaymentTypeMasterScreen()),
+          _MasterTile('Promotions', Icons.local_offer, PromotionMasterScreen()),
           _MasterTile('Product Field Config', Icons.settings, ProductFieldConfigScreen()),
         ],
       ),

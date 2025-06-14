@@ -7,6 +7,7 @@ class Customer {
   final String?  email;    // ← nullable
   final String?  gst;      // ← nullable
   final String?  address;  // ← nullable
+  final String? state;
 
   Customer({
     required this.id,
@@ -15,6 +16,7 @@ class Customer {
     this.email,             // optional
     this.gst,               // optional
     this.address,           // optional
+    this.state
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) => Customer(
@@ -24,6 +26,7 @@ class Customer {
         email:   json['email'] as String?,       // may be null
         gst:     json['gst'] as String?,  // matches backend field
         address: json['address'] as String?,     // may be null
+        state:   json['state'] as String?,
       );
 
   Map<String, dynamic> toJson() => {
@@ -32,5 +35,6 @@ class Customer {
         'email':      email,
         'gst':        gst,
         'address':    address,
+        'state':      state,
       };
 }

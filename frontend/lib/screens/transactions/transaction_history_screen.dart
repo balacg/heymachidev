@@ -1,6 +1,8 @@
+// lib/screens/transactions/transaction_history_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart'; // Optional: For sharing files
+import 'package:share_plus/share_plus.dart';
 import '../../widgets/table_column.dart';
 
 import '../../models/transaction_record.dart';
@@ -27,6 +29,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   List<TransactionRecord> _all = [];
   List<TransactionRecord> _filtered = [];
+  bool _loading = true;
 
   @override
   void initState() {
@@ -35,10 +38,12 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   }
 
   Future<void> _loadRecords() async {
+    setState(() => _loading = true);
     final data = await TransactionService.getAll();
     setState(() {
       _all = data;
       _filtered = data;
+      _loading = false;
     });
   }
 
@@ -69,7 +74,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
     for (var r in _filtered) {
       buffer.writeln([
-        r.date.toIso8601String(),
+        dateFormat.format(r.date),
         r.billId,
         r.lineId,
         r.customerName,
@@ -160,8 +165,12 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       TableColumn<Map<String, String>>(title: 'Tax Amt', field: 'tax_amount'),
       TableColumn<Map<String, String>>(title: 'Total', field: 'total_amount'),
       TableColumn<Map<String, String>>(title: 'Payment', field: 'payment_mode'),
+      TableColumn<Map<String, String>>(title: 'Promo Title', field: 'promo_title'),
+      TableColumn<Map<String, String>>(title: 'Promo %', field: 'promo_discount_percentage'),
+      TableColumn<Map<String, String>>(title: 'Discount ₹', field: 'promo_discount_value'),
       TableColumn<Map<String, String>>(title: 'Branch', field: 'branch'),
     ];
+
 
     final rows = _filtered.map((r) => {
       'date': r.date.toIso8601String(),
@@ -179,31 +188,37 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       'tax_amount': '₹${currencyFormat.format(r.taxAmount)}',
       'total_amount': '₹${currencyFormat.format(r.totalAmount)}',
       'payment_mode': r.paymentMode,
+      'promo_title': r.promoTitle ?? '-',
+      'promo_discount_percentage': r.promoDiscountPercentage?.toString() ?? '-',
+      'promo_discount_value': r.promoDiscountValue != null ? '₹${currencyFormat.format(r.promoDiscountValue!)}' : '-',
       'branch': r.branch,
     }).toList();
+
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Transaction History'),
         leading: const BackButton(),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Expanded(
-              child: GenericDataTable<Map<String, String>>(
-                columns: columns,
-                rows: rows,
-                onExportCsv: _exportCsv,
-                onExportPdf: _exportPdf,
-                onSearch: _filter,
-                searchHint: 'Search by customer, product, etc.',
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: GenericDataTable<Map<String, String>>(
+                      columns: columns,
+                      rows: rows,
+                      onExportCsv: _exportCsv,
+                      onExportPdf: _exportPdf,
+                      onSearch: _filter,
+                      searchHint: 'Search by customer, product, etc.',
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

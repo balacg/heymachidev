@@ -26,7 +26,7 @@ class Product {
         categoryName:  json['category_name'] as String,
         categoryId:    json['category_id'] as int?,
         subcategoryId: json['subcategory_id'] as int?,
-        gstId:         json['gst_id'] as int?,   // map gst_id
+        gstId: json['gst_id'] != null ? json['gst_id'] as int : null,
       );
 
   Map<String, dynamic> toJson() => {

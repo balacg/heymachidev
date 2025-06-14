@@ -24,6 +24,9 @@ class BillCreate(BaseModel):
     customer_phone: Optional[str]
     payment_mode: str
     items: List[BillItemCreate]
+    promo_title: Optional[str] = None
+    promo_discount_percentage: Optional[float] = None
+    promo_discount_value: Optional[float] = None
 
 class BillOut(BaseModel):
     id: int

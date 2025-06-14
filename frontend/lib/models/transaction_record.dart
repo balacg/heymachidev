@@ -1,3 +1,5 @@
+// lib/models/transaction_record.dart
+
 class TransactionRecord {
   final String billId;
   final String lineId;
@@ -13,9 +15,15 @@ class TransactionRecord {
   final String gstSlab;
   final double gstRate;
   final double taxAmount;
+  final double cgst;
+  final double sgst;
+  final double igst;
   final double totalAmount;
   final String paymentMode;
   final String branch;
+  final String? promoTitle;
+  final double? promoDiscountPercentage;
+  final double? promoDiscountValue;
 
   TransactionRecord({
     required this.billId,
@@ -32,50 +40,65 @@ class TransactionRecord {
     required this.gstSlab,
     required this.gstRate,
     required this.taxAmount,
+    required this.cgst,
+    required this.sgst,
+    required this.igst,
     required this.totalAmount,
     required this.paymentMode,
     required this.branch,
+    this.promoTitle,
+    this.promoDiscountPercentage,
+    this.promoDiscountValue,
   });
 
   factory TransactionRecord.fromJson(Map<String, dynamic> json) {
     return TransactionRecord(
-      billId: json['bill_id'],
-      lineId: json['line_id'],
+      billId: json['bill_id'] ?? '',
+      lineId: json['line_id'] ?? '',
       date: DateTime.parse(json['date']),
-      customerName: json['customer_name'],
-      customerPhone: json['customer_phone'],
-      customerGst: json['customer_gst'],
-      address: json['address'],
-      productName: json['product_name'],
-      category: json['category'],
-      quantity: json['quantity'],
-      unitPrice: (json['unit_price'] as num).toDouble(),
-      gstSlab: json['gst_slab'],
-      gstRate: (json['gst_rate'] as num).toDouble(),
-      taxAmount: (json['tax_amount'] as num).toDouble(),
-      totalAmount: (json['total_amount'] as num).toDouble(),
-      paymentMode: json['payment_mode'],
-      branch: json['branch'],
+      customerName: json['customer_name'] ?? '',
+      customerPhone: json['customer_phone'] ?? '',
+      customerGst: json['customer_gst'] ?? '',
+      address: json['address'] ?? '',
+      productName: json['product_name'] ?? '',
+      category: json['category'] ?? '',
+      quantity: json['quantity'] ?? 0,
+      unitPrice: (json['unit_price'] as num?)?.toDouble() ?? 0.0,
+      gstSlab: json['gst_slab'] ?? '',
+      gstRate: (json['gst_rate'] as num?)?.toDouble() ?? 0.0,
+      taxAmount: (json['tax_amount'] as num?)?.toDouble() ?? 0.0,
+      cgst: (json['cgst'] as num?)?.toDouble() ?? 0.0,
+      sgst: (json['sgst'] as num?)?.toDouble() ?? 0.0,
+      igst: (json['igst'] as num?)?.toDouble() ?? 0.0,
+      totalAmount: (json['total_amount'] as num?)?.toDouble() ?? 0.0,
+      paymentMode: json['payment_mode'] ?? '',
+      branch: json['branch'] ?? '',
+      promoTitle: json['promo_title'],
+      promoDiscountPercentage: (json['promo_discount_percentage'] as num?)?.toDouble(),
+      promoDiscountValue: (json['promo_discount_value'] as num?)?.toDouble(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "bill_id": billId,
-    "line_id": lineId,
-    "date": date.toIso8601String(),
-    "customer_name": customerName,
-    "customer_phone": customerPhone,
-    "customer_gst": customerGst,
-    "address": address,
-    "product_name": productName,
-    "category": category,
-    "quantity": quantity,
-    "unit_price": unitPrice,
-    "gst_slab": gstSlab,
-    "gst_rate": gstRate,
-    "tax_amount": taxAmount,
-    "total_amount": totalAmount,
-    "payment_mode": paymentMode,
-    "branch": branch
-  };
+        "bill_id": billId,
+        "line_id": lineId,
+        "date": date.toIso8601String(),
+        "customer_name": customerName,
+        "customer_phone": customerPhone,
+        "customer_gst": customerGst,
+        "address": address,
+        "product_name": productName,
+        "category": category,
+        "quantity": quantity,
+        "unit_price": unitPrice,
+        "gst_slab": gstSlab,
+        "gst_rate": gstRate,
+        "tax_amount": taxAmount,
+        "cgst": cgst,
+        "sgst": sgst,
+        "igst": igst,
+        "total_amount": totalAmount,
+        "payment_mode": paymentMode,
+        "branch": branch,
+      };
 }

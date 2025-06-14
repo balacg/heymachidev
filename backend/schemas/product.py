@@ -1,5 +1,3 @@
-# heymachi_backend/schemas/product.py
-
 from typing import Optional
 from pydantic import BaseModel
 
@@ -8,19 +6,18 @@ class ProductBase(BaseModel):
     price: float
     category_id: int
     subcategory_id: Optional[int] = None
-    gst_id: int
+    gst_id: Optional[int] = None
 
 class ProductCreate(ProductBase):
     pass
 
-class ProductOut(BaseModel):
+class ProductUpdate(ProductBase):
+    pass
+
+class ProductOut(ProductBase):
     id: int
-    name: str
-    price: float
-    category_id: int
-    subcategory_id: Optional[int] = None
-    gst_id: int
-    category_name: str  # 👈 Add this for UI
+    category_name: str
 
     class Config:
         orm_mode = True
+        from_attributes = True 

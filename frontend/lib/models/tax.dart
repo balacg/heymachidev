@@ -1,9 +1,8 @@
 // lib/models/tax.dart
-
 class Tax {
   final int id;
-  final String type;   // e.g. “GST” or “VAT”
-  final double rate;   // percent value, e.g. 18.0
+  final String type;
+  final double rate;
 
   Tax({
     required this.id,
@@ -14,15 +13,14 @@ class Tax {
   factory Tax.fromJson(Map<String, dynamic> json) {
     return Tax(
       id: json['id'] as int? ?? 0,
-      // read from the backend's 'name' field
-      type: json['name'] as String? ?? '',
+      type: (json['type'] ?? json['name'] ?? 'GST') as String,
       rate: (json['rate'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        // send it back under 'name'
-        'name': type,
-        'rate': rate,
-      };
+    'name': type,
+    'type': type,
+    'rate': rate,
+  };
 }

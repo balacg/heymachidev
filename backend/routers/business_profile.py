@@ -11,7 +11,7 @@ def get_profile(db: Session = Depends(get_db)):
     profile = db.query(BusinessProfile).first()
     if not profile:
         raise HTTPException(status_code=404, detail="Business profile not found")
-    return profile
+    return BusinessProfileOut.from_orm(profile)
 
 @router.put("/", response_model=BusinessProfileOut)
 def update_profile(payload: BusinessProfileUpdate, db: Session = Depends(get_db)):

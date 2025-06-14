@@ -1,9 +1,9 @@
-// lib/screens/settings/settings_screen.dart 
+// lib/screens/settings/settings_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../../services/api.dart'; // for baseUrl
+import '../../services/api.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -16,6 +16,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController businessNameController = TextEditingController();
   final TextEditingController gstNumberController = TextEditingController();
   final TextEditingController billFooterController = TextEditingController();
+  String? selectedState;
+
+  final List<String> indiaStates = [
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+    'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
+    'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+    'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+    'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Puducherry', 'Chandigarh', 'Andaman and Nicobar Islands', 'Dadra and Nagar Haveli and Daman and Diu', 'Lakshadweep'
+  ];
 
   bool _isLoading = true;
 
@@ -34,6 +44,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         businessNameController.text = data['name'] ?? '';
         gstNumberController.text = data['gst_number'] ?? '';
         billFooterController.text = data['footer_note'] ?? '';
+        selectedState = data['state'];
       }
     } catch (e) {
       debugPrint("Failed to load profile: $e");
@@ -43,11 +54,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _saveSettings() async {
+    if (selectedState == null || selectedState!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a state')));
+      return;
+    }
+
     final uri = Uri.parse('${ApiService.baseUrl}/business-profile/');
     final payload = {
       "name": businessNameController.text.trim(),
       "gst_number": gstNumberController.text.trim(),
       "footer_note": billFooterController.text.trim(),
+      "state": selectedState,
     };
 
     try {
@@ -85,10 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Business Settings'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading: const BackButton(),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -103,21 +117,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 20),
                   TextField(
                     controller: businessNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Business Name',
-                    ),
+                    decoration: const InputDecoration(labelText: 'Business Name'),
                   ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: indiaStates.contains(selectedState) ? selectedState : null,
+                    items: indiaStates.map((state) {
+                      return DropdownMenuItem(
+                        value: state,
+                        child: Text(state),
+                      );
+                    }).toList(),
+                    onChanged: (val) => setState(() => selectedState = val),
+                    decoration: const InputDecoration(labelText: 'State (Required)'),
+                    validator: (val) => val == null ? 'Required' : null,
+                  ),
+                  const SizedBox(height: 12),
                   TextField(
                     controller: gstNumberController,
-                    decoration: const InputDecoration(
-                      labelText: 'GST Number (optional)',
-                    ),
+                    decoration: const InputDecoration(labelText: 'GST Number (optional)'),
                   ),
                   TextField(
                     controller: billFooterController,
-                    decoration: const InputDecoration(
-                      labelText: 'Bill Footer Text',
-                    ),
+                    decoration: const InputDecoration(labelText: 'Bill Footer Text'),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(

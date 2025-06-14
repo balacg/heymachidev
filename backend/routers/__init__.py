@@ -15,5 +15,6 @@ from .payment_type import router as payment_type
 from .transaction import router as transaction
 from .email import router as email
 from .business_profile import router as business_profile
+from .promotion import router as promotion
 
 # Add other routers here as needed

@@ -32,3 +32,12 @@ frontend/macos/Flutter/Flutter-Release.xcconfig
 frontend/macos/Flutter/GeneratedPluginRegistrant.swift
 frontend/windows/flutter/generated_plugin_registrant.cc
 frontend/windows/flutter/generated_plugins.cmake
+frontend/.flutter-plugins-dependencies
+frontend/.DS_Store
+frontend/lib/.DS_Store
+frontend/lib/screens/.DS_Store
+backend/.DS_Store
+backend/.DS_Store
+backend/.DS_Store
+frontend/lib/screens/.DS_Store
+frontend/lib/.DS_Store

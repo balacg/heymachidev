@@ -6,11 +6,14 @@ from typing import Optional
 class BusinessProfileBase(BaseModel):
     name: str
     gst_number: Optional[str] = None
+    state: Optional[str] = None
     footer_note: Optional[str] = None
 
+    class Config:
+        orm_mode = True 
+        
 class BusinessProfileOut(BusinessProfileBase):
     pass
 
 class BusinessProfileUpdate(BusinessProfileBase):
     pass
-    

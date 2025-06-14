@@ -24,3 +24,6 @@ class Transaction(Base):
     total_amount    = Column(Float)
     payment_mode    = Column(String)
     branch          = Column(String)
+    promo_title = Column(String, nullable=True)
+    promo_discount_percentage = Column(Float, nullable=True)
+    promo_discount_value = Column(Float, nullable=True)
