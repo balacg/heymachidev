@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../services/promotion_service.dart';
 import '../../models/promotion.dart';
-import '../../widgets/table_column.dart';
+import '../../services/promotion_service.dart';
 import '../../widgets/generic_data_table.dart';
+import '../../widgets/table_column.dart';
 
 class PromotionMasterScreen extends StatefulWidget {
   const PromotionMasterScreen({Key? key}) : super(key: key);
@@ -19,8 +19,6 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
   List<Promotion> _allPromotions = [];
   bool _loading = true;
   String? _error;
-
-  final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
   @override
   void initState() {
@@ -39,17 +37,15 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
     } catch (e) {
       _error = e.toString();
     } finally {
-      setState(() {
-        _loading = false;
-      });
+      setState(() => _loading = false);
     }
   }
 
   void _onSort(String field, bool asc) {
     setState(() {
       _promotions.sort((a, b) {
-        final va = a.toJson()[field];
-        final vb = b.toJson()[field];
+        final va = (a.toJson())[field];
+        final vb = (b.toJson())[field];
         if (va is Comparable && vb is Comparable) {
           return asc ? va.compareTo(vb) : vb.compareTo(va);
         }
@@ -61,7 +57,7 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
   void _onFilter(String field, String query) {
     setState(() {
       _promotions = _allPromotions.where((p) {
-        final val = (p.toJson()[field]?.toString().toLowerCase() ?? '');
+        final val = (p.toJson())[field]?.toString().toLowerCase() ?? '';
         return val.contains(query.toLowerCase());
       }).toList();
     });
@@ -72,46 +68,91 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
     final titleCtl = TextEditingController(text: promo?.title ?? '');
     final descCtl = TextEditingController(text: promo?.description ?? '');
     final discountCtl = TextEditingController(text: promo?.discountPercentage.toString() ?? '');
-    final startCtl = TextEditingController(text: promo != null ? dateFormat.format(promo.startDate) : '');
-    final endCtl = TextEditingController(text: promo != null ? dateFormat.format(promo.endDate) : '');
+    DateTime start = promo?.startDate ?? DateTime.now();
+    DateTime end = promo?.endDate ?? DateTime.now().add(const Duration(days: 7));
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(isEdit ? 'Edit Promotion' : 'Add Promotion'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: titleCtl, decoration: const InputDecoration(labelText: 'Title')),
-              TextField(controller: descCtl, decoration: const InputDecoration(labelText: 'Description')),
-              TextField(
-                controller: discountCtl,
-                decoration: const InputDecoration(labelText: 'Discount %'),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-              ),
-              TextField(controller: startCtl, decoration: const InputDecoration(labelText: 'Start Date (yyyy-MM-dd HH:mm)')),
-              TextField(controller: endCtl, decoration: const InputDecoration(labelText: 'End Date (yyyy-MM-dd HH:mm)')),
-            ],
+        content: StatefulBuilder(
+          builder: (context, setState) => SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(controller: titleCtl, decoration: const InputDecoration(labelText: 'Title')),
+                TextField(controller: descCtl, decoration: const InputDecoration(labelText: 'Description')),
+                TextField(
+                  controller: discountCtl,
+                  decoration: const InputDecoration(labelText: 'Discount %'),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Text("Start: "),
+                    TextButton(
+                      child: Text(DateFormat('yyyy-MM-dd').format(start)),
+                      onPressed: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: start,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2100),
+                        );
+                        if (picked != null) setState(() => start = picked);
+                      },
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text("End: "),
+                    TextButton(
+                      child: Text(DateFormat('yyyy-MM-dd').format(end)),
+                      onPressed: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: end,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2100),
+                        );
+                        if (picked != null) setState(() => end = picked);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
+              final title = titleCtl.text.trim();
+              final desc = descCtl.text.trim();
+              final discount = double.tryParse(discountCtl.text.trim()) ?? 0;
+
+              if (title.isEmpty || discount <= 0) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Valid title & discount required')));
+                return;
+              }
+
+              final model = Promotion(
+                id: promo?.id,
+                title: title,
+                description: desc,
+                discountPercentage: discount,
+                startDate: start,
+                endDate: end,
+              );
+
               try {
-                final newPromo = Promotion(
-                  id: promo?.id,
-                  title: titleCtl.text.trim(),
-                  description: descCtl.text.trim(),
-                  discountPercentage: double.tryParse(discountCtl.text.trim()) ?? 0,
-                  startDate: dateFormat.parse(startCtl.text.trim()),
-                  endDate: dateFormat.parse(endCtl.text.trim()),
-                );
                 if (isEdit) {
-                  await PromotionService.updatePromotion(newPromo);
+                  await PromotionService.updatePromotion(model);
                 } else {
-                  await PromotionService.createPromotion(newPromo);
+                  await PromotionService.createPromotion(model);
                 }
                 Navigator.of(ctx).pop();
                 await _loadPromotions();
@@ -145,31 +186,32 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
               ? Center(child: Text('Error: $_error'))
               : GenericDataTable<Promotion>(
                   columns: [
-                    TableColumn(title: 'Title', field: 'title', filterable: true, sortable: true),
-                    TableColumn(title: 'Description', field: 'description'),
-                    TableColumn(
+                    TableColumn<Promotion>(title: 'Title', field: 'title', filterable: true),
+                    TableColumn<Promotion>(title: 'Description', field: 'description', filterable: true),
+                    TableColumn<Promotion>(
                       title: 'Discount %',
                       field: 'discountPercentage',
                       sortable: true,
-                      cellBuilder: (p) => Text('${p.discountPercentage.toStringAsFixed(2)}%'),
+                      cellBuilder: (p) => Text('${p.discountPercentage.toStringAsFixed(1)}%'),
                     ),
-                    TableColumn(
-                      title: 'Start Date',
-                      field: 'startDate',
-                      cellBuilder: (p) => Text(dateFormat.format(p.startDate)),
+                    TableColumn<Promotion>(
+                      title: 'Status',
+                      field: 'status',
+                      cellBuilder: (p) {
+                        final expired = p.endDate.isBefore(DateTime.now());
+                        return Text(
+                          expired ? 'Expired' : 'Active',
+                          style: TextStyle(color: expired ? Colors.red : Colors.green),
+                        );
+                      },
                     ),
-                    TableColumn(
-                      title: 'End Date',
-                      field: 'endDate',
-                      cellBuilder: (p) => Text(dateFormat.format(p.endDate)),
-                    ),
-                    TableColumn(
+                    TableColumn<Promotion>(
                       title: 'Actions',
                       field: 'actions',
                       cellBuilder: (p) => PopupMenuButton<String>(
-                        onSelected: (v) {
-                          if (v == 'edit') _showForm(promo: p);
-                          if (v == 'delete') _deletePromotion(p.id!);
+                        onSelected: (val) {
+                          if (val == 'edit') _showForm(promo: p);
+                          if (val == 'delete') _deletePromotion(p.id!);
                         },
                         itemBuilder: (_) => const [
                           PopupMenuItem(value: 'edit', child: Text('Edit')),
