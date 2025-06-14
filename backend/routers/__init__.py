@@ -17,4 +17,8 @@ from .email import router as email
 from .business_profile import router as business_profile
 from .promotion import router as promotion
 
+from routers.restaurant.table import router as restaurant_table_router
+from routers.restaurant.menu_item import router as restaurant_menu_item_router
+
+
 # Add other routers here as needed

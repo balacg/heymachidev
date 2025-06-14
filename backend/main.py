@@ -17,6 +17,9 @@ from routers.auth import router as auth_router, get_current_user
 from schemas.user import UserCreate, UserOut
 from schemas.auth import Token
 
+#----- Restaurant Routers -----------------
+from routers import restaurant_table_router, restaurant_menu_item_router
+
 app = FastAPI(title="HeyMachi Backend")
 
 # ── CORS ────────────────────────────────────────────────────────────────────────
@@ -62,6 +65,7 @@ def read_users_me(current_user: User = Depends(get_current_user)):
 
 
 # --- Include all your routers --------------------------------------------
+# --- Core -------
 app.include_router(users)      # /users
 app.include_router(roles)      # /roles
 app.include_router(category)   # /category
@@ -77,3 +81,8 @@ app.include_router(transaction)   # /transactions
 app.include_router(email)   # /email
 app.include_router(business_profile)
 app.include_router(promotion)
+
+## --- Restaurant -------
+app.include_router(restaurant_table_router)
+app.include_router(restaurant_menu_item_router)
+

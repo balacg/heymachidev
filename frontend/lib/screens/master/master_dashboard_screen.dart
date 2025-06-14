@@ -12,7 +12,7 @@ import 'tax_master_screen.dart';
 import 'payment_type_master_screen.dart';
 import 'product_field_config_screen.dart';
 import 'promotion_master_screen.dart';
-
+import '../restaurant/menu_item_screen.dart'; 
 
 class MasterDashboardScreen extends StatelessWidget {
   const MasterDashboardScreen({Key? key}) : super(key: key);
@@ -33,6 +33,7 @@ class MasterDashboardScreen extends StatelessWidget {
           _MasterTile('Payment Types', Icons.payment, PaymentTypeMasterScreen()),
           _MasterTile('Promotions', Icons.local_offer, PromotionMasterScreen()),
           _MasterTile('Product Field Config', Icons.settings, ProductFieldConfigScreen()),
+          _MasterTile('Menu Items', Icons.restaurant_menu, MenuItemScreen()),
         ],
       ),
     );
