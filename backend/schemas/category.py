@@ -14,7 +14,7 @@ class CategoryUpdate(CategoryBase):
     pass
 
 class CategoryOut(CategoryBase):
-    id: int
+    id: str
 
     class Config:
         orm_mode = True

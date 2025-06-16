@@ -1,7 +1,7 @@
 // lib/models/promotion.dart
 
 class Promotion {
-  final String? id;
+  final String id;
   final String title;
   final String description;
   final double discountPercentage;
@@ -9,7 +9,7 @@ class Promotion {
   final DateTime endDate;
 
   Promotion({
-    this.id,
+    required this.id,
     required this.title,
     required this.description,
     required this.discountPercentage,
@@ -19,23 +19,22 @@ class Promotion {
 
   factory Promotion.fromJson(Map<String, dynamic> json) {
     return Promotion(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      discountPercentage: (json['discountPercentage'] ?? 0).toDouble(),
-      startDate: DateTime.parse(json['startDate']),
-      endDate: DateTime.parse(json['endDate']),
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      discountPercentage: (json['discount_percentage'] ?? 0).toDouble(),
+      startDate: DateTime.parse(json['start_date']),
+      endDate: DateTime.parse(json['end_date']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'title': title,
       'description': description,
-      'discountPercentage': discountPercentage,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'discount_percentage': discountPercentage,
+      'start_date': startDate.toIso8601String(),
+      'end_date': endDate.toIso8601String(),
     };
   }
 }

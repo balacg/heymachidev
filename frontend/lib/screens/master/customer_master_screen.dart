@@ -47,13 +47,14 @@ class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
     });
   }
 
-  void _onEdit(Customer customer) {
-    final nameCtrl = TextEditingController(text: customer.name);
-    final phoneCtrl = TextEditingController(text: customer.phone);
-    final emailCtrl = TextEditingController(text: customer.email ?? '');
-    final gstCtrl = TextEditingController(text: customer.gst ?? '');
-    final addressCtrl = TextEditingController(text: customer.address ?? '');
-    String? state = customer.state;
+  void _onEdit({Customer? customer}) {
+    final isNew = customer == null;
+    final nameCtrl = TextEditingController(text: customer?.name ?? '');
+    final phoneCtrl = TextEditingController(text: customer?.phone ?? '');
+    final emailCtrl = TextEditingController(text: customer?.email ?? '');
+    final gstCtrl = TextEditingController(text: customer?.gst ?? '');
+    final addressCtrl = TextEditingController(text: customer?.address ?? '');
+    String? state = customer?.state;
 
     final states = [
       "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -68,7 +69,7 @@ class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Edit Customer'),
+        title: Text(isNew ? 'Add Customer' : 'Edit Customer'),
         content: SingleChildScrollView(
           child: Column(
             children: [
@@ -92,7 +93,7 @@ class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
           ElevatedButton(
             onPressed: () async {
               final updated = Customer(
-                id: customer.id,
+                id: customer?.id ?? 0, // 0 or any placeholder for new customer
                 name: nameCtrl.text.trim(),
                 phone: phoneCtrl.text.trim(),
                 email: emailCtrl.text.trim(),
@@ -100,13 +101,26 @@ class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
                 address: addressCtrl.text.trim(),
                 state: state,
               );
-              await ApiService.updateCustomer(updated);
-              if (!mounted) return;
-              Navigator.pop(context);
-              _loadData();
+
+              try {
+                if (customer == null) {
+                  await ApiService.addCustomer(updated);
+                } else {
+                  await ApiService.updateCustomer(updated);
+                }
+                if (!mounted) return;
+                Navigator.pop(context);
+                _loadData();
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Save failed: ${e.toString()}')),
+                );
+              }
             },
+
             child: const Text('Save'),
           ),
+
         ],
       ),
     );
@@ -137,7 +151,7 @@ class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
                   field: 'actions',
                   cellBuilder: (c) => PopupMenuButton<String>(
                     onSelected: (v) {
-                      if (v == 'edit') _onEdit(c);
+                      if (v == 'edit') _onEdit(customer: c);
                       if (v == 'delete') _onDelete(c.id);
                     },
                     itemBuilder: (_) => const [
@@ -150,6 +164,10 @@ class _CustomerMasterScreenState extends State<CustomerMasterScreen> {
               rows: _customers,
               onFilter: _onFilter,
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _onEdit(),  // For add
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

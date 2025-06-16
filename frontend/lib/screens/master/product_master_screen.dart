@@ -52,7 +52,7 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
     }
   }
 
-  void _deleteProduct(int id) async {
+  void _deleteProduct(String id) async {
     try {
       await ApiService.deleteProduct(id);
       _loadAllData();
@@ -99,60 +99,85 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
     final formKey = GlobalKey<FormState>();
     final nameController = TextEditingController(text: product?.name ?? '');
     final priceController = TextEditingController(text: product?.price.toString() ?? '');
-    int? selectedCategoryId = product?.categoryId;
-    int? selectedSubcategoryId = product?.subcategoryId;
+    
     int? selectedGstId = product?.gstId;
+    String? selectedCategoryId = product?.categoryId;
+    String? selectedSubcategoryId = product?.subcategoryId;
+
+    if (product != null && product.categoryId != null) {
+      // Pre-load subcategories for the given category
+      ApiService.fetchSubcategories(categoryId: product.categoryId!).then((subs) {
+        setState(() {
+          _subcategories = subs;
+        });
+      });
+    }
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(product == null ? 'Add Product' : 'Edit Product'),
         content: StatefulBuilder(
-          builder: (context, setModalState) => Form(
-            key: formKey,
-            child: SingleChildScrollView(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                TextFormField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Product Name'),
-                  validator: (value) => value == null || value.isEmpty ? 'Required' : null,
-                ),
-                TextFormField(
-                  controller: priceController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Price'),
-                  validator: (value) => value == null || value.isEmpty ? 'Required' : null,
-                ),
-                DropdownButtonFormField<int>(
-                  value: selectedCategoryId,
-                  items: _categories.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
-                  onChanged: (val) async {
-                    setModalState(() => selectedCategoryId = val);
-                    final subs = await ApiService.fetchSubcategories(categoryId: val!);
-                    setModalState(() => _subcategories = subs);
-                  },
-                  decoration: const InputDecoration(labelText: 'Category'),
-                  validator: (val) => val == null ? 'Select Category' : null,
-                ),
-                DropdownButtonFormField<int>(
-                  value: selectedSubcategoryId,
-                  items: _subcategories.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name))).toList(),
-                  onChanged: (val) => setModalState(() => selectedSubcategoryId = val),
-                  decoration: const InputDecoration(labelText: 'Subcategory'),
-                ),
-                DropdownButtonFormField<int>(
-                  value: selectedGstId,
-                  items: _taxes.map((t) {
-                    final label = '${t.type} (${t.rate.toStringAsFixed(1)}%)';
-                    return DropdownMenuItem(value: t.id, child: Text(label));
-                  }).toList(),
-                  onChanged: (val) => setModalState(() => selectedGstId = val),
-                  decoration: const InputDecoration(labelText: 'GST'),
-                  validator: (val) => val == null ? 'Select GST' : null,
-                ),
-              ]),
-            ),
-          ),
+          builder: (context, setModalState) {
+            // ✅ Auto-fetch subcategories when opening in edit mode
+            if (_subcategories.isEmpty && selectedCategoryId != null) {
+              ApiService.fetchSubcategories(categoryId: selectedCategoryId).then((subs) {
+                setModalState(() => _subcategories = subs);
+              });
+            }
+
+            return Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  TextFormField(
+                    controller: nameController,
+                    decoration: const InputDecoration(labelText: 'Product Name'),
+                    validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                  ),
+                  TextFormField(
+                    controller: priceController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Price'),
+                    validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                  ),
+                  DropdownButtonFormField<String>(
+                    value: selectedCategoryId,
+                    items: _categories.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
+                    onChanged: (val) async {
+                      setModalState(() => selectedCategoryId = val);
+                      final subs = await ApiService.fetchSubcategories(categoryId: val!);
+                      setModalState(() {
+                        _subcategories = subs;
+                        selectedSubcategoryId = null; // Clear subcat when category changes
+                      });
+                    },
+                    decoration: const InputDecoration(labelText: 'Category'),
+                    validator: (val) => val == null ? 'Select Category' : null,
+                  ),
+                  DropdownButtonFormField<String>(
+                    value: selectedSubcategoryId?.isEmpty == true ? null : selectedSubcategoryId,
+                    items: _subcategories.map((s) {
+                      return DropdownMenuItem(value: s.id, child: Text(s.name));
+                    }).toList(),
+                    onChanged: (val) => setModalState(() => selectedSubcategoryId = val),
+                    decoration: const InputDecoration(labelText: 'Subcategory'),
+                    validator: (val) => val == null || val.isEmpty ? 'Select Subcategory' : null,
+                  ),
+                  DropdownButtonFormField<int>(
+                    value: selectedGstId,
+                    items: _taxes.map((t) {
+                      final label = '${t.type} (${t.rate.toStringAsFixed(1)}%)';
+                      return DropdownMenuItem(value: t.id, child: Text(label));
+                    }).toList(),
+                    onChanged: (val) => setModalState(() => selectedGstId = val),
+                    decoration: const InputDecoration(labelText: 'GST'),
+                    validator: (val) => val == null ? 'Select GST' : null,
+                  ),
+                ]),
+              ),
+            );
+          },
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
@@ -160,13 +185,13 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
             onPressed: () async {
               if (formKey.currentState?.validate() ?? false) {
                 final newProduct = Product(
-                  id: product?.id ?? 0,
+                  id: product?.id ?? '',
                   name: nameController.text.trim(),
                   price: double.tryParse(priceController.text) ?? 0,
                   categoryId: selectedCategoryId,
                   subcategoryId: selectedSubcategoryId,
                   gstId: selectedGstId,
-                  categoryName: '', // not needed on post
+                  categoryName: '',
                 );
                 try {
                   if (product == null) {
@@ -187,6 +212,7 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
       ),
     );
   }
+
 
   String _getGstLabel(int? gstId) {
     final tax = _taxes.firstWhere((t) => t.id == gstId, orElse: () => Tax(id: 0, type: '', rate: 0));
@@ -235,6 +261,13 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
                       filterable: true,
                       cellBuilder: (p) => Text(p.categoryName),
                     ),
+                    TableColumn<Product>(
+                      title: 'Subcategory',
+                      field: 'subcategoryName',
+                      sortable: false,
+                      cellBuilder: (p) => Text(p.subcategoryName ?? '-'),
+                    ),
+
                     TableColumn<Product>(
                       title: 'GST',
                       field: 'gst',

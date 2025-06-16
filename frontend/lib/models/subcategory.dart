@@ -1,9 +1,9 @@
 // lib/models/subcategory.dart
 
 class Subcategory {
-  final int id;
+  final String id;
   final String name;
-  final int categoryId;
+  final String categoryId;
   final int? gstId;
 
   Subcategory({
@@ -15,9 +15,9 @@ class Subcategory {
 
   factory Subcategory.fromJson(Map<String, dynamic> json) {
     return Subcategory(
-      id:         json['id'] as int,
+      id:         json['id'],
       name:       json['name'] as String,
-      categoryId: json['category_id'] as int,
+      categoryId: json['category_id'],
       gstId: json['gst_id'] != null ? json['gst_id'] as int : null,
     );
   }
@@ -26,7 +26,7 @@ class Subcategory {
     return {
       'name':        name,
       'category_id': categoryId,
-      'gst_id':      gstId,              // send gst_id
+      'gst_id':      gstId,              
     };
   }
 }

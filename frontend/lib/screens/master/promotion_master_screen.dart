@@ -32,20 +32,25 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
       _error = null;
     });
     try {
-      _allPromotions = await PromotionService.fetchPromotions();
-      _promotions = List.of(_allPromotions);
+      final list = await PromotionService.fetchPromotions();
+      setState(() {
+        _allPromotions = list;
+        _promotions = List.of(list);
+        _loading = false;
+      });
     } catch (e) {
-      _error = e.toString();
-    } finally {
-      setState(() => _loading = false);
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
     }
   }
 
   void _onSort(String field, bool asc) {
     setState(() {
       _promotions.sort((a, b) {
-        final va = (a.toJson())[field];
-        final vb = (b.toJson())[field];
+        final va = a.toJson()[field];
+        final vb = b.toJson()[field];
         if (va is Comparable && vb is Comparable) {
           return asc ? va.compareTo(vb) : vb.compareTo(va);
         }
@@ -57,7 +62,7 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
   void _onFilter(String field, String query) {
     setState(() {
       _promotions = _allPromotions.where((p) {
-        final val = (p.toJson())[field]?.toString().toLowerCase() ?? '';
+        final val = p.toJson()[field]?.toString().toLowerCase() ?? '';
         return val.contains(query.toLowerCase());
       }).toList();
     });
@@ -87,10 +92,11 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
                   decoration: const InputDecoration(labelText: 'Discount %'),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Start: "),
+                    const Text("Start Date:"),
                     TextButton(
                       child: Text(DateFormat('yyyy-MM-dd').format(start)),
                       onPressed: () async {
@@ -106,8 +112,9 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
                   ],
                 ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("End: "),
+                    const Text("End Date:"),
                     TextButton(
                       child: Text(DateFormat('yyyy-MM-dd').format(end)),
                       onPressed: () async {
@@ -140,7 +147,7 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
               }
 
               final model = Promotion(
-                id: promo?.id,
+                id: promo?.id ?? '', // Leave empty for add, must be non-null for update
                 title: title,
                 description: desc,
                 discountPercentage: discount,
@@ -154,6 +161,7 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
                 } else {
                   await PromotionService.createPromotion(model);
                 }
+                if (!mounted) return;
                 Navigator.of(ctx).pop();
                 await _loadPromotions();
               } catch (e) {
@@ -179,7 +187,7 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Promotions')),
+      appBar: AppBar(title: const Text('Promotion Master')),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
@@ -193,6 +201,16 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
                       field: 'discountPercentage',
                       sortable: true,
                       cellBuilder: (p) => Text('${p.discountPercentage.toStringAsFixed(1)}%'),
+                    ),
+                    TableColumn<Promotion>(
+                      title: 'Start',
+                      field: 'startDate',
+                      cellBuilder: (p) => Text(DateFormat('yyyy-MM-dd').format(p.startDate)),
+                    ),
+                    TableColumn<Promotion>(
+                      title: 'End',
+                      field: 'endDate',
+                      cellBuilder: (p) => Text(DateFormat('yyyy-MM-dd').format(p.endDate)),
                     ),
                     TableColumn<Promotion>(
                       title: 'Status',
@@ -211,7 +229,7 @@ class _PromotionMasterScreenState extends State<PromotionMasterScreen> {
                       cellBuilder: (p) => PopupMenuButton<String>(
                         onSelected: (val) {
                           if (val == 'edit') _showForm(promo: p);
-                          if (val == 'delete') _deletePromotion(p.id!);
+                          if (val == 'delete') _deletePromotion(p.id ?? '');
                         },
                         itemBuilder: (_) => const [
                           PopupMenuItem(value: 'edit', child: Text('Edit')),

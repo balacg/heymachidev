@@ -5,7 +5,7 @@ from typing import Optional
 
 class SubcategoryBase(BaseModel):
     name: str
-    category_id: int
+    category_id: str
     gst_id: Optional[int]
 
 class SubcategoryCreate(SubcategoryBase):
@@ -15,7 +15,7 @@ class SubcategoryUpdate(SubcategoryBase):
     pass
 
 class SubcategoryOut(SubcategoryBase):
-    id: int
+    id: str
 
     class Config:
         orm_mode = True

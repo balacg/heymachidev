@@ -1,6 +1,4 @@
-# heymachi_backend/models/user.py
-
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
 from .association_tables import user_roles
@@ -15,5 +13,9 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
     is_admin = Column(Boolean, default=False)
+
+    # 🔐 NEW: Link to business
+    business_id = Column(String, ForeignKey("business_accounts.id"))
+    business = relationship("BusinessAccount", backref="users")
 
     roles = relationship("Role", secondary=user_roles, back_populates="users")

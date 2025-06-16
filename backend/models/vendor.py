@@ -1,6 +1,6 @@
 # heymachi_backend/models/vendor.py
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -13,6 +13,7 @@ class Vendor(Base):
     email = Column(String, nullable=True)
     gst = Column(String, nullable=True)
     address = Column(String, nullable=True)
+    business_id = Column(String, ForeignKey("business_accounts.id"))
+    
+    business = relationship("BusinessAccount", backref="vendors")
 
-    # Removed purchase_orders relationship since PurchaseOrder model doesn't exist yet
-    # purchase_orders = relationship("PurchaseOrder", back_populates="vendor")

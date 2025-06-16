@@ -1,7 +1,7 @@
 // lib/models/category.dart
 
 class Category {
-  final int id;
+  final String id;
   final String name;
   final int? gstId;
 
@@ -14,7 +14,7 @@ class Category {
   /// Construct a Category from JSON returned by the API
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
-      id: json['id'] as int,
+      id: json['id'],
       name: json['name'] as String,
       gstId: json['gst_id'] != null ? json['gst_id'] as int : null,
     );

@@ -34,6 +34,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
   void initState() {
     super.initState();
     _loadPaymentTypes();
+    _loadBranchState();
   }
 
   Future<void> _loadPaymentTypes() async {
@@ -43,6 +44,14 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
     setState(() {});
   }
 
+  Future<void> _loadBranchState() async {
+    try {
+      final state = await ApiService.fetchBranchState();
+      setState(() => businessState = state);
+    } catch (e) {
+      print("Could not fetch branch state. Using fallback.");
+    }
+  }
   double get _subtotal => widget.cartItems.entries.fold<double>(
         0,
         (sum, e) {
