@@ -1,6 +1,6 @@
 # heymachi_backend/models/customer.py
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -14,5 +14,7 @@ class Customer(Base):
     gst = Column(String, nullable=True)
     address = Column(String, nullable=True)
     state = Column(String, nullable=True)
-
+    business_id = Column(String, ForeignKey("business_accounts.id"))
+    
+    business = relationship("BusinessAccount", backref="customers")
     bills = relationship("Bill", back_populates="customer")

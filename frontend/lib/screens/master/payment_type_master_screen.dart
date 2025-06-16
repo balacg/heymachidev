@@ -72,8 +72,54 @@ class _PaymentTypeMasterScreenState extends State<PaymentTypeMasterScreen> {
   }
 
   void _showForm({PaymentType? pt}) {
-    // ← existing form code
+    final nameCtrl = TextEditingController(text: pt?.name ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(pt == null ? 'Add Payment Type' : 'Edit Payment Type'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Payment Type Name'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final name = nameCtrl.text.trim();
+                if (name.isEmpty) return;
+
+                try {
+                  if (pt == null) {
+                    await ApiService.createPaymentType(PaymentType(id: 0, name: name));
+                  } else {
+                    await ApiService.updatePaymentType(PaymentType(id: pt.id, name: name));
+                  }
+                  Navigator.pop(context);
+                  _loadTypes();
+                } catch (e) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +156,7 @@ class _PaymentTypeMasterScreenState extends State<PaymentTypeMasterScreen> {
                       cellBuilder: (t) => PopupMenuButton<String>(
                         onSelected: (v) {
                           if (v == 'edit') _showForm(pt: t);
-                          else if (v == 'delete') _deleteType(t.id);
+                          else if (v == 'delete' && t.id != null) _deleteType(t.id!);
                         },
                         itemBuilder: (_) => const [
                           PopupMenuItem(value: 'edit', child: Text('Edit')),

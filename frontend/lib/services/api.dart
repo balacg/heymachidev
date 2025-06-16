@@ -16,6 +16,8 @@ import '../models/vendor.dart';
 class ApiService {
   static String get _baseHost => Platform.isAndroid ? '10.0.2.2' : 'localhost';
   static String get baseUrl   => 'http://$_baseHost:8000';
+  static String? _token;
+  static Map<String, dynamic>? currentUser;
 
   static final Map<String, String> _jsonHeaders = {
     'Content-Type': 'application/json',
@@ -25,7 +27,7 @@ class ApiService {
 
   static Future<List<Customer>> fetchCustomers() async {
     final uri  = Uri.parse('$baseUrl/customers/');
-    final resp = await http.get(uri);
+    final resp = await http.get(uri, headers: headers);
     if (resp.statusCode == 200) {
       final List data = jsonDecode(resp.body);
       return data.map((e) => Customer.fromJson(e)).toList();
@@ -36,7 +38,7 @@ class ApiService {
   static Future<Customer> addCustomer(Customer c) async {
     final uri  = Uri.parse('$baseUrl/customers/');
     final resp = await http.post(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(c.toJson()),
     );
     if (resp.statusCode == 200 || resp.statusCode == 201) {
@@ -48,7 +50,7 @@ class ApiService {
   static Future<Customer> updateCustomer(Customer c) async {
     final uri  = Uri.parse('$baseUrl/customers/${c.id}');
     final resp = await http.put(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(c.toJson()),
     );
     if (resp.statusCode == 200) {
@@ -69,7 +71,7 @@ class ApiService {
 
   static Future<List<Product>> fetchProducts() async {
     final uri  = Uri.parse('$baseUrl/products/');
-    final resp = await http.get(uri);
+    final resp = await http.get(uri, headers: headers);
     if (resp.statusCode == 200) {
       final List data = jsonDecode(resp.body);
       return data.map((e) => Product.fromJson(e)).toList();
@@ -80,7 +82,7 @@ class ApiService {
   static Future<Product> createProduct(Product p) async {
     final uri  = Uri.parse('$baseUrl/products/');
     final resp = await http.post(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(p.toJson()),
     );
     if (resp.statusCode == 200 || resp.statusCode == 201) {
@@ -92,7 +94,7 @@ class ApiService {
   static Future<Product> updateProduct(Product p) async {
     final uri  = Uri.parse('$baseUrl/products/${p.id}');
     final resp = await http.put(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(p.toJson()),
     );
     if (resp.statusCode == 200) {
@@ -101,10 +103,10 @@ class ApiService {
     throw Exception('updateProduct ${resp.statusCode}: ${resp.body}');
   }
 
-  static Future<void> deleteProduct(int id) async {
+  static Future<void> deleteProduct(String id) async {
     final uri  = Uri.parse('$baseUrl/products/$id');
     final resp = await http.delete(uri);
-    if (resp.statusCode != 204) {
+    if (resp.statusCode != 204 && resp.statusCode != 200) {
       throw Exception('deleteProduct ${resp.statusCode}: ${resp.body}');
     }
   }
@@ -113,7 +115,7 @@ class ApiService {
 
   static Future<List<Category>> fetchCategories() async {
     final uri  = Uri.parse('$baseUrl/categories/');
-    final resp = await http.get(uri);
+    final resp = await http.get(uri, headers: headers);
     if (resp.statusCode == 200) {
       final List data = jsonDecode(resp.body);
       return data.map((e) => Category.fromJson(e)).toList();
@@ -124,7 +126,7 @@ class ApiService {
   static Future<Category> createCategory(Category c) async {
     final uri  = Uri.parse('$baseUrl/categories/');
     final resp = await http.post(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(c.toJson()),
     );
     if (resp.statusCode == 200 || resp.statusCode == 201) {
@@ -136,7 +138,7 @@ class ApiService {
   static Future<Category> updateCategory(Category c) async {
     final uri  = Uri.parse('$baseUrl/categories/${c.id}');
     final resp = await http.put(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(c.toJson()),
     );
     if (resp.statusCode == 200) {
@@ -145,7 +147,7 @@ class ApiService {
     throw Exception('updateCategory ${resp.statusCode}: ${resp.body}');
   }
 
-  static Future<void> deleteCategory(int id) async {
+  static Future<void> deleteCategory(String id) async {
     final uri  = Uri.parse('$baseUrl/categories/$id');
     final resp = await http.delete(uri);
     if (resp.statusCode != 204) {
@@ -155,12 +157,12 @@ class ApiService {
 
   // ─── SUBCATEGORIES (/subcategories/) ────────────────────────────────────────
 
-  static Future<List<Subcategory>> fetchSubcategories({int? categoryId}) async {
+  static Future<List<Subcategory>> fetchSubcategories({String? categoryId}) async {
     final path = categoryId != null
         ? '/subcategories/?category_id=$categoryId'
         : '/subcategories/';
     final uri  = Uri.parse('$baseUrl$path');
-    final resp = await http.get(uri);
+    final resp = await http.get(uri, headers: headers);
     if (resp.statusCode == 200) {
       final List data = jsonDecode(resp.body);
       return data.map((e) => Subcategory.fromJson(e)).toList();
@@ -171,7 +173,7 @@ class ApiService {
   static Future<Subcategory> createSubcategory(Subcategory s) async {
     final uri  = Uri.parse('$baseUrl/subcategories/');
     final resp = await http.post(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(s.toJson()),
     );
     if (resp.statusCode == 200 || resp.statusCode == 201) {
@@ -183,7 +185,7 @@ class ApiService {
   static Future<Subcategory> updateSubcategory(Subcategory s) async {
     final uri  = Uri.parse('$baseUrl/subcategories/${s.id}');
     final resp = await http.put(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(s.toJson()),
     );
     if (resp.statusCode == 200) {
@@ -192,7 +194,7 @@ class ApiService {
     throw Exception('updateSubcategory ${resp.statusCode}: ${resp.body}');
   }
 
-  static Future<void> deleteSubcategory(int id) async {
+  static Future<void> deleteSubcategory(String id) async {
     final uri  = Uri.parse('$baseUrl/subcategories/$id');
     final resp = await http.delete(uri);
     if (resp.statusCode != 204) {
@@ -204,7 +206,7 @@ class ApiService {
 
   static Future<List<PaymentType>> fetchPaymentTypes() async {
     final uri  = Uri.parse('$baseUrl/payment_types/');
-    final resp = await http.get(uri);
+    final resp = await http.get(uri, headers: headers);
     if (resp.statusCode == 200) {
       final List data = jsonDecode(resp.body);
       return data.map((e) => PaymentType.fromJson(e)).toList();
@@ -215,7 +217,7 @@ class ApiService {
   static Future<PaymentType> createPaymentType(PaymentType pt) async {
     final uri  = Uri.parse('$baseUrl/payment_types/');
     final resp = await http.post(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(pt.toJson()),
     );
     if (resp.statusCode == 200 || resp.statusCode == 201) {
@@ -227,7 +229,7 @@ class ApiService {
   static Future<PaymentType> updatePaymentType(PaymentType pt) async {
     final uri  = Uri.parse('$baseUrl/payment_types/${pt.id}');
     final resp = await http.put(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(pt.toJson()),
     );
     if (resp.statusCode == 200) {
@@ -248,7 +250,7 @@ class ApiService {
 
   static Future<List<Tax>> fetchTaxes() async {
     final uri  = Uri.parse('$baseUrl/taxes/');
-    final resp = await http.get(uri);
+    final resp = await http.get(uri, headers: headers);
     if (resp.statusCode == 200) {
       final List data = jsonDecode(resp.body);
       return data.map((e) => Tax.fromJson(e)).toList();
@@ -259,7 +261,7 @@ class ApiService {
   static Future<Tax> createTax(Tax t) async {
     final uri  = Uri.parse('$baseUrl/taxes/');
     final resp = await http.post(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(t.toJson()),
     );
     if (resp.statusCode == 200 || resp.statusCode == 201) {
@@ -271,7 +273,7 @@ class ApiService {
   static Future<Tax> updateTax(Tax t) async {
     final uri  = Uri.parse('$baseUrl/taxes/${t.id}/');
     final resp = await http.put(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(t.toJson()),
     );
     if (resp.statusCode == 200) {
@@ -292,7 +294,7 @@ class ApiService {
 
   static Future<List<Vendor>> fetchVendors() async {
     final uri  = Uri.parse('$baseUrl/vendors/');
-    final resp = await http.get(uri);
+    final resp = await http.get(uri, headers: headers);
     if (resp.statusCode == 200) {
       final List data = jsonDecode(resp.body);
       return data.map((e) => Vendor.fromJson(e)).toList();
@@ -303,7 +305,7 @@ class ApiService {
   static Future<Vendor> createVendor(Vendor v) async {
     final uri  = Uri.parse('$baseUrl/vendors/');
     final resp = await http.post(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(v.toJson()),
     );
     if (resp.statusCode == 200 || resp.statusCode == 201) {
@@ -315,7 +317,7 @@ class ApiService {
   static Future<Vendor> updateVendor(Vendor v) async {
     final uri  = Uri.parse('$baseUrl/vendors/${v.id}');
     final resp = await http.put(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(v.toJson()),
     );
     if (resp.statusCode == 200) {
@@ -336,7 +338,7 @@ class ApiService {
 
   static Future<List<Unit>> fetchUnits() async {
     final uri  = Uri.parse('$baseUrl/units/');
-    final resp = await http.get(uri);
+    final resp = await http.get(uri, headers: headers);
     if (resp.statusCode == 200) {
       final List data = jsonDecode(resp.body);
       return data.map((e) => Unit.fromJson(e)).toList();
@@ -347,7 +349,7 @@ class ApiService {
   static Future<Unit> createUnit(Unit u) async {
     final uri  = Uri.parse('$baseUrl/units/');
     final resp = await http.post(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(u.toJson()),
     );
     if (resp.statusCode == 200 || resp.statusCode == 201) {
@@ -359,7 +361,7 @@ class ApiService {
   static Future<Unit> updateUnit(Unit u) async {
     final uri  = Uri.parse('$baseUrl/units/${u.id}');
     final resp = await http.put(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(u.toJson()),
     );
     if (resp.statusCode == 200) {
@@ -380,7 +382,7 @@ class ApiService {
   static Future<void> postTransaction(Map<String, dynamic> data) async {
     final uri = Uri.parse('$baseUrl/transactions/');
     final resp = await http.post(uri,
-      headers: _jsonHeaders,
+      headers: headers,
       body: jsonEncode(data),
     );
     if (resp.statusCode != 200 && resp.statusCode != 201) {
@@ -389,7 +391,7 @@ class ApiService {
   }
 
   static Future<List<Map<String, dynamic>>> fetchTransactionItemsForCustomer(String customerName) async {
-    final response = await http.get(Uri.parse('$baseUrl/transactions'));
+    final response = await http.get(Uri.parse('$baseUrl/transactions'), headers: headers);
     if (response.statusCode != 200) throw Exception("Failed to fetch transactions");
     final data = jsonDecode(response.body) as List;
     return data.where((item) => item['customer_name'] == customerName).toList().cast<Map<String, dynamic>>();
@@ -397,12 +399,77 @@ class ApiService {
 
   static Future<Map<String, dynamic>> fetchBusinessProfile() async {
     final uri = Uri.parse('$baseUrl/business-profile/');
-    final resp = await http.get(uri);
+    final resp = await http.get(uri, headers: headers);
     if (resp.statusCode == 200) {
       return jsonDecode(resp.body);
     }
     throw Exception('fetchBusinessProfile ${resp.statusCode}: ${resp.body}');
   }
 
+  static Future<List<Map<String, dynamic>>> fetchIndustries() async {
+    final uri = Uri.parse('$baseUrl/industries');
+  final resp = await http.get(uri, headers: headers);
+    if (resp.statusCode == 200) {
+      final List data = jsonDecode(resp.body);
+      return data.cast<Map<String, dynamic>>();
+    }
+    throw Exception('fetchIndustries ${resp.statusCode}: ${resp.body}');
+  }
+
+  static Future<dynamic> get(String endpoint) async {
+    final uri = Uri.parse('$baseUrl$endpoint');
+    final resp = await http.get(uri, headers: headers);
+    if (resp.statusCode == 200) {
+      return jsonDecode(resp.body);
+    }
+    throw Exception('GET $endpoint failed: ${resp.statusCode} ${resp.body}');
+  }
+
+  static Future<dynamic> post(String endpoint, Map<String, dynamic> data) async {
+    final uri = Uri.parse('$baseUrl$endpoint');
+    final resp = await http.post(uri,
+      headers: headers,
+      body: jsonEncode(data),
+    );
+    if (resp.statusCode == 200 || resp.statusCode == 201) {
+      return jsonDecode(resp.body);
+    }
+    throw Exception('POST $endpoint failed: ${resp.statusCode} ${resp.body}');
+  }
+
+  // ─── SECURITY (/security/) ────────────────────────────────────────────────────────
+
+  static Future<void> setToken(String token) async {
+    _token = token;
+  }
+
+  static Map<String, String> get headers => {
+    'Authorization': 'Bearer $_token',
+    'Content-Type': 'application/json',
+  };
+
+  static Future<void> fetchUserSession() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/auth/me'),
+      headers: headers,
+    );
+
+
+    if (response.statusCode == 200) {
+      currentUser = json.decode(response.body);
+    } else {
+      throw Exception("Failed to fetch user session");
+    }
+  }
+
+  static Future<String> fetchBranchState() async {
+  final res = await http.get(Uri.parse('$baseUrl/branches/default'));
+  if (res.statusCode == 200) {
+    final data = jsonDecode(res.body);
+    return data['state'] ?? 'Tamil Nadu'; // fallback to old logic
+  } else {
+    throw Exception("Branch info not found");
+  }
+}
 }
 

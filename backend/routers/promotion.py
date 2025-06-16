@@ -1,43 +1,56 @@
 # backend/routers/promotion.py
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from datetime import datetime
 
 from database import get_db
-from models.promotion import Promotion as PromotionModel
+from models.promotion import Promotion
 from schemas.promotion import PromotionCreate, PromotionUpdate, PromotionOut
+from models.user import User
+from core.security import get_current_user
+from utils.id_generator import generate_custom_id
 
-router = APIRouter()
+router = APIRouter(prefix="/promotions", tags=["promotions"])
 
-@router.get("/promotions", response_model=List[PromotionOut])
-def get_promotions(db: Session = Depends(get_db)):
-    return db.query(PromotionModel).all()
+@router.get("/", response_model=List[PromotionOut])
+def get_promotions(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return db.query(Promotion).filter_by(business_id=current_user.business_id).all()
 
-@router.post("/promotions", response_model=PromotionOut)
-def create_promotion(promotion: PromotionCreate, db: Session = Depends(get_db)):
-    db_promo = PromotionModel(**promotion.dict())
-    db.add(db_promo)
+@router.post("/", response_model=PromotionOut, status_code=status.HTTP_201_CREATED)
+def create_promotion(payload: PromotionCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    new_promo = Promotion(
+        id=generate_custom_id("PRM", db, Promotion),
+        title=payload.title,
+        description=payload.description,
+        discount_percentage=payload.discount_percentage,
+        start_date=payload.start_date,
+        end_date=payload.end_date,
+        business_id=current_user.business_id
+    )
+    db.add(new_promo)
     db.commit()
-    db.refresh(db_promo)
-    return db_promo
+    db.refresh(new_promo)
+    return new_promo
 
-@router.put("/promotions/{promotion_id}", response_model=PromotionOut)
-def update_promotion(promotion_id: str, updated: PromotionUpdate, db: Session = Depends(get_db)):
-    promo = db.query(PromotionModel).filter(PromotionModel.id == promotion_id).first()
+@router.put("/{promotion_id}", response_model=PromotionOut)
+def update_promotion(promotion_id: str, payload: PromotionUpdate, db: Session = Depends(get_db)):
+    promo = db.query(Promotion).filter(Promotion.id == promotion_id).first()
     if not promo:
         raise HTTPException(status_code=404, detail="Promotion not found")
-    for field, value in updated.dict(exclude_unset=True).items():
+
+    for field, value in payload.dict(exclude_unset=True).items():
         setattr(promo, field, value)
+
     db.commit()
     db.refresh(promo)
     return promo
 
-@router.delete("/promotions/{promotion_id}")
+@router.delete("/{promotion_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_promotion(promotion_id: str, db: Session = Depends(get_db)):
-    promo = db.query(PromotionModel).filter(PromotionModel.id == promotion_id).first()
+    promo = db.query(Promotion).filter(Promotion.id == promotion_id).first()
     if not promo:
         raise HTTPException(status_code=404, detail="Promotion not found")
     db.delete(promo)
     db.commit()
-    return {"message": "Deleted successfully"}

@@ -1,7 +1,7 @@
 // lib/screens/admin/admin_center_screen.dart
 
 import 'package:flutter/material.dart';
-import '../settings/settings_screen.dart';
+import '../settings/business_profile_screen.dart';
 import 'user_management_screen.dart';
 import 'role_management_screen.dart';
 import '../admin/email_notification_templates_screen.dart';
@@ -59,7 +59,7 @@ class AdminCenterScreen extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                MaterialPageRoute(builder: (_) => const BusinessProfileScreen()),
               );
             },
           ),

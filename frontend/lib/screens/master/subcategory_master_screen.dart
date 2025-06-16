@@ -134,7 +134,7 @@ class _SubcategoryMasterScreenState extends State<SubcategoryMasterScreen> {
                   return;
                 }
                 final model = Subcategory(
-                  id: subcategory?.id ?? 0,
+                  id: subcategory?.id ?? '',
                   name: nameCtrl.text.trim(),
                   categoryId: selectedCat!.id, // non-null assertion
                   gstId: selectedTax!.id,      // non-null assertion
@@ -162,7 +162,7 @@ class _SubcategoryMasterScreenState extends State<SubcategoryMasterScreen> {
 
 
 
-  void _deleteSubcategory(int id) async {
+  void _deleteSubcategory(String id) async {
     try {
       await ApiService.deleteSubcategory(id);
       _loadDeps();
@@ -202,7 +202,7 @@ class _SubcategoryMasterScreenState extends State<SubcategoryMasterScreen> {
                       cellBuilder: (s) {
                         final c = _categories.firstWhere(
                           (c) => c.id == s.categoryId,
-                          orElse: () => Category(id: 0, name: 'Unknown', gstId: null),
+                          orElse: () => Category(id: '', name: 'Unknown', gstId: null),
                         );
                         return Text(c.name);
                       },

@@ -1,41 +1,88 @@
-// lib/screens/login/login_screen.dart
+// lib/screens/auth/login_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../../services/api.dart';
+import '../dashboard/dashboard_screen.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);  // <- const constructor added
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+  String? _error;
+
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    final response = await http.post(
+      Uri.parse('${ApiService.baseUrl}/auth/token'),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: {
+        'username': _usernameController.text,
+        'password': _passwordController.text,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final token = data['access_token'];
+
+      await ApiService.setToken(token);
+      await ApiService.fetchUserSession(); // populates current user globally
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const DashboardScreen()),
+      );
+    } else {
+      setState(() {
+        _error = "Invalid credentials";
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text("Login")),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            // Email field
             TextField(
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
+              controller: _usernameController,
+              decoration: const InputDecoration(labelText: "Username"),
             ),
             const SizedBox(height: 16),
-            // Password field
             TextField(
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-              ),
+              controller: _passwordController,
+              decoration: const InputDecoration(labelText: "Password"),
               obscureText: true,
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/dashboard');
-              },
-              child: const Text('Login'),
+              onPressed: _isLoading ? null : _login,
+              child: _isLoading ? const CircularProgressIndicator() : const Text("Login"),
             ),
+            if (_error != null) ...[
+              const SizedBox(height: 20),
+              Text(_error!, style: const TextStyle(color: Colors.red)),
+            ]
           ],
         ),
       ),

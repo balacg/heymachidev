@@ -1,15 +1,18 @@
-#heymachi_backend/schemas/payment_type.py
-
 from pydantic import BaseModel
+from typing import Optional
 
-class PaymentTypeBase(BaseModel):
+class PaymentTypeCreate(BaseModel):
     name: str
+    description: Optional[str] = None
 
-class PaymentTypeCreate(PaymentTypeBase):
-    pass
+class PaymentTypeUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
 
-class PaymentTypeOut(PaymentTypeBase):
+class PaymentTypeOut(BaseModel):
     id: int
+    name: str
+    description: Optional[str] = None
 
     class Config:
         orm_mode = True

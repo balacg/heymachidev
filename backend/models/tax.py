@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float
+# backend/models/tax.py
+
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -9,5 +11,9 @@ class Tax(Base):
     name = Column(String)
     rate = Column(Float)
     type = Column(String)
+    business_id = Column(String, ForeignKey("business_accounts.id"))
 
-    products = relationship("Product", back_populates="tax", foreign_keys="Product.gst_id")  # ✅ Fixed
+    business = relationship("BusinessAccount", backref="taxes")
+
+    # ✅ Fix this line
+    products = relationship("Product", back_populates="gst")

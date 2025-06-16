@@ -3,40 +3,46 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/promotion.dart';
+import 'api.dart'; // Ensure this is imported
 
 class PromotionService {
-  static const String baseUrl = 'http://localhost:8000';
+  static String get _baseUrl => ApiService.baseUrl;
 
   static Future<List<Promotion>> fetchPromotions() async {
-    final response = await http.get(Uri.parse('$baseUrl/promotions'));
+    final response = await http.get(Uri.parse('$_baseUrl/promotions/'), headers: ApiService.headers);
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Promotion.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to fetch promotions');
+      throw Exception('Failed to fetch promotions: ${response.body}');
     }
   }
 
-  static Future<bool> createPromotion(Promotion promotion) async {
+  static Future<bool> createPromotion(Promotion promo) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/promotions'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(promotion.toJson()),
+      Uri.parse('$_baseUrl/promotions/'),
+      headers: ApiService.headers,
+      body: jsonEncode(promo.toJson()),
     );
     return response.statusCode == 200 || response.statusCode == 201;
   }
 
-  static Future<bool> deletePromotion(String id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/promotions/$id'));
+  static Future<bool> updatePromotion(Promotion promo) async {
+    final response = await http.put(
+      Uri.parse('$_baseUrl/promotions/${promo.id}'),
+      headers: ApiService.headers,
+      body: jsonEncode(promo.toJson()),
+    );
     return response.statusCode == 200;
   }
 
-  static Future<bool> updatePromotion(Promotion promotion) async {
-    final response = await http.put(
-      Uri.parse('$baseUrl/promotions/${promotion.id}'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(promotion.toJson()),
+  static Future<void> deletePromotion(String id) async {
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/promotions/$id'),
+      headers: ApiService.headers,
     );
-    return response.statusCode == 200;
+    if (response.statusCode != 204) {
+      throw Exception('Delete failed: ${response.body}');
+    }
   }
 }

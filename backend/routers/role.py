@@ -1,4 +1,4 @@
-# heymachi_backend/routers/roles.py
+# heymachi_backend/routers/role.py
 
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
@@ -6,28 +6,19 @@ from typing import List, Optional
 from pydantic import BaseModel
 from database import get_db
 from models.role import Role
+from core.security import get_current_user  # ✅ or wherever your auth lives
+from models.user import User
+from schemas.role import RoleCreate, RoleUpdate, RoleOut
 
 router = APIRouter(prefix="/roles", tags=["roles"])
 
-class RoleCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
-
-class RoleUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-
-class RoleOut(BaseModel):
-    id: int
-    name: str
-    description: Optional[str] = None
-
-    class Config:
-        orm_mode = True
-
 @router.get("/", response_model=List[RoleOut])
-def read_roles(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return db.query(Role).offset(skip).limit(limit).all()
+def read_roles(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return db.query(Role).filter_by(business_id=current_user.business_id).all()
+
 
 @router.get("/{role_id}", response_model=RoleOut)
 def read_role(role_id: int, db: Session = Depends(get_db)):
@@ -37,15 +28,27 @@ def read_role(role_id: int, db: Session = Depends(get_db)):
     return role
 
 @router.post("/", response_model=RoleOut, status_code=status.HTTP_201_CREATED)
-def create_role(role: RoleCreate, db: Session = Depends(get_db)):
-    existing = db.query(Role).filter(Role.name == role.name).first()
+def create_role(
+    role: RoleCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    existing = db.query(Role).filter_by(
+        name=role.name, business_id=current_user.business_id
+    ).first()
     if existing:
         raise HTTPException(status_code=400, detail="Role name already exists")
-    new_role = Role(name=role.name, description=role.description)
+
+    new_role = Role(
+        name=role.name,
+        description=role.description,
+        business_id=current_user.business_id
+    )
     db.add(new_role)
     db.commit()
     db.refresh(new_role)
     return new_role
+
 
 @router.put("/{role_id}", response_model=RoleOut)
 def update_role(role_id: int, role_in: RoleUpdate, db: Session = Depends(get_db)):

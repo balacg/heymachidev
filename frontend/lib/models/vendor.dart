@@ -1,7 +1,7 @@
 // lib/models/vendor.dart
 
 class Vendor {
-  final int id;
+  final int? id;
   final String name;
   final String phone;
   final String? email;
@@ -9,7 +9,7 @@ class Vendor {
   final String? address;
 
   Vendor({
-    required this.id,
+    this.id,
     required this.name,
     required this.phone,
     this.email,
@@ -19,18 +19,17 @@ class Vendor {
 
   factory Vendor.fromJson(Map<String, dynamic> json) {
     return Vendor(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      phone: json['phone'] as String,
-      email: json['email'] as String?,
-      gst: json['gst'] as String?,
-      address: json['address'] as String?,
+      id: json['id'],
+      name: json['name'],
+      phone: json['phone'],
+      email: json['email'],
+      gst: json['gst'],
+      address: json['address'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'name': name,
       'phone': phone,
       'email': email,

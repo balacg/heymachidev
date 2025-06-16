@@ -7,6 +7,8 @@ from typing import List
 from database import get_db
 from models.vendor import Vendor
 from schemas.vendor import VendorCreate, VendorOut, VendorUpdate
+from routers.auth import get_current_user
+from models.user import User
 
 router = APIRouter(
     prefix="/vendors",
@@ -14,16 +16,13 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[VendorOut])
-def list_vendors(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    vendors = db.query(Vendor).offset(skip).limit(limit).all()
-    return vendors
+def get_vendors(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return db.query(Vendor).filter_by(business_id=current_user.business_id).all()
 
 @router.post("/", response_model=VendorOut)
-def create_vendor(vendor_in: VendorCreate, db: Session = Depends(get_db)):
-    db_vendor = db.query(Vendor).filter(Vendor.phone == vendor_in.phone).first()
-    if db_vendor:
-        raise HTTPException(status_code=400, detail="Vendor with this phone number already exists")
-    new_vendor = Vendor(**vendor_in.dict())
+def create_vendor(payload: VendorCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    new_vendor = Vendor(**payload.dict())
+    new_vendor.business_id = current_user.business_id
     db.add(new_vendor)
     db.commit()
     db.refresh(new_vendor)

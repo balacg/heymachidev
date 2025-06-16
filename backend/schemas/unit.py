@@ -1,17 +1,18 @@
-# heymachi_backend/schemas/unit.py
-
 from pydantic import BaseModel
 from typing import Optional
 
-class UnitBase(BaseModel):
+class UnitCreate(BaseModel):
     name: str
-    abbreviation: Optional[str] = None
+    description: Optional[str] = None
 
-class UnitCreate(UnitBase):
-    pass
+class UnitUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
 
-class UnitOut(UnitBase):
+class UnitOut(BaseModel):
     id: int
+    name: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True

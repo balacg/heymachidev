@@ -17,4 +17,6 @@ from .transaction import Transaction
 from .business_profile import BusinessProfile
 from .association_tables import user_roles
 from .promotion import Promotion
-
+from .industry import Industry
+from .business_account import BusinessAccount
+from .branch import Branch

@@ -115,7 +115,7 @@ class _CategoryMasterScreenState extends State<CategoryMasterScreen> {
                 return;
               }
               final model = Category(
-                id:    category?.id ?? 0,
+                id:    category?.id ?? '',
                 name:  name,
                 gstId: selectedTax!.id,
               );
@@ -139,7 +139,7 @@ class _CategoryMasterScreenState extends State<CategoryMasterScreen> {
     );
   }
 
-  void _deleteCategory(int id) async {
+  void _deleteCategory(String id) async {
     try {
       await ApiService.deleteCategory(id);
       await _loadData();
