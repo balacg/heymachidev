@@ -10,6 +10,7 @@ import '../admin/admin_center_screen.dart';
 import '../../utils/app_session.dart';
 import '../../utils/industry_config.dart';
 import '../../utils/industry_registry.dart';
+import 'package:restaurant_addon/screens/billing/open_orders_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -35,6 +36,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     AppSession.instance.industryId = 'restaurant';
     _pages = [
       const DashboardHome(userName: 'Bala G'),
+      const OpenOrdersScreen(),
       const LedgerScreen(),
       const UserProfileScreen(
         userName: 'Bala G',
@@ -141,10 +143,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 
   void _onItemTapped(int index) {
-    if (index == 4) {
+    if (index == 5) {
       _openMoreMenu();
-    } else if (index == 1) {
-      _handleBillingTap();  // 🍛 custom logic — no setState!
+    } else if (index == 2) {
+      _handleBillingTap(); 
     } else {
       setState(() {
         _selectedIndex = index;
@@ -168,6 +170,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Orders'),
           BottomNavigationBarItem(icon: Icon(Icons.point_of_sale), label: 'Billing'),
           BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Ledger'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),

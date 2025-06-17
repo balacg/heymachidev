@@ -3,7 +3,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship, declarative_base
 
-Base = declarative_base()
+#Base = declarative_base()
 
 user_roles = Table(
     'user_roles',

@@ -10,7 +10,9 @@ import 'cart_page.dart';
 import '../../widgets/order_meta_display.dart';
 
 class ItemCatalogPage extends StatefulWidget {
-  const ItemCatalogPage({Key? key}) : super(key: key);
+  final bool isSelectorMode;
+
+  const ItemCatalogPage({Key? key, this.isSelectorMode = false}) : super(key: key);
 
   @override
   State<ItemCatalogPage> createState() => _ItemCatalogPageState();
@@ -192,7 +194,13 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                             ],
                           )
                         : GestureDetector(
-                            onTap: () => _add(p),
+                            onTap: () {
+                              if (widget.isSelectorMode) {
+                                Navigator.pop(context, {'name': p.name, 'price': p.price});
+                              } else {
+                                _add(p);
+                              }
+                            },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
