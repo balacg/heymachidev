@@ -1,5 +1,4 @@
 // lib/screens/dashboard/dashboard_screen.dart
-
 import 'package:flutter/material.dart';
 import '../billing/item_catalog_page.dart';
 import '../dashboard/dashboard_home.dart';
@@ -8,6 +7,9 @@ import '../profile/user_profile_screen.dart';
 import '../master/master_dashboard_screen.dart';
 import '../transactions/transaction_history_screen.dart';
 import '../admin/admin_center_screen.dart';
+import '../../utils/app_session.dart';
+import '../../utils/industry_config.dart';
+import '../../utils/industry_registry.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -30,9 +32,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    AppSession.instance.industryId = 'restaurant';
     _pages = [
       const DashboardHome(userName: 'Bala G'),
-      const ItemCatalogPage(),
       const LedgerScreen(),
       const UserProfileScreen(
         userName: 'Bala G',
@@ -94,25 +96,66 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  void _handleBillingTap() async {
+    print('🧭 Billing tapped');
+
+    final industryId = AppSession.instance.industryId;
+    print('🏷️ Industry ID: $industryId');
+
+    final config = IndustryRegistry.getConfig(industryId ?? '');
+    print('🛠️ Config: $config');
+
+    if (config != null && config.containsKey("preBillingScreen")) {
+      final screenId = config["preBillingScreen"];
+      print('🎯 PreBilling screen ID: $screenId');
+
+      final screen = IndustryRegistry.resolvePreBillingScreen(screenId);
+      print('🧩 Resolved screen: $screen');
+
+      if (screen != null) {
+        final result = await Navigator.push<Map<String, dynamic>>(
+          context,
+          MaterialPageRoute(builder: (_) => screen),
+        );
+
+        print('📦 Result from preBilling screen: $result');
+
+        if (result != null) {
+          AppSession.instance.sessionData = result;
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const ItemCatalogPage(),
+            ),
+          );
+        }
+      } else {
+        print('❌ Screen not resolved!');
+      }
+    } else {
+      print('❌ No config or preBillingScreen found!');
+    }
+  }
+
+
+
   void _onItemTapped(int index) {
     if (index == 4) {
       _openMoreMenu();
+    } else if (index == 1) {
+      _handleBillingTap();  // 🍛 custom logic — no setState!
     } else {
       setState(() {
         _selectedIndex = index;
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    // ────────────────────────────────────────────────
-    // If Billing (index == 1) is selected, show that
-    // page full-screen (hides the outer AppBar + nav bar)
     if (_selectedIndex == 1) {
-      return _pages[1];
+      return _pages[1]; // This is a placeholder only. Billing screen is external.
     }
-    // ────────────────────────────────────────────────
 
     return Scaffold(
       appBar: AppBar(title: Text(_titles[_selectedIndex])),

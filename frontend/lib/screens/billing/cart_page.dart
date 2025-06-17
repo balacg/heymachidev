@@ -1,13 +1,12 @@
 // lib/screens/billing/cart_page.dart
-// ✅ FIXED:
-// 1. Dark mode support for (- 1 +) counter using theme color.
-// 2. Comma separators for item prices and total amount using intl.
-// 📦 Make sure to include `intl: ^0.18.1` in pubspec.yaml.
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../utils/app_session.dart';
+import '../../utils/industry_config.dart';
 import 'final_billing_page.dart';
-
+import '../../widgets/order_meta_display.dart';
+import '../../services/api.dart';
 class CartPage extends StatefulWidget {
   final Map<String, Map<String, dynamic>> cartItems;
   final void Function(Map<String, Map<String, dynamic>>) onCartUpdated;
@@ -48,6 +47,12 @@ class _CartPageState extends State<CartPage> {
     final numberFormat = NumberFormat.decimalPattern('en_IN');
     final itemColor = theme.colorScheme.onSurface;
 
+    final industryId = AppSession.instance.industryId ?? '';
+    final fieldMap = (IndustryConfig.forIndustry(industryId)?['sessionFields'] is Map)
+        ? Map<String, String>.from(
+            IndustryConfig.forIndustry(industryId)?['sessionFields'] ?? {})
+        : <String, String>{};
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -60,7 +65,7 @@ class _CartPageState extends State<CartPage> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Cart Summary'),
+        title: const Text('Cart'),
       ),
       body: _local.isEmpty
           ? Center(
@@ -71,6 +76,14 @@ class _CartPageState extends State<CartPage> {
             )
           : Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: OrderMetaDisplay(
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    sessionData: AppSession.instance.sessionData.map((k, v) => MapEntry(k, v.toString())),
+                    sessionLabels: fieldMap,
+                  ),
+                ),
                 Expanded(
                   child: ListView.builder(
                     itemCount: _local.length,
@@ -142,7 +155,7 @@ class _CartPageState extends State<CartPage> {
                       ),
                       child: Center(
                         child: Text(
-                          'Proceed | ₹${numberFormat.format(totalAmount)}',
+                          'Proceed to Billing (₹${numberFormat.format(totalAmount)})',
                           style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,

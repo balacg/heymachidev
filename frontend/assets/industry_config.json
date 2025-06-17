@@ -1,0 +1,18 @@
+{
+    "restaurant": {
+  "preBillingScreen": "DiningSelectorPage",
+  "sessionFields": {
+    "diningType": "Dining Mode",
+    "tableNo": "Table No",
+    "pax": "Guests"
+  }
+},
+    "clinic": {
+      "preBillingScreen": "PatientInfoForm",
+      "sessionFields": {
+        "patientName":     "Patient",
+        "appointmentSlot": "Appointment Slot"
+      }
+    }
+  }
+  

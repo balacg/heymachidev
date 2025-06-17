@@ -17,8 +17,8 @@ dependencies:
   path_provider: ^2.1.1
   pdf: ^3.10.1
   printing: ^5.12.0
-
-
+  restaurant_addon:
+    path: ../../hm_industries/restaurant/frontend
 
 dev_dependencies:
   flutter_test:
@@ -27,6 +27,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/industry_config.json
     - assets/images/
     - assets/icons/
     - assets/fonts/NotoSans-Regular.ttf

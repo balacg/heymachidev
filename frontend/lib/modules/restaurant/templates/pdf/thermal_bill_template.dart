@@ -11,6 +11,8 @@ Future<pw.Document> buildThermalPDF({
   required double totalAmount,
   required String paymentMode,
   required Map<String, dynamic> business,
+  Map<String, dynamic>? sessionData,
+  Map<String, String>? sessionLabels,
   String? promoTitle,
   double? promoDiscountPercentage,
   double? promoDiscountValue,
@@ -39,6 +41,17 @@ Future<pw.Document> buildThermalPDF({
 
             pw.Text("Order ID: $orderId", style: pw.TextStyle(font: notoFont, fontSize: 10)),
             pw.Text("Payment Mode: $paymentMode", style: pw.TextStyle(font: notoFont, fontSize: 10)),
+
+            if (sessionLabels != null && sessionData != null) ...[
+              pw.SizedBox(height: 6),
+              ...sessionLabels.entries.map((e) {
+                final val = sessionData[e.key];
+                return val != null
+                    ? pw.Text("${e.value}: $val", style: pw.TextStyle(font: notoFont, fontSize: 10))
+                    : pw.SizedBox();
+              }),
+            ],
+
             pw.SizedBox(height: 10),
 
             pw.Text("Items:", style: pw.TextStyle(font: notoFont, decoration: pw.TextDecoration.underline)),
