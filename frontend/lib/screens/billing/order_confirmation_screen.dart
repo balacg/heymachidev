@@ -9,6 +9,7 @@ import '../../models/customer.dart';
 import '../../modules/restaurant/templates/pdf/thermal_bill_template.dart';
 import '../../services/email_service.dart';
 import '../../services/api.dart';
+import '../../widgets/order_meta_display.dart';
 
 class OrderConfirmationScreen extends StatelessWidget {
   final Customer customer;
@@ -24,6 +25,9 @@ class OrderConfirmationScreen extends StatelessWidget {
   final double? promoPercentage;
   final double? promoDiscount;
 
+  final Map<String, dynamic> sessionData;
+  final Map<String, String> sessionLabels;
+
   const OrderConfirmationScreen({
     Key? key,
     required this.customer,
@@ -34,6 +38,8 @@ class OrderConfirmationScreen extends StatelessWidget {
     required this.cgst,
     required this.sgst,
     required this.igst,
+    required this.sessionData,
+    required this.sessionLabels,
     this.promoTitle,
     this.promoPercentage,
     this.promoDiscount,
@@ -58,19 +64,7 @@ class OrderConfirmationScreen extends StatelessWidget {
   Future<void> _handleExport(BuildContext context) async {
     try {
       final business = await ApiService.fetchBusinessProfile();
-      final pdfDoc = await buildThermalPDF(
-        orderId: orderId,
-        customer: customer.toJson(),
-        items: items,
-        totalAmount: totalAmount,
-        paymentMode: paymentMode,
-        business: business,
-        promoTitle: promoTitle,
-        promoDiscountPercentage: promoPercentage,
-        promoDiscountValue: promoDiscount,
-      );
-
-      final pdfBytes = await pdfDoc.save();
+      final pdfBytes = await _generatePdfBytes();
 
       if ((customer.email ?? '').isNotEmpty) {
         await EmailService.sendEmailWithPDF(
@@ -85,7 +79,8 @@ class OrderConfirmationScreen extends StatelessWidget {
       await EmailService.sendEmailWithPDF(
         toEmail: 'owner@yourbiz.com',
         subject: 'New Order Placed - $orderId',
-        body: 'Customer: ${customer.name}\nAmount: ₹${totalAmount.toStringAsFixed(2)}\nOrder ID: $orderId',
+        body:
+            'Customer: ${customer.name}\nAmount: ₹${totalAmount.toStringAsFixed(2)}\nOrder ID: $orderId',
         pdfBytes: pdfBytes,
         filename: 'order_$orderId.pdf',
       );
@@ -122,12 +117,12 @@ class OrderConfirmationScreen extends StatelessWidget {
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) async {
+              final pdfBytes = await _generatePdfBytes();
               if (value == 'pdf') {
-                final pdfBytes = await _generatePdfBytes();
-                await Printing.layoutPdf(onLayout: (format) async => pdfBytes);
+                await Printing.layoutPdf(onLayout: (_) async => pdfBytes);
               } else if (value == 'save') {
-                final pdfBytes = await _generatePdfBytes();
-                final file = await EmailService.savePDFToFile(pdfBytes, 'order_$orderId.pdf');
+                final file =
+                    await EmailService.savePDFToFile(pdfBytes, 'order_$orderId.pdf');
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text("Saved to: ${file.path}")),
                 );
@@ -147,15 +142,23 @@ class OrderConfirmationScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: ListView(
           children: [
+            OrderMetaDisplay(
+              sessionData: sessionData.map((k, v) => MapEntry(k, v.toString())),
+              sessionLabels: sessionLabels,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const Divider(),
             Text('Customer: ${customer.name}', style: theme.textTheme.titleMedium),
             Text('Phone: ${customer.phone}', style: theme.textTheme.bodyMedium),
-            Text('Address: ${customer.address ?? ''}, ${customer.state ?? ''}', style: theme.textTheme.bodyMedium),
+            Text('Address: ${customer.address ?? ''}, ${customer.state ?? ''}',
+                style: theme.textTheme.bodyMedium),
             if ((customer.email ?? '').isNotEmpty)
               Text('Email: ${customer.email}', style: theme.textTheme.bodyMedium),
             const SizedBox(height: 12),
             Text('Payment Mode: $paymentMode', style: theme.textTheme.bodyMedium),
             const Divider(),
-            Text('Items Summary:', style: theme.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold)),
+            Text('Items Summary:',
+                style: theme.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             ...items.map((item) {
               final name = item['productName']?.toString() ?? 'Unnamed Item';
@@ -167,25 +170,21 @@ class OrderConfirmationScreen extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 title: Text(name, style: theme.textTheme.bodyLarge),
                 subtitle: Text('Qty: $qty x ₹${formatter.format(price)}'),
-                trailing: Text('₹${formatter.format(total)}', style: theme.textTheme.bodyLarge),
+                trailing: Text('₹${formatter.format(total)}',
+                    style: theme.textTheme.bodyLarge),
               );
             }).toList(),
             const Divider(),
-            if (igst > 0) ...[
-              _buildAlignedRow('Total IGST', igst, theme),
-            ] else ...[
+            if (igst > 0)
+              _buildAlignedRow('Total IGST', igst, theme)
+            else ...[
               _buildAlignedRow('Total CGST', cgst, theme),
               _buildAlignedRow('Total SGST', sgst, theme),
             ],
             const Divider(),
             if ((promoTitle ?? '').isNotEmpty && (promoDiscount ?? 0) > 0)
               _buildAlignedRow('Promo "$promoTitle" Discount', -promoDiscount!, theme),
-            _buildAlignedRow(
-              'Grand Total',
-              totalAmount,
-              theme,
-              isBold: true,
-            ),
+            _buildAlignedRow('Grand Total', totalAmount, theme, isBold: true),
           ],
         ),
       ),

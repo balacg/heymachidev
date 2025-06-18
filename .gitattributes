@@ -1,0 +1,19 @@
+# Force text files to use LF
+* text=auto eol=lf
+
+# Ensure specific file types are treated as text
+*.py  text
+*.dart  text
+*.yaml  text
+*.yml  text
+*.json  text
+*.md  text
+*.gitignore  text
+*.gitattributes  text
+*.sh  text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary

@@ -1,6 +1,10 @@
 // lib/main.dart
 
+
 import 'package:flutter/material.dart';
+import 'package:restaurant_addon/screens/billing/table_selector.dart';
+
+import 'utils/industry_config.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/profile/user_profile_screen.dart';
@@ -15,9 +19,12 @@ import 'services/api.dart';
 /// Global notifier for theme mode
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await IndustryConfig.load();
   runApp(const HeyMachiApp());
 }
+
 
 class HeyMachiApp extends StatelessWidget {
   const HeyMachiApp({Key? key}) : super(key: key);
@@ -61,6 +68,8 @@ class HeyMachiApp extends StatelessWidget {
           ),
           onGenerateRoute: (RouteSettings settings) {
             switch (settings.name) {
+              case '/table-selector':
+                return MaterialPageRoute(builder: (_) => const TableSelectorPage());
               case '/dashboard':
                 return MaterialPageRoute(builder: (_) => const DashboardScreen());
               case '/profile':

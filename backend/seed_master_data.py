@@ -2,7 +2,7 @@
 
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
-from models import Base
+from models.base import Base
 from models.tax import Tax
 from models.category import Category
 from models.subcategory import Subcategory

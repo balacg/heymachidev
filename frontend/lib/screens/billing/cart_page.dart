@@ -1,22 +1,29 @@
 // lib/screens/billing/cart_page.dart
-// ✅ FIXED:
-// 1. Dark mode support for (- 1 +) counter using theme color.
-// 2. Comma separators for item prices and total amount using intl.
-// 📦 Make sure to include `intl: ^0.18.1` in pubspec.yaml.
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:restaurant_addon/services/restaurant_api.dart';
+import '../../utils/app_session.dart';
+import '../../utils/industry_config.dart';
 import 'final_billing_page.dart';
+import '../../widgets/order_meta_display.dart';
+import '../../services/api.dart';
 
 class CartPage extends StatefulWidget {
   final Map<String, Map<String, dynamic>> cartItems;
   final void Function(Map<String, Map<String, dynamic>>) onCartUpdated;
 
+  final bool fromOpenOrder; // ✅ optional flag
+  final Map<String, dynamic>? initialOrder; // ✅ optional order meta
+
   const CartPage({
     Key? key,
     required this.cartItems,
     required this.onCartUpdated,
+    this.fromOpenOrder = false,
+    this.initialOrder,
   }) : super(key: key);
+
 
   @override
   State<CartPage> createState() => _CartPageState();
@@ -48,6 +55,16 @@ class _CartPageState extends State<CartPage> {
     final numberFormat = NumberFormat.decimalPattern('en_IN');
     final itemColor = theme.colorScheme.onSurface;
 
+    final sessionData = widget.fromOpenOrder && widget.initialOrder != null
+    ? widget.initialOrder!.map((k, v) => MapEntry(k, v.toString()))
+    : AppSession.instance.sessionData.map((k, v) => MapEntry(k, v.toString()));
+
+    final industryId = AppSession.instance.industryId ?? '';
+    final fieldMap = (IndustryConfig.forIndustry(industryId)?['sessionFields'] is Map)
+        ? Map<String, String>.from(
+            IndustryConfig.forIndustry(industryId)?['sessionFields'] ?? {})
+        : <String, String>{};
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -60,7 +77,7 @@ class _CartPageState extends State<CartPage> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Cart Summary'),
+        title: const Text('Cart'),
       ),
       body: _local.isEmpty
           ? Center(
@@ -71,6 +88,14 @@ class _CartPageState extends State<CartPage> {
             )
           : Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: OrderMetaDisplay(
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                    sessionData: sessionData,
+                    sessionLabels: fieldMap,
+                  ),
+                ),
                 Expanded(
                   child: ListView.builder(
                     itemCount: _local.length,
@@ -123,33 +148,68 @@ class _CartPageState extends State<CartPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: GestureDetector(
-                    onTap: () {
-                      widget.onCartUpdated(_local);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => FinalBillingPage(cartItems: _local),
+                  child: Column(
+                    children: [
+                      // ➕ NEW Save button — goes back to Orders screen
+                      ElevatedButton(
+                        onPressed: () async {
+                          widget.onCartUpdated(_local);
+
+                          await RestaurantApi.saveOpenOrder({
+                            ...AppSession.instance.sessionData,
+                            'items': _local.entries.map((e) => {
+                              'item': e.key,
+                              'qty': e.value['qty'],
+                              'price': e.value['price'],
+                            }).toList(),
+                            'total_amount': totalAmount,
+                          });
+
+                          if (context.mounted) {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/open-orders',
+                              (route) => false,
+                            );
+                          }
+                        },
+                        child: const Text(
+                          'Save',
+                          style: TextStyle(color: Colors.white),
                         ),
-                      );
-                    },
-                    child: Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                            colors: [Colors.deepOrange, Colors.pinkAccent]),
-                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Center(
-                        child: Text(
-                          'Proceed | ₹${numberFormat.format(totalAmount)}',
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
+
+                      const SizedBox(height: 8),
+                      // Proceed to Billing button
+                      GestureDetector(
+                        onTap: () {
+                          widget.onCartUpdated(_local);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => FinalBillingPage(cartItems: _local),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                                colors: [Colors.deepOrange, Colors.pinkAccent]),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Proceed to Billing (₹${numberFormat.format(totalAmount)})',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],

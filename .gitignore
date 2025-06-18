@@ -1,44 +1,33 @@
-
- # Python virtualenv
- 
--/backend/venv/
-+/backend/venv/
-+/backend/.venv/
-
-
-# Flutter build + tool folders
-/frontend/build/
-/frontend/.dart_tool/
-/frontend/.packages
-/frontend/.pub/
-/frontend/pubspec.lock
-
-# macOS + IDE cruft
-**/.DS_Store
+# Flutter artifacts
+**/build/
+**/.dart_tool/
 **/.idea/
-**/*.iml
-.vscode/settings.json
-frontend/ios/Podfile
-frontend/ios/Podfile.lock
-frontend/ios/Flutter/Debug.xcconfig
-frontend/ios/Flutter/Release.xcconfig
-frontend/ios/Runner.xcodeproj/project.pbxproj
-frontend/ios/Runner.xcworkspace/contents.xcworkspacedata
-frontend/linux/flutter/generated_plugin_registrant.cc
-frontend/linux/flutter/generated_plugins.cmake
-frontend/macos/Podfile
-frontend/macos/Flutter/Flutter-Debug.xcconfig
-frontend/macos/Flutter/Flutter-Release.xcconfig
-frontend/macos/Flutter/GeneratedPluginRegistrant.swift
-frontend/windows/flutter/generated_plugin_registrant.cc
-frontend/windows/flutter/generated_plugins.cmake
-frontend/.flutter-plugins-dependencies
-frontend/.DS_Store
-frontend/lib/.DS_Store
-frontend/lib/screens/.DS_Store
-backend/.DS_Store
-backend/.DS_Store
-backend/.DS_Store
-frontend/lib/screens/.DS_Store
-frontend/lib/.DS_Store
-frontend/lib/.DS_Store
+**/.vscode/
+**/.packages
+**/pubspec.lock
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.DS_Store
+**/.metadata
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.eggs/
+.eggs/
+.env/
+.venv/
+env/
+venv/
+
+# Logs
+*.log
+*.sqlite3
+
+# System files
+Thumbs.db
+.DS_Store
+*.swp

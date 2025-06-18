@@ -1,11 +1,18 @@
+// lib/screens/billing/item_catalog_page.dart
+
 import 'package:flutter/material.dart';
+import 'package:heymachi_dev/utils/app_session.dart';
+import 'package:heymachi_dev/utils/industry_config.dart';
 import 'package:intl/intl.dart';
 import '../../services/api.dart';
 import '../../models/product.dart';
 import 'cart_page.dart';
+import '../../widgets/order_meta_display.dart';
 
 class ItemCatalogPage extends StatefulWidget {
-  const ItemCatalogPage({Key? key}) : super(key: key);
+  final bool isSelectorMode;
+
+  const ItemCatalogPage({Key? key, this.isSelectorMode = false}) : super(key: key);
 
   @override
   State<ItemCatalogPage> createState() => _ItemCatalogPageState();
@@ -16,11 +23,24 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
   List<Product> _filteredProducts = [];
   Map<String, Map<String, dynamic>> _cartItems = {};
   final TextEditingController _searchCtl = TextEditingController();
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
     _fetchProducts();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args != null && args is Map<String, Map<String, dynamic>>) {
+        _cartItems = Map.from(args);
+      }
+      _initialized = true;
+    }
   }
 
   Future<void> _fetchProducts() async {
@@ -111,19 +131,33 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
-                    onPressed: () => Navigator.pushNamed(context, '/dashboard'),
+                    onPressed: () {
+                      Navigator.pop(context, _cartItems); // return updated cart
+                    },
                   ),
                   const SizedBox(width: 8),
-                  Text('Item Catalog',
-                      style: theme.textTheme.titleLarge!
-                          .copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                    'Item Catalog',
+                    style: theme.textTheme.titleLarge!
+                        .copyWith(fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
             ),
 
+            // Billing Info Display (modular)
+            OrderMetaDisplay(
+              sessionData: AppSession.instance.sessionData.map((k, v) => MapEntry(k, v.toString())),
+              sessionLabels: (IndustryConfig.forIndustry(AppSession.instance.industryId ?? '')?['sessionFields'] as Map?)?.map(
+                    (k, v) => MapEntry(k.toString(), v.toString()),
+                  ) ?? {},
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+
             // Search Box
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               child: TextField(
                 controller: _searchCtl,
                 onChanged: _onSearch,
@@ -163,7 +197,8 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                               ),
                               Text('$qty',
                                   style: TextStyle(
-                                      color: theme.textTheme.bodyLarge?.color,
+                                      color:
+                                          theme.textTheme.bodyLarge?.color,
                                       fontWeight: FontWeight.bold)),
                               IconButton(
                                 icon: const Icon(Icons.add),
@@ -173,13 +208,22 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                             ],
                           )
                         : GestureDetector(
-                            onTap: () => _add(p),
+                            onTap: () {
+                              if (widget.isSelectorMode) {
+                                Navigator.pop(context, {'name': p.name, 'price': p.price});
+                              } else {
+                                _add(p);
+                              }
+                            },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Colors.deepOrange, Colors.pinkAccent],
+                                  colors: [
+                                    Colors.deepOrange,
+                                    Colors.pinkAccent
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -199,13 +243,16 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
           ],
         ),
       ),
+
+      // Bottom Bar
       bottomNavigationBar: totalItems > 0
           ? SafeArea(
               child: GestureDetector(
                 onTap: _goToCart,
                 child: Container(
                   height: 70,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 12),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.deepOrange, Colors.pinkAccent],
