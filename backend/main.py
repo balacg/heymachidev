@@ -5,8 +5,6 @@ load_dotenv()
 import sys
 import os
 
- 
-sys.path.append('/Users/bala/development/AppDev/hm_industries')
 from hm_industries.restaurant.backend.dbmodels import OpenOrderDB
 
 from datetime import timedelta
@@ -42,8 +40,8 @@ from seeder.industry_seeder import seed_industries
 from seeder.business_account_seeder import seed_business_accounts
 
 # Restaurant module
-from restaurant.backend.routers import open_order_router
-from restaurant.backend.models import open_order_model
+from hm_industries.restaurant.backend.routers import open_order_router
+from hm_industries.restaurant.backend.models import open_order_model
 
 
 
