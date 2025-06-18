@@ -23,11 +23,24 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
   List<Product> _filteredProducts = [];
   Map<String, Map<String, dynamic>> _cartItems = {};
   final TextEditingController _searchCtl = TextEditingController();
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
     _fetchProducts();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args != null && args is Map<String, Map<String, dynamic>>) {
+        _cartItems = Map.from(args);
+      }
+      _initialized = true;
+    }
   }
 
   Future<void> _fetchProducts() async {
@@ -118,8 +131,9 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
-                    onPressed: () =>
-                        Navigator.pushNamed(context, '/dashboard'),
+                    onPressed: () {
+                      Navigator.pop(context, _cartItems); // return updated cart
+                    },
                   ),
                   const SizedBox(width: 8),
                   Text(

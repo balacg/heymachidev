@@ -9,7 +9,6 @@ import os
 sys.path.append('/Users/bala/development/AppDev/hm_industries')
 from hm_industries.restaurant.backend.dbmodels import OpenOrderDB
 
-
 from datetime import timedelta
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +19,8 @@ from database import get_db, engine, SessionLocal
 from models.base import Base
 from models.user import User
 from utils.id_generator import generate_custom_id
+from seeder.config_seeder import seed_token_prefixes
+from models.token_sequence import TokenSequence 
 
 from routers import (
     users, roles, category, subcategory, product, tax, customer, vendor,
@@ -66,6 +67,7 @@ def startup_event():
     db = SessionLocal()
     seed_industries(db)  
     seed_business_accounts(db)
+    seed_token_prefixes(db)
     db.close()
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60

@@ -10,7 +10,7 @@ import '../admin/admin_center_screen.dart';
 import '../../utils/app_session.dart';
 import '../../utils/industry_config.dart';
 import '../../utils/industry_registry.dart';
-import 'package:restaurant_addon/screens/billing/open_orders_screen.dart';
+import 'package:restaurant_addon/screens/billing/orders_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -36,7 +36,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     AppSession.instance.industryId = 'restaurant';
     _pages = [
       const DashboardHome(userName: 'Bala G'),
-      const OpenOrdersScreen(),
+      const OrdersScreen(),
       const LedgerScreen(),
       const UserProfileScreen(
         userName: 'Bala G',
