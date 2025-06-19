@@ -15,12 +15,13 @@ class RestaurantApi {
     }
   }
 
-  static Future<void> cancelOrder(String orderId) async {
-    final response = await http.delete(Uri.parse('$baseUrl/open-orders/$orderId'));
-    if (response.statusCode != 200) {
-      throw Exception('Failed to cancel order');
-    }
+ static Future<void> cancelOrder(String orderId) async {
+  final response = await http.delete(Uri.parse('$baseUrl/open-orders/$orderId'));
+  if (response.statusCode != 200) {
+    throw Exception('Failed to cancel order');
   }
+}
+
 
   static Future<void> createOrUpdateOrder(Map<String, dynamic> order) async {
     final url = '$baseUrl/open-orders/';
@@ -77,6 +78,5 @@ class RestaurantApi {
       throw Exception('Failed to generate token');
     }
   }
-
 
 }

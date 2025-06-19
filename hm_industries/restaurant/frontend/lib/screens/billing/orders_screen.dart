@@ -22,11 +22,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
   List<dynamic> openOrders = [];
   bool isLoading = true;
 
-  @override
-  void initState() {
-    super.initState();
-    fetchOpenOrders();
+  List<String> occupiedTables = [];
+
+@override
+void initState() {
+  super.initState();
+  loadOccupiedTables();
+}
+
+  Future<void> loadOccupiedTables() async {
+    final orders = await fetchOrdersRaw();
+    setState(() {
+      occupiedTables = orders
+          .where((o) => o['dining_mode'] == 'Dine-In')
+          .map<String>((o) => o['table_no']?.toString() ?? '')
+          .toList();
+    });
   }
+
+
 
   Future<void> fetchOpenOrders() async {
     setState(() => isLoading = true);
@@ -43,10 +57,19 @@ class _OrdersScreenState extends State<OrdersScreen> {
     }
   }
 
+  Future<List<dynamic>> fetchOrdersRaw() async {
+  try {
+    return await RestaurantApi.getOpenOrders();
+  } catch (e) {
+    debugPrint("Error in fetchOrdersRaw: $e");
+    return [];
+  }
+}
+
   Map<String, Map<String, dynamic>> convertToCartItems(List<dynamic> items) {
     final Map<String, Map<String, dynamic>> result = {};
     for (var item in items) {
-      if (item['name'] != null) {
+      if (item['item'] != null) {
         result[item['name']] = {
           'qty': item['qty'],
           'price': item['price'],
@@ -67,30 +90,49 @@ class _OrdersScreenState extends State<OrdersScreen> {
       } else {
         return; // Cancelled
       }
+
+      final token = await RestaurantApi.getTokenForType('DL');
+      AppSession.instance.sessionData['token_no'] = token;
+
+      if (context.mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ItemCatalogPage(),
+            settings: RouteSettings(arguments: {
+              'cartItems': {},
+              'id': null,
+            }),
+          ),
+        );
+      }
+
     } else {
-      // 👇 Dynamically generate token prefix from config
       final prefix = (mode == 'Takeaway') ? 'TK' : 'DL';
       try {
         final token = await RestaurantApi.getTokenForType(prefix);
         AppSession.instance.sessionData['token_no'] = token;
+
+        if (context.mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const ItemCatalogPage(),
+              settings: RouteSettings(arguments: {
+                'cartItems': {},
+                'id': null,
+              }),
+            ),
+          );
+        }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to generate $prefix token')),
         );
-        return;
       }
     }
-
-    // ✅ Navigate to Item Catalog page
-    if (context.mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const ItemCatalogPage(),
-        ),
-      );
-    }
   }
+
 
   Widget buildOrderCard(dynamic order) {
     final formatter = NumberFormat('#,##0.00', 'en_IN');
@@ -162,49 +204,169 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Orders')),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : openOrders.isEmpty
-              ? const Center(child: Text('No open orders'))
-              : RefreshIndicator(
-                  onRefresh: fetchOpenOrders,
-                  child: ListView.builder(
-                    itemCount: openOrders.length,
-                    itemBuilder: (context, index) {
-                      return buildOrderCard(openOrders[index]);
-                    },
-                  ),
+      appBar: AppBar(
+        title: const Text("Select Table"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/open-orders');
+            },
+            child: const Text("View All Orders", style: TextStyle(color: Colors.white)),
+          )
+        ],
+      ),
+      body: GridView.count(
+        crossAxisCount: 4,
+        padding: const EdgeInsets.all(16),
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        children: List.generate(12, (i) {
+          final tableNo = 'T${i + 1}';
+          final isOccupied = occupiedTables.contains(tableNo);
+
+          return GestureDetector(
+            onTap: () async {
+              if (!isOccupied) {
+                AppSession.instance.sessionData.clear();
+                AppSession.instance.sessionData.addAll({
+                  'dining_mode': 'Dine-In',
+                  'table_no': tableNo,
+                  'pax': 1,
+                });
+
+                final token = await RestaurantApi.getTokenForType('DL');
+                AppSession.instance.sessionData['token_no'] = token;
+
+                if (context.mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ItemCatalogPage(),
+                    ),
+                  );
+                }
+              }
+ else {
+                // 🧠 Load openOrders if not already loaded
+                if (openOrders.isEmpty) {
+                  openOrders = await fetchOrdersRaw();
+                }
+
+                // 🧲 Find the order for the tapped table
+                final existingOrder = openOrders.firstWhere(
+                  (o) => o['table_no'] == tableNo,
+                  orElse: () => null,
+                );
+
+                if (existingOrder != null) {
+                  final items = existingOrder['items'] as List<dynamic>? ?? [];
+                  final Map<String, Map<String, dynamic>> cart = {
+                    for (var item in items)
+                      item['item']: {
+                        'price': item['price'],
+                        'qty': item['qty'],
+                      }
+                  };
+
+                  AppSession.instance.sessionData.clear();
+                  AppSession.instance.sessionData['dining_mode'] = 'Dine-In';
+                  AppSession.instance.sessionData['table_no'] = tableNo;
+                  AppSession.instance.sessionData['pax'] = existingOrder['pax'].toString();
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CartPage(
+                        cartItems: cart,
+                        onCartUpdated: (_) {},
+                        fromOpenOrder: true,
+                        initialOrder: existingOrder,
+                      ),
+                    ),
+                  );
+                }
+              }
+            },
+
+            child: Container(
+              decoration: BoxDecoration(
+                color: isOccupied ? Colors.blue[200] : Colors.grey[300],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.black12),
+              ),
+              child: Center(
+                child: Text(
+                  tableNo,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-      floatingActionButton: buildFloatingFAB(),
+              ),
+            ),
+          );
+        }),
+      ),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.extended(
+            heroTag: 'takeaway',
+            label: const Text('Takeaway'),
+            icon: const Icon(Icons.shopping_bag),
+            onPressed: () async {
+              try {
+                final token = await RestaurantApi.getTokenForType('TK');
+                AppSession.instance.sessionData.clear();
+                AppSession.instance.sessionData.addAll({
+                  'dining_mode': 'Takeaway',
+                  'token_no': token,
+                });
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ItemCatalogPage(),
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to generate Takeaway token')),
+                );
+              }
+            },
+
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton.extended(
+            heroTag: 'delivery',
+            label: const Text('Delivery'),
+            icon: const Icon(Icons.delivery_dining),
+            onPressed: () async {
+              try {
+                final token = await RestaurantApi.getTokenForType('DL');
+                AppSession.instance.sessionData.clear();
+                AppSession.instance.sessionData.addAll({
+                  'dining_mode': 'Delivery',
+                  'token_no': token,
+                });
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ItemCatalogPage(),
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to generate Delivery token')),
+                );
+              }
+            },
+
+          ),
+        ],
+      ),
     );
   }
 
-  Widget buildFloatingFAB() {
-    return ExpandableFab(
-      distance: 112.0,
-      children: [
-        FloatingActionButton.extended(
-          heroTag: 'dinein',
-          onPressed: () => startNewOrder('Dine-In'),
-          icon: const Icon(Icons.restaurant),
-          label: const Text('Dine-In'),
-        ),
-        FloatingActionButton.extended(
-          heroTag: 'takeaway',
-          onPressed: () => startNewOrder('Takeaway'),
-          icon: const Icon(Icons.shopping_bag),
-          label: const Text('Takeaway'),
-        ),
-        FloatingActionButton.extended(
-          heroTag: 'delivery',
-          onPressed: () => startNewOrder('Delivery'),
-          icon: const Icon(Icons.delivery_dining),
-          label: const Text('Delivery'),
-        ),
-      ],
-    );
-  }
 }
 
 // Note: Implement ExpandableFab as a custom widget or use an available package to get FAB expansion animation.

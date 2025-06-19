@@ -1,6 +1,7 @@
 // lib/screens/billing/cart_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:heymachi_dev/screens/billing/item_catalog_page.dart';
 import 'package:intl/intl.dart';
 import 'package:restaurant_addon/services/restaurant_api.dart';
 import '../../utils/app_session.dart';
@@ -8,13 +9,14 @@ import '../../utils/industry_config.dart';
 import 'final_billing_page.dart';
 import '../../widgets/order_meta_display.dart';
 import '../../services/api.dart';
+import 'package:restaurant_addon/screens/billing/orders_screen.dart'; // 🧭 Importing OrdersScreen directly
+import 'package:flutter/foundation.dart';
 
 class CartPage extends StatefulWidget {
   final Map<String, Map<String, dynamic>> cartItems;
   final void Function(Map<String, Map<String, dynamic>>) onCartUpdated;
-
-  final bool fromOpenOrder; // ✅ optional flag
-  final Map<String, dynamic>? initialOrder; // ✅ optional order meta
+  final bool fromOpenOrder;
+  final Map<String, dynamic>? initialOrder;
 
   const CartPage({
     Key? key,
@@ -24,7 +26,6 @@ class CartPage extends StatefulWidget {
     this.initialOrder,
   }) : super(key: key);
 
-
   @override
   State<CartPage> createState() => _CartPageState();
 }
@@ -32,11 +33,95 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   late Map<String, Map<String, dynamic>> _local;
 
-  @override
-  void initState() {
-    super.initState();
-    _local = Map.from(widget.cartItems);
+  bool _hasChanges = false;
+
+  void _openItemCatalogWithCart() async {
+    print("🧠 Opening ItemCatalog with cart: $_local");
+
+    final updatedCart = await Navigator.push<Map<String, Map<String, dynamic>>>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ItemCatalogPage(isSelectorMode: false),
+        settings: RouteSettings(arguments: {
+          'cartItems': _local,
+          'id': widget.initialOrder?['id'],
+        }),
+      ),
+    );
+
+    if (updatedCart != null && mounted) {
+      print("🧠 Returned from ItemCatalog: $updatedCart");
+      bool hasChanges = false;
+
+      updatedCart.forEach((key, newItem) {
+        if (!_local.containsKey(key) ||
+            _local[key]!['qty'] != newItem['qty'] ||
+            _local[key]!['price'] != newItem['price']) {
+          hasChanges = true;
+        }
+      });
+
+      if (_local.length != updatedCart.length) {
+        hasChanges = true;
+      }
+
+      setState(() {
+        _local = updatedCart;
+        _hasChanges = hasChanges;
+      });
+
+      print("🧠 Cart updated: $_local | _hasChanges: $_hasChanges");
+    }
   }
+
+
+
+
+
+
+// 🔍 Deep equality check
+bool _deepEquals(Map<String, Map<String, dynamic>> a, Map<String, Map<String, dynamic>> b) {
+  if (a.length != b.length) return false;
+  for (final key in a.keys) {
+    if (!b.containsKey(key)) return false;
+    if (!mapEquals(a[key], b[key])) return false;
+  }
+  return true;
+}
+
+
+
+
+  @override
+void initState() {
+  super.initState();
+
+  
+  if (widget.cartItems.isNotEmpty) {
+    print('🛒 Using passed cartItems');
+    _local = Map.from(widget.cartItems);
+    _hasChanges = true;
+  } else if (widget.fromOpenOrder && widget.initialOrder != null) {
+    print('🛒 Loading from initialOrder');
+    final items = widget.initialOrder!['items'] as List<dynamic>? ?? [];
+    _local = {
+      for (var item in items)
+        item['item']: {
+          'price': item['price'],
+          'qty': item['qty'],
+        }
+    };
+    _hasChanges = false;
+  } else {
+    _local = {};
+    _hasChanges = false;
+  }
+  print('🛒 Final loaded cart: $_local');
+  print('🛒 Has Changes: $_hasChanges');
+
+}
+
+
 
   int get totalAmount {
     return _local.entries.fold<int>(
@@ -56,13 +141,12 @@ class _CartPageState extends State<CartPage> {
     final itemColor = theme.colorScheme.onSurface;
 
     final sessionData = widget.fromOpenOrder && widget.initialOrder != null
-    ? widget.initialOrder!.map((k, v) => MapEntry(k, v.toString()))
-    : AppSession.instance.sessionData.map((k, v) => MapEntry(k, v.toString()));
+        ? widget.initialOrder!.map((k, v) => MapEntry(k, v.toString()))
+        : AppSession.instance.sessionData.map((k, v) => MapEntry(k, v.toString()));
 
     final industryId = AppSession.instance.industryId ?? '';
     final fieldMap = (IndustryConfig.forIndustry(industryId)?['sessionFields'] is Map)
-        ? Map<String, String>.from(
-            IndustryConfig.forIndustry(industryId)?['sessionFields'] ?? {})
+        ? Map<String, String>.from(IndustryConfig.forIndustry(industryId)?['sessionFields'] ?? {})
         : <String, String>{};
 
     return Scaffold(
@@ -74,7 +158,11 @@ class _CartPageState extends State<CartPage> {
           icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
           onPressed: () {
             widget.onCartUpdated(_local);
-            Navigator.pop(context);
+            if (widget.fromOpenOrder) {
+              Navigator.pop(context, _local); // 🔁 back to Item Catalog
+            } else {
+              Navigator.pop(context);
+            }
           },
         ),
         title: const Text('Cart'),
@@ -119,6 +207,7 @@ class _CartPageState extends State<CartPage> {
                               color: itemColor,
                               onPressed: () {
                                 setState(() {
+                                  _hasChanges = true;
                                   if (qty > 1) {
                                     _local[key]!['qty'] = qty - 1;
                                   } else {
@@ -136,6 +225,7 @@ class _CartPageState extends State<CartPage> {
                               color: itemColor,
                               onPressed: () {
                                 setState(() {
+                                  _hasChanges = true;
                                   _local[key]!['qty'] = qty + 1;
                                 });
                               },
@@ -148,64 +238,122 @@ class _CartPageState extends State<CartPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      // ➕ NEW Save button — goes back to Orders screen
-                      ElevatedButton(
-                        onPressed: () async {
-                          widget.onCartUpdated(_local);
+                  child: Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.add),
+                            color: theme.iconTheme.color,
+                            onPressed: () {
+                              print('🧠 + button tapped');
+                              _openItemCatalogWithCart();
+                            } 
+                          ),
 
-                          await RestaurantApi.saveOpenOrder({
-                            ...AppSession.instance.sessionData,
-                            'items': _local.entries.map((e) => {
-                              'item': e.key,
-                              'qty': e.value['qty'],
-                              'price': e.value['price'],
-                            }).toList(),
-                            'total_amount': totalAmount,
-                          });
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton(
+                          onPressed: (_hasChanges && _local.isNotEmpty) ? () async {
+                            print('💾 Final cart before save: $_local');
 
-                          if (context.mounted) {
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              '/open-orders',
-                              (route) => false,
-                            );
-                          }
-                        },
-                        child: const Text(
-                          'Save',
-                          style: TextStyle(color: Colors.white),
+                            widget.onCartUpdated(_local);
+
+                            final sessionMap = Map<String, dynamic>.from(AppSession.instance.sessionData);
+
+                            final orderPayload = {
+                              ...sessionMap,
+                              'items': _local.entries.map((e) => {
+                                'item': e.key,
+                                'qty': e.value['qty'],
+                                'price': e.value['price'],
+                              }).toList(),
+                              'total_amount': totalAmount,
+                            };
+                            
+                            // ✅ Ensure we attach order ID when editing
+                            if (widget.fromOpenOrder && widget.initialOrder != null && widget.initialOrder!['id'] != null) {
+                              orderPayload['id'] = widget.initialOrder!['id'];
+                            }
+
+                            await RestaurantApi.saveOpenOrder(orderPayload);
+                            print('✅ Saved order payload: $orderPayload');
+
+                            if (context.mounted) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(builder: (_) => OrdersScreen()), 
+                                  (Route<dynamic> route) => false,
+                              );
+                            }
+                          } :null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                          ),
+                          child: const Text('Save', style: TextStyle(color: Colors.white)),
                         ),
                       ),
+                      if (widget.fromOpenOrder) ...[
+                          const SizedBox(width: 12),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  title: const Text('Clear this order?'),
+                                  content: const Text('Are you sure you want to clear all items from this order?'),
+                                  actions: [
+                                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                                    TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Clear')),
+                                  ],
+                                ),
+                              );
 
-                      const SizedBox(height: 8),
-                      // Proceed to Billing button
-                      GestureDetector(
-                        onTap: () {
-                          widget.onCartUpdated(_local);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => FinalBillingPage(cartItems: _local),
+                              if (confirm == true) {
+                                if (widget.fromOpenOrder && widget.initialOrder?['id'] != null) {
+                                  final id = widget.initialOrder!['id'];
+                                  await RestaurantApi.cancelOrder(id); // 🔥 Add this call
+                                  print('🗑️ Cleared order $id from server');
+                                }
+
+                                setState(() {
+                                  _local.clear();
+                                  _hasChanges = true;
+                                });
+
+                                widget.onCartUpdated(_local);
+
+                                if (context.mounted) {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(builder: (_) => OrdersScreen()),
+                                    (Route<dynamic> route) => false,
+                                  );
+                                }
+                              }
+
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
                             ),
-                          );
-                        },
-                        child: Container(
-                          height: 50,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                                colors: [Colors.deepOrange, Colors.pinkAccent]),
-                            borderRadius: BorderRadius.circular(8),
+                            child: const Text('Clear Order', style: TextStyle(color: Colors.white)),
                           ),
-                          child: Center(
-                            child: Text(
-                              'Proceed to Billing (₹${numberFormat.format(totalAmount)})',
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
-                            ),
+                      ],
+
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            widget.onCartUpdated(_local);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => FinalBillingPage(cartItems: _local),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                          ),
+                          child: Text(
+                            'Billing ₹${numberFormat.format(totalAmount)}',
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
                       ),

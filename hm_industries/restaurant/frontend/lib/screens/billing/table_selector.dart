@@ -30,13 +30,14 @@ class _TableSelectorPageState extends State<TableSelectorPage> {
 
     try {
       final token = await RestaurantApi.getTokenForType('DL');
-      print('✅ Received Token: $token');
-      AppSession.instance.sessionData = {
+      //print('✅ Received Token: $token');
+      AppSession.instance.sessionData.addAll({
         'dining_mode': 'Dine-In',
         'table_no': selectedTable,
         'pax': pax,
         'token_no': token,
-      };
+      });
+      //print('✅ Updated Session: ${AppSession.instance.sessionData}');
 
       if (context.mounted) {
         Navigator.push(
