@@ -3,6 +3,9 @@
 from pydantic import BaseModel
 from typing import Optional
 
+from typing import List
+from .tag import TagOut
+
 
 class ProductBase(BaseModel):
     name: str
@@ -13,9 +16,8 @@ class ProductBase(BaseModel):
     unit_id: Optional[int]
     is_active: Optional[bool] = True
 
-
 class ProductCreate(ProductBase):
-    pass
+    tag_ids: Optional[List[int]] = []
 
 
 class ProductUpdate(BaseModel):
@@ -26,7 +28,7 @@ class ProductUpdate(BaseModel):
     gst_id: Optional[int]
     unit_id: Optional[int]
     is_active: Optional[bool]
-
+    tag_ids: Optional[List[int]] = []
 
 class ProductOut(BaseModel):
     id: str
@@ -42,6 +44,7 @@ class ProductOut(BaseModel):
     category_name: Optional[str]
     subcategory_name: Optional[str]
     gst_rate: Optional[float]
+    tags: Optional[List[TagOut]] = [] 
 
     class Config:
         orm_mode = True

@@ -20,3 +20,4 @@ from .promotion import Promotion
 from .industry import Industry
 from .business_account import BusinessAccount
 from .branch import Branch
+from .product_tag import product_tags 

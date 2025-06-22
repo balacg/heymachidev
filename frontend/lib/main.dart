@@ -30,14 +30,17 @@ class HeyMachiApp extends StatelessWidget {
   const HeyMachiApp({Key? key}) : super(key: key);
 
   Future<bool> isLoggedIn() async {
-    try {
-      // Try fetching user session if token exists
-      await ApiService.fetchUserSession();
-      return true;
-    } catch (_) {
-      return false;
-    }
+  try {
+    final token = await ApiService.getToken(); // 👈 your shared prefs or secure store logic
+    if (token == null) return false;
+
+    ApiService.setToken(token); // 👈 set the Authorization header before calling fetchUserSession
+    await ApiService.fetchUserSession();
+    return true;
+  } catch (_) {
+    return false;
   }
+}
 
   @override
   Widget build(BuildContext context) {

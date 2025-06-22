@@ -25,7 +25,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late final List<Widget> _pages;
   final List<String> _titles = [
     'HeyMachi',
-    'Billing',
+    'Orders',
     'Ledger',
     'Profile',
   ];
@@ -98,55 +98,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  void _handleBillingTap() async {
-    print('🧭 Billing tapped');
-
-    final industryId = AppSession.instance.industryId;
-    print('🏷️ Industry ID: $industryId');
-
-    final config = IndustryRegistry.getConfig(industryId ?? '');
-    print('🛠️ Config: $config');
-
-    if (config != null && config.containsKey("preBillingScreen")) {
-      final screenId = config["preBillingScreen"];
-      print('🎯 PreBilling screen ID: $screenId');
-
-      final screen = IndustryRegistry.resolvePreBillingScreen(screenId);
-      print('🧩 Resolved screen: $screen');
-
-      if (screen != null) {
-        final result = await Navigator.push<Map<String, dynamic>>(
-          context,
-          MaterialPageRoute(builder: (_) => screen),
-        );
-
-        print('📦 Result from preBilling screen: $result');
-
-        if (result != null) {
-          AppSession.instance.sessionData = result;
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const ItemCatalogPage(),
-            ),
-          );
-        }
-      } else {
-        print('❌ Screen not resolved!');
-      }
-    } else {
-      print('❌ No config or preBillingScreen found!');
-    }
-  }
+  
 
 
 
   void _onItemTapped(int index) {
-    if (index == 5) {
+    if (index == 4) {
       _openMoreMenu();
-    } else if (index == 2) {
-      _handleBillingTap(); 
     } else {
       setState(() {
         _selectedIndex = index;
@@ -155,23 +113,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    if (_selectedIndex == 1) {
-      return _pages[1]; // This is a placeholder only. Billing screen is external.
-    }
+    final isMore = _selectedIndex == 4;
 
     return Scaffold(
-      appBar: AppBar(title: Text(_titles[_selectedIndex])),
-      body: _pages[_selectedIndex],
+      appBar: AppBar(
+        title: Text(isMore ? 'More' : _titles[_selectedIndex]),
+      ),
+      body: isMore ? const SizedBox.shrink() : _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.indigo,
         unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex < 4 ? _selectedIndex : 0,
+        currentIndex: _selectedIndex < 5 ? _selectedIndex : 0, // now safe
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Orders'),
-          BottomNavigationBarItem(icon: Icon(Icons.point_of_sale), label: 'Billing'),
           BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Ledger'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
@@ -179,4 +136,5 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
 }

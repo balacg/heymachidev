@@ -1,7 +1,9 @@
 // lib/screens/auth/login_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:heymachi_dev/utils/app_session.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../services/api.dart';
 import '../dashboard/dashboard_screen.dart';
@@ -37,6 +39,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final token = data['access_token'];
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('access_token', token);
+      
+      print("Bearer Token: ${AppSession.instance.sessionData['access_token']}");
 
       await ApiService.setToken(token);
       await ApiService.fetchUserSession(); // populates current user globally

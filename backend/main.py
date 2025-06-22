@@ -43,7 +43,7 @@ from seeder.business_account_seeder import seed_business_accounts
 from hm_industries.restaurant.backend.routers import open_order_router
 from hm_industries.restaurant.backend.models import open_order_model
 
-
+from backend.routers import tag  
 
 # ────────────────────────────────────────────────────────────────────────────────
 app = FastAPI(title="HeyMachi Backend")
@@ -76,27 +76,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
     return users.create_user(user_in, db)
 
-@app.post("/auth/token", response_model=Token, tags=["auth"])
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
-
-    access_token = create_access_token(
-        data={"sub": user.username},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
-
-@app.get("/auth/me", response_model=UserOut, tags=["auth"])
-def read_users_me(current_user: User = Depends(get_current_user)):
-    return current_user
-
-
 # ─── API Routers ────────────────────────────────────────────────────────────────
 app.include_router(business_account)
 app.include_router(industry_router)
 
+app.include_router(auth_router) 
 app.include_router(users)
 app.include_router(roles)
 app.include_router(category)
@@ -113,6 +97,9 @@ app.include_router(email)
 app.include_router(business_profile)
 app.include_router(promotion)
 app.include_router(branch)
+
+app.include_router(tag.router) 
+
 
 # Plug-in restaurant module
 try:

@@ -1,0 +1,566 @@
+Name,Category,Sub Category,Rate,Tax,Product Group 1,Product Group 2,Product Group 3
+65 - Babycorn,Appetizers,Veg,170,GST 5%,65,Indian,Babycorn
+65 - Chicken,Appetizers,Non Veg,180,GST 5%,65,Indian,Chicken
+65 - Egg,Appetizers,Non Veg,100,GST 5%,65,Indian,Egg
+65 - Fish,Appetizers,Non Veg,270,GST 5%,65,Indian,Fish
+65 - Gobi,Appetizers,Veg,160,GST 5%,65,Indian,Gobi
+65 - Mushroom,Appetizers,Veg,160,GST 5%,65,Indian,Mushroom
+65 - Paneer,Appetizers,Veg,170,GST 5%,65,Indian,Paneer
+65 - Prawn,Appetizers,Non Veg,270,GST 5%,65,Indian,Prawn
+Aloo Capsicum,Curries,Veg,120,GST 5%,,Indian,Aloo
+Aloo Gobi Masala,Curries,Veg,190,GST 5%,,Indian,Aloo
+Aloo Jeera,Curries,Veg,120,GST 5%,,Indian,Aloo
+Aloo Matar,Curries,Veg,190,GST 5%,,Indian,Aloo
+Aloo Paneer Masala,Curries,Veg,210,GST 5%,,Indian,Aloo
+American Chopsey - Chicken,Noodles,Non Veg,290,GST 5%,,Chinese,Chicken
+American Chopsey - Veg,Noodles,Veg,260,GST 5%,,Chinese,
+Apple Juice,Beverages,Fresh Juice,80,GST 5%,,Indian,
+Apple Pie,Desserts,Pastry,90,GST 5%,,Continental,
+Apple Pie with Icecream,Desserts,Pastry,125,GST 5%,,Continental,
+Appuchi Chicken,Appetizers,Non Veg,240,GST 5%,,Indian,Chicken
+Arabian Delight - I/C - Regular,Desserts,Icecreams,120,GST 5%,,Indian,
+Arabian Delight - I/C - Single,Desserts,Icecreams,60,GST 5%,,Indian,
+Arabian Delight M/S,Beverages,Milkshakes,150,GST 5%,,Indian,
+Assorted Veg Platter,Appetizers,Veg,380,GST 5%,,Continental,
+Authentic Soup - Chicken,Soups,Non Veg,100,GST 5%,Authentic Soup,Indian,Chicken
+Authentic Soup - Mutton,Soups,Non Veg,120,GST 5%,Authentic Soup,Indian,Mutton
+Authentic Soup - Tomato,Soups,Veg,80,GST 5%,Authentic Soup,Indian,Tomato
+Authentic Soup - Veg,Soups,Veg,90,GST 5%,Authentic Soup,Indian,
+Baked Vegetables,Appetizers,Veg,160,GST 5%,,Continental,
+BBQ Chicken Grilled Sandwich,Sandwiches,Non Veg,130,GST 5%,,Continental,Chicken
+BBQ Chicken Pizza - Large,Pizzas,Non Veg,380,GST 5%,BBQ Chicken Pizza,Continental,Chicken
+BBQ Chicken Pizza - Regular,Pizzas,Non Veg,280,GST 5%,BBQ Chicken Pizza,Continental,Chicken
+BBQ Prawns with Roast Chilli Salsa,Appetizers,Barbecue,200,GST 5%,,Continental,Prawns
+Bhurji - Egg,Appetizers,Non Veg,130,GST 5%,,Indian,Egg
+Bhurji - Paneer,Appetizers,Veg,130,GST 5%,Bhurji,Indian,Paneer
+Bindi Kadai,Curries,Veg,110,GST 5%,,Indian,
+Bindi Masala,Curries,Veg,110,GST 5%,,Indian,
+Black Coffee,Beverages,Hot,15,GST 5%,,Indian,Coffee
+Black Tea,Beverages,Hot,15,GST 5%,,Indian,
+Blackcurrent - I/C - Regular,Desserts,Icecreams,100,GST 5%,,Indian,
+Blackcurrent - I/C - Single,Desserts,Icecreams,50,GST 5%,,Indian,
+Blackcurrent M/S,Beverages,Milkshakes,140,GST 5%,,Indian,
+Boiled Egg - 2 Pieces,Appetizers,Non Veg,30,GST 5%,,Indian,Tea
+Bone Chicken Biryani,Main Course,Biryanis,140,GST 5%,,Indian,Tea
+Bread Butter Jam Toast,Sandwiches,Veg ,80,GST 5%,,Continental,
+Bread Omlette,Sandwiches,Non Veg,110,GST 5%,,Continental,Egg
+Breads - Aloo Kulcha,Main Course,Indian Breads,130,GST 5%,,Indian,Aloo
+Breads - Aloo Paratha,Main Course,Indian Breads,130,GST 5%,,Indian,Aloo
+Breads - Butter Kulcha,Main Course,Indian Breads,60,GST 5%,,Indian,
+Breads - Butter Naan,Main Course,Indian Breads,60,GST 5%,,Indian,
+Breads - Butter Roti,Main Course,Indian Breads,60,GST 5%,,Indian,
+Breads - Garlic Naan,Main Course,Indian Breads,70,GST 5%,,Indian,
+Breads - Gobi Paratha,Main Course,Indian Breads,120,GST 5%,,Indian,Gobi
+Breads - Kulcha,Main Course,Indian Breads,50,GST 5%,,Indian,
+Breads - Naan,Main Course,Indian Breads,45,GST 5%,,Indian,
+Breads - Paneer Kulcha,Main Course,Indian Breads,140,GST 5%,,Indian,
+Breads - Paneer Paratha,Main Course,Indian Breads,140,GST 5%,,Indian,Paneer
+Breads - Tandoori Roti,Main Course,Indian Breads,50,GST 5%,Tandoori,Indian,
+Brownie,Desserts,Pastry,140,GST 5%,,Continental,
+Brownie Sizzlers,Desserts,Pastry,260,GST 5%,Sizzlers,Continental,
+Brownie with Icecream,Desserts,Pastry,180,GST 5%,,Continental,
+Bruschetta,Appetizers,Veg,220,GST 5%,,Continental,
+Butter Chicken Masala,Curries,Non Veg,270,GST 5%,Butter,Indian,Chicken
+Buttermilk,Beverages,Cold,40,GST 5%,,Indian,
+Butterscotch - I/C - Regular,Desserts,Icecreams,90,GST 5%,,Indian,
+Butterscotch - I/C - Single,Desserts,Icecreams,45,GST 5%,,Indian,
+Butterscotch M/S,Beverages,Milkshakes,130,GST 5%,,Indian,
+Caramel Blast,Beverages,Milkshakes,190,GST 5%,,Indian,
+Caribbean Chicken,Appetizers,Barbecue,170,GST 5%,,Continental,Chicken
+Cashew Pulao,Main Course,Rice Varieties,130,GST 5%,,Indian,
+Channa Masala,Curries,Veg,100,GST 5%,,Indian,
+Chapati,Main Course,Indian Breads,25,GST 5%,,Indian,
+Cheese Garlic Bread,Appetizers,Veg,140,GST 5%,,Continental,
+Chef's Delight Atta Roll - Chicken,Kick Grass Specials,Non Veg,160,GST 5%,,Indian,Chicken
+Chef's Delight Atta Roll - Veg,Kick Grass Specials,Veg,140,GST 5%,,Indian,
+Chettinadu Chicken Masala,Curries,Non Veg,240,GST 5%,Chettinadu,Indian,Chicken
+Chettinadu Fry - Chicken,Appetizers,Non Veg,150,GST 5%,Chettinadu Fry,Indian,Chicken
+Chettinadu Fry - Fish,Appetizers,Non Veg,180,GST 5%,Chettinadu Fry,Indian,Fish
+Chettinadu Fry - Nandu Vadai,Appetizers,Non Veg,200,GST 5%,Chettinadu Fry,Indian,Crab
+Chettinadu Fry - Prawn,Appetizers,Non Veg,180,GST 5%,Chettinadu Fry,Indian,Prawns
+Chettinadu Kari Varuval,Appetizers,Non Veg,190,GST 5%,,Indian,Mutton
+Chettinadu Muttai Kulambu,Curries,Non Veg,130,GST 5%,,Indian,Egg
+Chicken Biryani,Main Course,Biryanis,230,GST 5%,,Indian,Chicken
+Chicken Burger,Burgers,Non Veg,190,GST 5%,,,
+Chicken Burger - Double Patty,Burgers,Non Veg,300,GST 5%,,,
+Chicken Cheese Sandwich,Sandwiches,Non Veg,190,GST 5%,,Continental,Chicken
+Chicken Classic - Large,Pizzas,Non Veg,360,GST 5%,Chicken Classic,Continental,Chicken
+Chicken Classic - Medium,Pizzas,Non Veg,200,GST 5%,Chicken Classic,Continental,Chicken
+Chicken Classic - Regular,Pizzas,Non Veg,260,GST 5%,Chicken Classic,Continental,Chicken
+Chicken Club Sandwich,Sandwiches,Non Veg,140,GST 5%,,Continental,Chicken
+Chicken Kalmi Kebab,Appetizers,Non Veg,190,GST 5%,,Indian,Chicken
+Chicken Keema Dosa,Dosas,Non Veg,130,GST 5%,,Indian,Chicken
+Chicken Kola Urundai - 5 Pieces,Dosas,Non Veg,160,GST 5%,,Indian,Chicken
+Chicken Koththu Kari Dosa,Dosas,Non Veg,120,GST 5%,,Indian,Chicken
+Chicken Kurma,Dosas,Non Veg,150,GST 5%,,Indian,Chicken
+Chicken Lasagna,Dosas,Non Veg,170,GST 5%,Lasagna,Continental,Chicken
+Chicken Lollypop - 5 Pieces,Dosas,Non Veg,230,GST 5%,Fried,Continental,Chicken
+Chicken Makhani,Rolls,Non Veg,130,GST 5%,,Indian,Chicken
+Chicken Mushroom Pie,Dosas,Non Veg,120,GST 5%,,Continental,Chicken
+Chicken Nesamani,Dosas,Non Veg,240,GST 5%,,Continental,Chicken
+Chicken Nizam,Dosas,Non Veg,150,GST 5%,,Indian,Chicken
+Chicken Pallipalayam,Dosas,Non Veg,230,GST 5%,,Indian,Chicken
+Chicken Pasta - Red,Pastas,Non Veg,290,GST 5%,,Continental,Chicken
+Chicken Pasta - Red & White,Pastas,Non Veg,290,GST 5%,,Continental,Chicken
+Chicken Pasta - White,Pastas,Non Veg,290,GST 5%,,Continental,Chicken
+Chicken Pizza - Large,Pizzas,Non Veg,360,GST 5%,Chicken Pizza,Continental,Chicken
+Chicken Pizza - Regular,Pizzas,Non Veg,260,GST 5%,Chicken Pizza,Continental,Chicken
+Chicken Pizza - Regular,Pizzas,Non Veg,220,GST 5%,Chicken Pizza,Continental,Chicken
+Chicken Pulao,Main Course,Rice Varieties,220,GST 5%,,Indian,Chicken
+Chicken Roll,Rolls,Non Veg,160,GST 5%,,Indian,Chicken
+Chicken Salt & Pepper,Appetizers,Non Veg,240,GST 5%,Salt & Pepper,Continental,Chicken
+Chicken Sandwich,Sandwiches,Non Veg,170,GST 5%,,Continental,Chicken
+Chicken Sheek Roll,Rolls,Non Veg,120,GST 5%,,Indian,Chicken
+Chicken Sizzlers,Sizzlers,Non Veg,350,GST 5%,,Continental,Chicken
+Chicken Spring Roll,Appetizers,Non Veg,190,GST 5%,Fried,Continental,Chicken
+Chicken Sticks,Appetizers,Non Veg,250,GST 5%,Fried,Continental,Chicken
+Chicken Suicide Bombs,Appetizers,Non Veg,240,GST 5%,,Continental,Chicken
+Chicken Supreme Pizza - Large,Pizzas,Non Veg,520,GST 5%,Chicken Supreme Pizza,Continental,Chicken
+Chicken Supreme Pizza - Regular,Pizzas,Non Veg,280,GST 5%,Chicken Supreme Pizza,Continental,Chicken
+Chicken Supreme Pizza - Small,Pizzas,Non Veg,380,GST 5%,Chicken Supreme Pizza,Continental,Chicken
+Chicken Tangri Kebab - 1 Piece,Appetizers,Non Veg,130,GST 5%,,Indian,Chicken
+Chicken Tikka,Appetizers,Non Veg,240,GST 5%,Tandoori,Indian,Chicken
+Chicken Tikka Biryani,Main Course,Biryanis,250,GST 5%,,Indian,Chicken
+Chicken Tikka Dosa,Dosas,Non Veg,130,GST 5%,,Indian,Chicken
+Chicken Tikka Masala,Curries,Non Veg,260,GST 5%,,Indian,Chicken
+Chicken Tikka Roll,Rolls,Non Veg,180,GST 5%,,Indian,Chicken
+Chilli - Babycorn,Appetizers,Veg,190,GST 5%,Chilli,,
+Chilli - Chicken,Appetizers,Non Veg,210,GST 5%,Chilli,Chinese,Chicken
+Chilli - Crab Podimas,Appetizers,Non Veg,280,GST 5%,Chilli,Chinese,Crab
+Chilli - Egg,Appetizers,Non Veg,120,GST 5%,Chilli,Chinese,Egg
+Chilli - Fish,Appetizers,Non Veg,280,GST 5%,Chilli,Chinese,Fish
+Chilli - Gobi,Appetizers,Veg,180,GST 5%,Chilli,,
+Chilli - Mushroom,Appetizers,Veg,180,GST 5%,Chilli,,
+Chilli - Paneer,Appetizers,Veg,190,GST 5%,Chilli,,
+Chilli - Prawn,Appetizers,Non Veg,280,GST 5%,Chilli,Chinese,Prawns
+Chilli Cheese Toast,Sandwiches,Veg ,140,GST 5%,,Continental,
+Chilli Chicken,Appetizers,Non Veg,120,GST 5%,Chilli,Indian,Chicken
+Chilli Garlic Chicken Roll,Rolls,Non Veg,195,GST 5%,,Indian,Chicken
+Chilli Garlic Potato,Appetizers,Veg,120,GST 5%,,Continental,
+Chilli Mutton Roll,Rolls,Non Veg,140,GST 5%,,Indian,Mutton
+Chinese Chopsey - Chicken,Noodles,Non Veg,185,GST 5%,,Chinese,Chicken
+Chinese Chopsey - Veg,Noodles,Veg,175,GST 5%,,Chinese,
+Chipotle Chilaquiles,Kick Grass Specials,Non Veg,190,GST 5%,,Continental,Chicken
+Chipotle Mango Barbecue Chicken,Appetizers,Barbecue,160,GST 5%,,Continental,Chicken
+Choco Chip Cookie Shake,Beverages,Milkshakes,220,GST 5%,,Indian,
+Chocolate - I/C - Regular,Desserts,Icecreams,90,GST 5%,,Indian,
+Chocolate - I/C - Single,Desserts,Icecreams,45,GST 5%,,Indian,
+Chocolate M/S,Beverages,Milkshakes,130,GST 5%,,Indian,
+Clear Soup - Chicken,Soups,Non Veg,90,GST 5%,Clear Soup,Chinese,Chicken
+Clear Soup - Veg,Soups,Veg,80,GST 5%,Clear Soup,Chinese,
+Coconut Oil - Farm fresh,Sides,Sides,220,-,,,
+Coconut Pancakes,Kick Grass Specials,Veg,140,GST 5%,,Continental,
+Coffee,Beverages,Hot,25,GST 5%,,Indian,Coffee
+Coffee Brazillia - I/C - Regular,Desserts,Icecreams,120,GST 5%,,Indian,
+Coffee Brazillia - I/C - Single,Desserts,Icecreams,60,GST 5%,,Indian,
+Coffee Brazillia M/S,Beverages,Milkshakes,150,GST 5%,,Indian,
+Cold Coffee,Beverages,Milkshakes,150,GST 5%,,Indian,
+Coleslaw Salad,Sides,Salads,120,GST 5%,,Continental,
+Crab - Balls,Appetizers,Non Veg,200,GST 5%,,Continental,Crab
+Crab Lollypop,Appetizers,Non Veg,280,GST 5%,Lollypop,Continental,Crab
+Crab Podimas,Appetizers,Non Veg,220,GST 5%,,Indian,Crab
+Cream of Soup - Chicken,Soups,Non Veg,120,GST 5%,Cream of Soup,Continental,Chicken
+Cream of Soup - Roasted Pumpkin,Soups,Veg,100,GST 5%,Cream of Soup,Continental,
+Cream of Soup - Tomato,Soups,Veg,100,GST 5%,Cream of Soup,Continental,
+Cream of Soup - Veg,Soups,Veg,100,GST 5%,Cream of Soup,Continental,
+Curd,Sides,Sides,25,GST 5%,,,
+Curd Rice,Main Course,Rice Varieties,120,GST 5%,,Indian,
+Death by Chocolate,Desserts,Pastry,240,GST 5%,,Continental,
+Devil's Drink,Beverages,Cold,90,GST 5%,Soda,Continental,
+Deviled Egg Prawn Dippers,Kick Grass Specials,Non Veg,180,GST 5%,,Continental,Prawns
+Deviled Egg Salad,Sides,Salads,110,GST 5%,,Continental,Egg
+Dhal Fry,Curries,Veg,140,GST 5%,,Indian,Dhal
+Dhal Makhani,Curries,Veg,120,GST 5%,,Indian,Dhal
+Dhal Palak,Curries,Veg,90,GST 5%,,Indian,Dhal
+Dhal Tadka,Curries,Veg,140,GST 5%,,Indian,Dhal
+Dirty Sandwich Sizzler - Chicken,Sandwiches,Non Veg,260,GST 5%,,Continental,Chicken
+Dirty Sandwich Sizzler - Veg,Sandwiches,Veg,250,GST 5%,,Continental,
+Double Patty - Chicken Burger,Burgers,Non Veg,300,GST 5%,,,
+Double Patty - Veg Burger,Burgers,Veg,270,GST 5%,,,
+Dragon Chicken,Appetizers,Non Veg,240,GST 5%,,Indian,Chicken
+Drink the Pan,Beverages,Mojitos,140,GST 5%,,Continental,
+Drums of Heaven - 5 Pieces,Appetizers,Non Veg,250,GST 5%,,Chinese,Chicken
+Egg - Half Boil,Appetizers,Non Veg,15,GST 5%,,Indian,Egg
+Egg & Chicken Roll,Rolls,Non Veg,170,GST 5%,,Indian,Chicken
+Egg Biryani,Main Course,Biryanis,190,GST 5%,,Indian,Egg
+Egg Dosa,Dosas,Non Veg,60,GST 5%,,Indian,Egg
+Egg Masala,Curries,Non Veg,180,GST 5%,,Indian,Egg
+Egg Roll,Rolls,Non Veg,130,GST 5%,,Indian,Egg
+Egg Sandwich,Sandwiches,Non Veg,150,GST 5%,,Continental,Egg
+Extra Cheese,Sides,Sides,20,GST 5%,,,
+Fire Cooked - Fish,Appetizers,Non Veg,280,GST 5%,Tandoori,Indian,Fish
+Fire Cooked - Prawn,Appetizers,Non Veg,280,GST 5%,Tandoori,Continental,Prawns
+Fish Biryani,Main Course,Biryanis,280,GST 5%,,Indian,Fish
+Fish Fingers,Appetizers,Non Veg,280,GST 5%,,Continental,Fish
+Fish Fry Masala,Curries,Non Veg,290,GST 5%,,,Fish
+Fish in Banana Leaf,Kick Grass Specials,Non Veg,180,GST 5%,,Indian,Fish
+Fish n Chips,Kick Grass Specials,Non Veg,180,GST 5%,,Continental,Fish
+French Fries,Appetizers,Veg,130,GST 5%,,Continental,
+French Toast,Sandwiches,Veg ,120,GST 5%,,Continental,
+Fried - Chicken,Appetizers,Non Veg,190,GST 5%,Fried,Continental,Chicken
+Fried - Fish,Appetizers,Non Veg,200,GST 5%,Fried,Continental,Fish
+Fried - Mushroom,Appetizers,Veg,160,GST 5%,Fried,Continental,Mushroom
+Fried - Paneer,Appetizers,Veg,160,GST 5%,Fried,Continental,Paneer
+Fried - Prawns,Appetizers,Non Veg,200,GST 5%,Fried,Continental,Prawns
+Fried Chicken,Appetizers,Non Veg,200,GST 5%,Fried,Continental,Chicken
+Fried Prawns,Appetizers,Non Veg,190,GST 5%,Fried,Continental,Prawns
+Fried Rice - Chicken,Fried Rice,Non Veg,230,GST 5%,,Chinese,Chicken
+Fried Rice - Egg,Fried Rice,Non Veg,210,GST 5%,,Chinese,Egg
+Fried Rice - Mushroom,Fried Rice,Veg,190,GST 5%,,Chinese,Mushroom
+Fried Rice - Paneer,Fried Rice,Veg,200,GST 5%,,Chinese,Paneer
+Fried Rice - Veg,Fried Rice,Veg,180,GST 5%,,Chinese,
+Fruit Bowl,Desserts,Fruits,120,GST 5%,,Indian,
+Fruit Bowl with Icecream,Desserts,Fruits,170,GST 5%,,Indian,
+Fruit Honey Sandwich,Sandwiches,Veg,100,GST 5%,,Continental,
+Fruity Pebble,Beverages,Milkshakes,170,GST 5%,,Indian,
+Fusion Burger - Barbecue Chicken,Burgers,Non Veg,200,GST 5%,,,Chicken
+Fusion Burger - Chipotle Chicken,Burgers,Non Veg,200,GST 5%,,,Chicken
+Fusion Burger - Chipotle Veg,Burgers,Non Veg,180,GST 5%,,,Chicken
+Fusion Burger - Liquid Cheese Chicken,Burgers,Non Veg,180,GST 5%,,,Chicken
+Fusion Burger - Shredded Chicken,Burgers,Non Veg,170,GST 5%,,,Chicken
+Fusion Burger - Tandoori Chicken,Burgers,Non Veg,180,GST 5%,,,Chicken
+Fusion Burger - Zesty Chicken,Burgers,Non Veg,200,GST 5%,,,Chicken
+Fusion Burger - Zesty Veg,Burgers,Veg,180,GST 5%,,,
+Garlic Bread,Appetizers,Veg,120,GST 5%,,Continental,
+Ghee Rice,Main Course,Rice Varieties,220,GST 5%,,Indian,
+Ginger Chicken,Appetizers,Non Veg,150,GST 5%,,Chinese,Chicken
+Ginger Tea,Beverages,Hot,25,GST 5%,,Indian,Tea
+Golden Fried Babycorn,Appetizers,Veg,120,GST 5%,,Continental,
+Gramathu Mutton Kuzhambu,Curries,Non Veg,280,GST 5%,,Indian,Mutton
+Green Apple Mojito,Beverages,Mojitos,140,GST 5%,,Continental,
+Green Peas Masala,Curries,Veg,180,GST 5%,,Indian,
+Green Peas Pulao,Main Course,Rice Varieties,180,GST 5%,,Indian,
+Green Salad,Sides,Salads,80,GST 5%,,Continental,
+"Green Tea - Ginger, Lemon & Honey",Beverages,Hot,50,GST 5%,,Indian,Tea
+Green Tea - Honey,Beverages,Hot,35,GST 5%,,Indian,Tea
+Grilled Cheese Soup Dippers,Kick Grass Specials,Veg,80,GST 5%,,Continental,
+Grilled Fish - Large,Appetizers,Non Veg,320,GST 5%,Grilled,Continental,Fish
+Grilled Fish - Small,Appetizers,Non Veg,280,GST 5%,Grilled,Continental,Fish
+Grilled Paneer Slabs,Appetizers,Veg,210,GST 5%,,Continental,
+Grilled Pasta Sandwich,Sandwiches,Veg ,150,GST 5%,,Continental,
+Grilled Pineapple with BBQ Salsa,Appetizers,Barbecue,130,GST 5%,,Continental,Pineapple
+Grilled Prawns,Appetizers,Non Veg,290,GST 5%,,Continental,Prawns
+Grilled Prawns with Garlic sauce,Appetizers,Barbecue,200,GST 5%,,Continental,Prawns
+Grilled Tuscan Chicken,Appetizers,Barbecue,150,GST 5%,,Continental,Chicken
+Gulab Jamoon,Desserts,Sweets,120,GST 5%,,Indian,
+Guntur Chicken Masala,Curries,Non Veg,160,GST 5%,,Indian,Chicken
+Hariyali Smoked Chicken,Appetizers,Non Veg,230,GST 5%,Tandoori,Indian,Chicken
+Hariyali Smoked Paneer,Appetizers,Veg,160,GST 5%,Tandoori,Indian,Paneer
+Hariyali Smoked Prawn,Appetizers,Non Veg,280,GST 5%,Tandoori,Indian,Prawns
+Hariyali Tikka - Chicken,Appetizers,Non Veg,260,GST 5%,Tandoori,Indian,Chicken
+Hariyali Tikka - Fish,Appetizers,Non Veg,280,GST 5%,Tandoori,Indian,Fish
+Hariyali Tikka - Gobi,Appetizers,Veg,170,GST 5%,Tandoori,Indian,Gobi
+Hariyali Tikka - Mushroom,Appetizers,Veg,210,GST 5%,Tandoori,Indian,Mushroom
+Hariyali Tikka - Paneer,Appetizers,Veg ,230,GST 5%,,Indian,Paneer
+Hariyali Tikka - Prawn,Appetizers,Non Veg,280,GST 5%,,Indian,Prawns
+Hawaiian Grilled Sandwich,Sandwiches,Veg ,130,GST 5%,,Continental,
+High on Sky,Beverages,Mojitos,140,GST 5%,,Continental,
+Home Style Chicken Curry,Curries,Non Veg,240,GST 5%,,Indian,Chicken
+Hot n Sour Soup - Chicken,Soups,Non Veg,90,GST 5%,Hot n Sour Soup,Chinese,Chicken
+Hot n Sour Soup - Veg,Soups,Veg,80,GST 5%,Hot n Sour Soup,Chinese,
+Hot n Spicy Fish Toast,Kick Grass Specials,Non Veg,260,GST 5%,,Continental,Fsh
+Hyderabadi Chicken Masala,Curries,Non Veg,240,GST 5%,,Indian,Chicken
+Ice Tea,Beverages,Cold,120,GST 5%,,Continental,Tea
+Italian Cheesy Baked Chicken,Kick Grass Specials,Non Veg,180,GST 5%,,Continental,Chicken
+Jeera Rice,Main Course,Rice Varieties,140,GST 5%,,Indian,
+Kadai Chicken,Curries,Non Veg,240,GST 5%,Kadai,Indian,Chicken
+Kadai Paneer,Curries,Veg,190,GST 5%,,Indian,Paneer
+Kal Dosa,Dosas,Veg,40,GST 5%,,Indian,
+Kalakki,Appetizers,Non Veg,20,GST 5%,,Indian,Egg
+Karaikudi Chicken Dry,Appetizers,Non Veg,180,GST 5%,,Indian,Chicken
+Karaikudi Masala,Curries,Veg,130,GST 5%,,Indian,
+Karaikudi thokku - Fish,Appetizers,Non Veg,190,GST 5%,,Indian,Fish
+Karaikudi thokku - Prawn,Appetizers,Non Veg,190,GST 5%,Karaikudi thokku,Indian,Prawns
+Kashmiri Dum Aloo Masala,Curries,Veg,120,GST 5%,,Indian,
+Kernel Corn Vada,Appetizers,Veg,130,GST 5%,,Indian,
+Kick Grass Sandwich,Sandwiches,Non Veg,130,GST 5%,,Continental,
+Kulcha,Main Course,Indian Breads,50,GST 5%,,Indian,
+Lassi,Beverages,Cold,90,GST 5%,Lassi,Indian,
+Lemon Pepper Chicken,Appetizers,Non Veg,240,GST 5%,,Chinese,Chicken
+Lemon Rice,Main Course,Rice Varieties,80,GST 5%,,Indian,
+Lemon Tea,Beverages,Hot,25,GST 5%,,Indian,Tea
+Lime Juice,Beverages,Fresh Juice,40,GST 5%,,Indian,Lime
+Lime Juice - S & S,Beverages,Fresh Juice,40,GST 5%,,Indian,Lime
+Lime Juice - Salt,Beverages,Fresh Juice,40,GST 5%,,Indian,Lime
+Lime Juice - Sweet,Beverages,Fresh Juice,40,GST 5%,,Indian,Lime
+Lime Soda - S & S,Beverages,Cold,60,GST 5%,Soda,Indian,
+Lime Soda - Salt,Beverages,Cold,60,GST 5%,Soda,Indian,
+Lime Soda - Sweet,Beverages,Cold,60,GST 5%,Soda,Indian,
+Lollypop 5 pcs - Chicken,Appetizers,Non Veg,230,GST 5%,Lollypop,Chinese,Chicken
+Lollypop 5 pcs - Corn,Appetizers,Veg,120,GST 5%,Lollypop,Chinese,
+Lollypop 5 pcs - Crab,Appetizers,Non Veg,280,GST 5%,Lollypop,Chinese,Crab
+Lollypop 5 pcs - Veg,Appetizers,Veg,120,GST 5%,Lollypop,Chinese,
+Malai Chicken,Curries,Non Veg,190,GST 5%,Malai,Indian,Chicken
+Malai Kebab - Chicken,Appetizers,Non Veg,260,GST 5%,,Indian,Chicken
+Malai Kebab - Fish,Appetizers,Non Veg,290,GST 5%,,Indian,Fish
+Malai Kebab - Gobi,Appetizers,Veg ,150,GST 5%,,Indian,Gobi
+Malai Kebab - Mushroom Tikka,Appetizers,Veg ,160,GST 5%,,Indian,Mushroom
+Malai Kebab - Paneer,Appetizers,Veg ,230,GST 5%,,Indian,Paneer
+Malai Kebab - Prawn,Appetizers,Non Veg,290,GST 5%,,Indian,Prawns
+Manchow Soup - Chicken,Soups,Non Veg,100,GST 5%,Manchow Soup,Chinese,Chicken
+Manchow Soup - Chicken,Soups,Non Veg,130,GST 5%,Manchow Soup,Chinese,Chicken
+Manchow Soup - Veg,Soups,Veg,90,GST 5%,Manchow Soup,Chinese,
+Manchurian - Babycorn,Appetizers,Veg,210,GST 5%,Manchurian,Chinese,Babycorn
+Manchurian - Chicken,Appetizers,Non Veg,240,GST 5%,Manchurian,Chinese,Chicken
+Manchurian - Fish,Appetizers,Non Veg,290,GST 5%,Manchurian,Chinese,Fish
+Manchurian - Gobi,Appetizers,Veg,140,GST 5%,Manchurian,Chinese,Gobi
+Manchurian - Gobi,Appetizers,Veg,190,GST 5%,Manchurian,Chinese,Gobi
+Manchurian - Mushroom,Appetizers,Veg,140,GST 5%,Manchurian,Chinese,Mushroom
+Manchurian - Mushroom,Appetizers,Veg,190,GST 5%,Manchurian,Chinese,Mushroom
+Manchurian - Paneer,Appetizers,Veg,140,GST 5%,Manchurian,Chinese,Paneer
+Manchurian - Paneer,Appetizers,Veg,210,GST 5%,Manchurian,Chinese,Paneer
+Manchurian - Prawn,Appetizers,Non Veg,200,GST 5%,Manchurian,Chinese,Prawns
+Manchurian - Prawn,Appetizers,Non Veg,290,GST 5%,Manchurian,Chinese,Prawns
+Manchurian - Veg Balls,Appetizers,Veg,190,GST 5%,Manchurian,Chinese,
+Mango - I/C - Regular,Desserts,Icecreams,90,GST 5%,,Indian,
+Mango - I/C - Single,Desserts,Icecreams,45,GST 5%,,Indian,
+Mango Lassi,Beverages,Cold,110,GST 5%,Lassi,Indian,
+Mango M/S,Beverages,Milkshakes,130,GST 5%,,Indian,
+Mango Mousse,Desserts,Pastry,90,GST 5%,,Continental,
+Mango Mule,Beverages,Mojitos,200,GST 5%,,Continental,
+Margherita Pizza - Large,Pizzas,Veg ,340,GST 5%,Margherita Pizza,Continental,
+Margherita Pizza - Small,Pizzas,Veg ,240,GST 5%,Margherita Pizza,Continental,
+Margherita Sandwich,Sandwiches,Veg,150,GST 5%,,Continental,
+Masala Dosa,Dosas,Veg,50,GST 5%,,Indian,
+Masala Fried Fish - Large,Appetizers,Non Veg,180,GST 5%,,Indian,Fish
+Masala Fried Fish - Medium,Appetizers,Non Veg,160,GST 5%,,Indian,Fish
+Masala Fried Fish - Small,Appetizers,Non Veg,150,GST 5%,,Indian,Fish
+Masala Omlette,Appetizers,Non Veg,70,GST 5%,,Indian,Egg
+Masala Papad,Sides,Sides,80,GST 5%,,,
+Masala Tea,Beverages,Hot,25,GST 5%,,Indian,Tea
+Masala Uthappam,Dosas,Veg,50,GST 5%,,Indian,
+Matar - Mushroom,Curries,Veg,190,GST 5%,,Indian,Mushroom
+Matar - Paneer,Curries,Veg,220,GST 5%,,Indian,Paneer
+Meen Podimas,Appetizers,Non Veg,190,GST 5%,Karaikudi thokku,Indian,Fish
+Milk,Beverages,Hot,20,GST 5%,,Indian,
+Minced Mutton,Rolls,Non Veg,150,GST 5%,,Indian,Mutton
+Minestrone,Soups,Veg,90,GST 5%,,Chinese,
+Mini Lamb Satay Sticks,Appetizers,Barbecue,200,GST 5%,,Continental,Mutton
+Mint Lime Juice - S & S,Beverages,Fresh Juice,50,GST 5%,,Indian,
+Mint Lime Juice - Salt,Beverages,Fresh Juice,50,GST 5%,,Indian,
+Mint Lime Juice - Sweet,Beverages,Fresh Juice,50,GST 5%,,Indian,
+Mint Lime Soda - S & S,Beverages,Cold,70,GST 5%,Soda,Indian,
+Mint Lime Soda - Salt,Beverages,Cold,70,GST 5%,Soda,Indian,
+Mint Lime Soda - Sweet,Beverages,Cold,70,GST 5%,Soda,Indian,
+Mint Mayo Chicken Roll,Rolls,Non Veg,195,GST 5%,,Indian,Chicken
+Mint Mojito,Beverages,Mojitos,140,GST 5%,,Continental,
+Mixed Fried Rice - Non-Veg,Fried Rice,Non Veg,260,GST 5%,Mixed,Chinese,
+Mixed Fried Rice - Veg,Fried Rice,Veg,220,GST 5%,Mixed,Chinese,
+Mixed Noodles - Non-Veg,Noodles,Non Veg,260,GST 5%,Mixed Noodles,Chinese,
+Mixed Noodles - Veg,Noodles,Veg,220,GST 5%,Mixed Noodles,Chinese,
+Mixed Veg Masala,Curries,Veg,180,GST 5%,,Indian,
+Mushroom Biryani,Main Course,Biryanis,130,GST 5%,,Indian,Mushroom
+Mushroom Dosa,Dosas,Veg,60,GST 5%,,Indian,Mushroom
+Mushroom Masala,Curries,Veg,190,GST 5%,,Indian,Mushroom
+Mushroom Omlette,Appetizers,Non Veg,100,GST 5%,,Indian,Egg
+Mushroom Pizza - Large,Pizzas,Veg ,440,GST 5%,Mushroom Pizza,Continental,Mushroom
+Mushroom Pizza - Regular,Pizzas,Veg ,160,GST 5%,Mushroom Pizza,Continental,Mushroom
+Mushroom Pizza - Small,Pizzas,Veg ,290,GST 5%,Mushroom Pizza,Continental,Mushroom
+Mushroom Pulao,Main Course,Rice Varieties,190,GST 5%,,Indian,Mushroom
+Mushroom Roll,Rolls,Veg ,120,GST 5%,,Indian,Mushroom
+Muskmelon Juice,Beverages,Fresh Juice,70,GST 5%,,Indian,
+Mutton Biryani,Main Course,Biryanis,280,GST 5%,,Indian,Mutton
+Mutton Ghee Roast,Appetizers,Non Veg,280,GST 5%,,Indian,Mutton
+Mutton Keema,Appetizers,Non Veg,190,GST 5%,,Indian,Mutton
+Mutton Keema Dosa,Dosas,Non Veg,150,GST 5%,,Indian,Mutton
+Mutton Kola Urundai 5 pcs,Appetizers,Non Veg,200,GST 5%,,Indian,Mutton
+Mutton Kudal Pepper Fry,Appetizers,Non Veg,200,GST 5%,,Indian,Mutton
+Mutton Liver Fry,Appetizers,Non Veg,180,GST 5%,,Indian,Mutton
+Mutton Pepper Fry,Appetizers,Non Veg,190,GST 5%,,Indian,Mutton
+Mutton Peratal,Appetizers,Non Veg,200,GST 5%,,Indian,Mutton
+Mutton Pulao,Main Course,Rice Varieties,270,GST 5%,,Indian,Mutton
+Mutton Raththa Poriyal,Appetizers,Non Veg,200,GST 5%,,Indian,Mutton
+Mutton Sheek Roll,Rolls,Non Veg,140,GST 5%,,Indian,Mutton
+Mutton Sukka,Appetizers,Non Veg,190,GST 5%,,Indian,Mutton
+Naatu Kozhi Kulambu,Curries,Non Veg,190,GST 5%,,Indian,Chicken
+Nasi Goreng Prawn Fried Rice,Fried Rice,Non Veg,290,GST 5%,,Chinese,Prawn
+Nasi Goreng Prawn Noodles,Noodles,Non Veg,290,GST 5%,,Chinese,Prawn
+Non-Veg Tandoori Platter,Appetizers,Non Veg,590,GST 5%,,Indian,
+Noodle - Chicken Soup,Soups,Non Veg,100,GST 5%,Noodle Soup,Chinese,Chicken
+Noodle - Veg Soup,Soups,Veg,90,GST 5%,Noodle Soup,Chinese,
+Noodles - Chicken,Noodles,Non Veg,230,GST 5%,,Chinese,Chicken
+Noodles - Egg,Noodles,Non Veg,210,GST 5%,,Chinese,Egg
+Noodles - Mushroom,Noodles,Veg,190,GST 5%,,Chinese,Mushroom
+Noodles - Paneer,Noodles,Veg,200,GST 5%,,Chinese,Paneer
+Noodles - Veg,Noodles,Veg,180,GST 5%,,Chinese,
+Nutella Hazelnut Sandwich,Sandwiches,Veg ,180,GST 5%,,Continental,
+Nutty Challenge,Beverages,Milkshakes,180,GST 5%,,Indian,
+Oats Chicken,Appetizers,Non Veg,160,GST 5%,,Continental,Chicken
+Onion Dosa,Dosas,Veg,60,GST 5%,,Indian,
+Onion Salad,Sides,Salads,30,GST 5%,,Continental,
+Onion Uthappam,Dosas,Veg,50,GST 5%,,Indian,
+Orange Chicken,Kick Grass Specials,Non Veg,160,GST 5%,,Chinese,Chicken
+Orange Juice,Beverages,Fresh Juice,80,GST 5%,,Indian,
+Organic Small Bee Honey - 1kg,Sides,Sides,420,GST 5%,,,
+Pallipalayam - Chicken,Appetizers,Non Veg,230,GST 5%,Pallipalayam,Indian,Chicken
+Pallipalayam - Mutton,Appetizers,Non Veg,280,GST 5%,Pallipalayam,Indian,Mutton
+Pan Climax M/S,Beverages,Milkshakes,140,GST 5%,,Indian,
+Pan Lassi,Beverages,Cold,110,GST 5%,Lassi,Indian,
+Paneer Biryani,Main Course,Biryanis,140,GST 5%,,Indian,Paneer
+Paneer Bread Roll,Rolls,Veg ,110,GST 5%,,Indian,Paneer
+Paneer Butter Masala,Curries,Veg,220,GST 5%,,Indian,Paneer
+Paneer Frankie,Rolls,Veg ,100,GST 5%,,Indian,Paneer
+Paneer Keema Dosa,Dosas,Veg,70,GST 5%,,Indian,Paneer
+Paneer Pizza - Large,Pizzas,Veg ,440,GST 5%,Paneer Pizza,Continental,Paneer
+Paneer Pizza - Regular,Pizzas,Veg ,160,GST 5%,Paneer Pizza,Continental,Paneer
+Paneer Pizza - Small,Pizzas,Veg ,300,GST 5%,Paneer Pizza,Continental,Paneer
+Paneer Pulao,Main Course,Rice Varieties,190,GST 5%,,Indian,Paneer
+Paneer Sandwich,Sandwiches,Veg ,150,GST 5%,,Continental,
+Paneer Tikka Masala,Curries,Veg,220,GST 5%,Tandoori,Indian,Paneer
+Paneer Tikka Roll,Rolls,Veg ,160,GST 5%,,Indian,Paneer
+Peanut Butter Brownie Shake,Beverages,Milkshakes,230,GST 5%,,Indian,
+Pepper Chicken Dry,Appetizers,Non Veg,160,GST 5%,,Indian,Chicken
+Pepper Chicken Masala,Curries,Non Veg,240,GST 5%,,Indian,Chicken
+Pepper Fry - Babycorn,Appetizers,Veg,190,GST 5%,Pepper Fry,Indian,Babycorn
+Pepper Fry - Chicken,Appetizers,Non Veg,230,GST 5%,Pepper Fry,Indian,Chicken
+Pepper Fry - Fish,Appetizers,Non Veg,280,GST 5%,Pepper Fry,Indian,Fish
+Pepper Fry - Mushroom,Appetizers,Veg,190,GST 5%,Pepper Fry,Indian,Mushroom
+Pepper Fry - Mutton,Appetizers,Non Veg,280,GST 5%,Pepper Fry,Indian,Mutton
+Pepper Fry - Prawn,Appetizers,Non Veg,280,GST 5%,Pepper Fry,Indian,Prawn
+Peri Peri Chicken Kebab,Appetizers,Non Veg,250,GST 5%,,Indian,Chicken
+Peri Peri Chicken Pizza - Large,Pizzas,Non Veg,380,GST 5%,Peri Peri,Continental,Chicken
+Peri Peri Chicken Pizza - Regular,Pizzas,Non Veg,280,GST 5%,Peri Peri,Continental,Chicken
+Peri Peri Chicken Roll,Rolls,Non Veg,195,GST 5%,,Indian,Chicken
+Peri Peri Fries,Appetizers,Veg,140,GST 5%,,Continental,
+Pesto Pasta - Chicken,Pastas,Non Veg,320,GST 5%,,Continental,
+Pesto Pasta - Veg,Pastas,Veg,290,GST 5%,,Continental,
+Pineapple Juice,Beverages,Fresh Juice,80,GST 5%,,Indian,Pineapple
+Pink Lips,Beverages,Milkshakes,140,GST 5%,,Indian,
+Pink Pasta - Chicken,Pastas,Non Veg,290,GST 5%,,Continental,Chicken
+Pink Pasta - Veg,Pastas,Veg,260,GST 5%,,Continental,
+Pistanut - I/C - Regular,Desserts,Icecreams,100,GST 5%,,Indian,
+Pistanut - I/C - Single,Desserts,Icecreams,50,GST 5%,,Indian,
+Pistanut M/S,Beverages,Milkshakes,140,GST 5%,,Indian,
+Pitchupotta Chicken,Appetizers,Non Veg,230,GST 5%,,Indian,Chicken
+Plain Biryani,Main Course,Biryanis,170,GST 5%,,Indian,
+Plain Dosa,Dosas,Veg,40,GST 5%,,Indian,
+Plain Omlette,Appetizers,Non Veg,50,GST 5%,,Indian,Egg
+Plain Rice,Main Course,Rice Varieties,80,GST 5%,,Indian,
+Plain Uthappam,Dosas,Veg,40,GST 5%,,Indian,
+Platter - Non-Veg,Appetizers,Non Veg,430,GST 5%,,Indian,
+Podi Dosa,Dosas,Veg,50,GST 5%,,Indian,
+Pomfret Fish Fry,Kick Grass Specials,Non Veg,180,GST 5%,,Indian,Fish
+Popcorn Chicken,Appetizers,Non Veg,120,GST 5%,Fried,Continental,Chicken
+Prawn Biryani,Main Course,Biryanis,280,GST 5%,,Indian,Prawn
+Prawn Cocktail Salad,Sides,Salads,140,GST 5%,,Continental,Prawn
+Prawn Fry Masala,Curries,Non Veg,290,GST 5%,,Indian,Prawn
+Prawn Toast,Appetizers,Non Veg,180,GST 5%,,Continental,Prawns
+Pulka,Main Course,Indian Breads,30,GST 5%,,Indian,
+Rava Dosa,Dosas,Veg,60,GST 5%,,Indian,
+Red Diesel,Beverages,Mojitos,140,GST 5%,,Continental,
+Reshmi Kebab,Appetizers,Non Veg,170,GST 5%,,Indian,Chicken
+Roasted Chicken Salad,Sides,Salads,180,GST 5%,,Continental,Chicken
+Roasted Chicken Slices,Snack,Non Veg,120,GST 5%,,Continental,Chicken
+Rumali Roti,Main Course,Indian Breads,60,GST 5%,,Indian,
+Russian Salad,Sides,Salads,140,GST 5%,,Continental,
+Salt & Pepper - Babycorn,Appetizers,Veg,190,GST 5%,Salt & Pepper,Continental,Babycorn
+Salt & Pepper - Chicken,Appetizers,Non Veg,240,GST 5%,Salt & Pepper,Continental,Chicken
+Salt & Pepper - Mushroom,Appetizers,Veg,190,GST 5%,Salt & Pepper,Continental,Mushroom
+Salt & Pepper - Prawn,Appetizers,Non Veg,290,GST 5%,Salt & Pepper,Continental,Prawn
+Sambar Rice,Main Course,Rice Varieties,80,GST 5%,,Indian,
+Schezwan Chicken,Appetizers,Non Veg,160,GST 5%,,Chinese,Chicken
+Schezwan Fried Rice - Chicken,Fried Rice,Non Veg,230,GST 5%,Schezwan,Chinese,Chicken
+Schezwan Fried Rice - Egg,Fried Rice,Non Veg,220,GST 5%,Schezwan,Chinese,Egg
+Schezwan Fried Rice - Veg,Fried Rice,Veg,190,GST 5%,Schezwan,Chinese,
+Schezwan Noodles - Chicken,Noodles,Non Veg,230,GST 5%,Schezwan,Chinese,Chicken
+Schezwan Noodles - Egg,Noodles,Non Veg,220,GST 5%,Schezwan,Chinese,Egg
+Schezwan Noodles - Veg,Noodles,Veg,190,GST 5%,Schezwan,Chinese,
+Scrambled Egg,Appetizers,Non Veg,60,GST 5%,,Indian,Egg
+Seafood Lasagna,Snack,Non Veg,320,GST 5%,Lasagna,Continental,Fish
+Seafood Pizza - Large,Pizzas,Non Veg,590,GST 5%,Seafood Pizza,Continental,Fish
+Seafood Pizza - Small,Pizzas,Non Veg,480,GST 5%,Seafood Pizza,Continental,Fish
+Seafood Sizzlers,Sizzlers,Non Veg,460,GST 5%,,Continental,Fish
+Seasonal fruits,Beverages,Fresh Juice,60,GST 5%,,Indian,
+Set Dosa,Dosas,Veg,60,GST 5%,,Indian,
+Sheek Kebab - Chicken,Appetizers,Non Veg,230,GST 5%,,Indian,Chicken
+Sheek Kebab - Fish,Appetizers,Non Veg,290,GST 5%,,Indian,Fish
+Sheek Kebab - Mutton,Appetizers,Non Veg,290,GST 5%,,Indian,Mutton
+Shorba - Chicken Soup,Soups,Non Veg,100,GST 5%,,Chinese,Chicken
+Shorba - Veg Soup,Soups,Veg,90,GST 5%,,Chinese,
+Shredded Chicken,Appetizers,Non Veg,220,GST 5%,,Chinese,Chicken
+Smoked - Chicken on the Flame,Appetizers,Non Veg,230,GST 5%,Tandoori,Tandoori,Chicken
+Smoked - Mushroom,Appetizers,Veg,210,GST 5%,Smoked,Indian,Mushroom
+Smoked - Paneer,Appetizers,Veg,210,GST 5%,Smoked,Indian,Paneer
+Spanish Omlette,Appetizers,Non Veg,170,GST 5%,,Continental,Egg
+Spicy Paprika Sandwich,Sandwiches,Veg ,160,GST 5%,,Continental,
+Strawberry - I/C - Regular,Desserts,Icecreams,70,GST 5%,,Indian,
+Strawberry - I/C - Single,Desserts,Icecreams,35,GST 5%,,Indian,
+Strawberry M/S,Beverages,Milkshakes,120,GST 5%,,Indian,
+Stuffed Bell Peppers,Appetizers,Veg,130,GST 5%,,Continental,
+Stuffed Kulcha,Main Course,Indian Breads,140,GST 5%,,Indian,
+Stuffed Mushroom,Appetizers,Veg,120,GST 5%,,Continental,
+Stuffed Paratha,Main Course,Indian Breads,140,GST 5%,,Indian,
+Sukka - Chicken,Appetizers,Non Veg,240,GST 5%,Sukka,Indian,Chicken
+Sukka - Fish,Appetizers,Non Veg,280,GST 5%,Sukka,Indian,Fish
+Sukka - Mutton,Appetizers,Non Veg,280,GST 5%,Sukka,Indian,Mutton
+Sukka - Prawn,Appetizers,Non Veg,280,GST 5%,Sukka,Indian,Prawn
+Sundae of the day,Desserts,Pastry,280,GST 5%,,Indian,
+Sunset Surprise,Beverages,Mojitos,140,GST 5%,,Continental,
+Sweet of the day,Desserts,Sweets,120,GST 5%,,Indian,
+Sweetcorn Soup - Chicken,Soups,Non Veg,100,GST 5%,,Chinese,
+Sweetcorn Soup - Veg,Soups,Veg,90,GST 5%,,Chinese,
+Tandoori Chicken - Full,Appetizers,Non Veg,580,GST 5%,Tandoori,Indian,
+Tandoori Chicken - Half,Appetizers,Non Veg,290,GST 5%,Tandoori,Indian,
+Tandoori Grilled - Chicken Sandwich,Sandwiches,Non Veg,130,GST 5%,,Continental,
+Tawa Chicken-Rice/Salad,Kick Grass Specials,Non Veg,180,GST 5%,,Continental,Chicken
+Tawa Toasted Chicken - Rice/Salad,Kick Grass Specials,Non Veg,180,GST 5%,,Continental,Chicken
+Tea,Beverages,Hot,20,GST 5%,,Indian,Tea
+Thai Basil Fried Rice - Chicken,Fried Rice,Non Veg,230,GST 5%,Thai Basil,Chinese,Chicken
+Thai Basil Fried Rice - Veg,Fried Rice,Veg,200,GST 5%,Thai Basil,Chinese,
+Thai Basil Noodles - Chicken,Noodles,Non Veg,230,GST 5%,Thai Basil,Chinese,Chicken
+Thai Basil Noodles - Veg,Noodles,Veg,200,GST 5%,Thai Basil,Chinese,
+Thai Sizzlers,Sizzlers,Non Veg,270,GST 5%,,Continental,Fish
+Thalluvandi Chicken,Appetizers,Non Veg,230,GST 5%,,Indian,Chicken
+Thoothukudi Chicken Dry,Appetizers,Non Veg,230,GST 5%,,Indian,Chicken
+Tikka - Chicken,Appetizers,Non Veg,240,GST 5%,,Indian,Chicken
+Tikka - Fish,Appetizers,Non Veg,280,GST 5%,,Indian,Fish
+Tikka - Mushroom,Appetizers,Veg ,190,GST 5%,,Indian,Mushroom
+Tikka - Paneer,Appetizers,Veg ,220,GST 5%,,Indian,Paneer
+Tikka - Prawn,Appetizers,Non Veg,280,GST 5%,,Indian,Prawns
+Tikkis - 6 Pieces - Chicken,Kick Grass Specials,Non Veg,180,GST 5%,,Indian,Chicken
+Tikkis - 6 Pieces - Paneer,Kick Grass Specials,Veg,160,GST 5%,,Indian,Paneer
+Tomato Rice,Main Course,Rice Varieties,80,GST 5%,,Indian,
+Tornado Potatoes,Appetizers,Veg,100,GST 5%,,Continental,
+Tossed Salad,Sides,Salads,90,GST 5%,,Continental,
+Twisted Lamb Kebabs,Appetizers,Non Veg,240,GST 5%,,Indian,Mutton
+Vanilla - I/C - Regular,Desserts,Icecreams,70,GST 5%,,Indian,
+Vanilla - I/C - Single,Desserts,Icecreams,35,GST 5%,,Indian,
+Vanilla M/S,Beverages,Milkshakes,120,GST 5%,,Indian,
+Vanilla Wonders,Beverages,Milkshakes,140,GST 5%,,Indian,
+Veg  Biryani,Main Course,Biryanis,130,GST 5%,,Indian,
+Veg Achar,Rolls,Veg ,90,GST 5%,,Indian,
+Veg Burger,Burgers,Veg,170,GST 5%,,,
+Veg Cheese Balls,Appetizers,Veg,220,GST 5%,,Continental,
+Veg Cheese Sandwich,Sandwiches,Veg ,140,GST 5%,,Continental,
+Veg Chettinadu Masala,Curries,Veg,180,GST 5%,,Indian,
+Veg Club Sandwich,Sandwiches,Veg ,110,GST 5%,,Continental,
+Veg Falafel,Rolls,Veg ,100,GST 5%,,Indian,
+Veg Gold Coin,Appetizers,Veg,130,GST 5%,,Continental,
+Veg Kadai,Curries,Veg,180,GST 5%,,Indian,
+Veg Kari Dosa,Dosas,Veg,70,GST 5%,,Indian,
+Veg Keema Dosa,Dosas,Veg,60,GST 5%,,Indian,
+Veg Lasagna,Snack,Veg,150,GST 5%,Lasagna,Continental,
+Veg Lollypop,Appetizers,Veg,120,GST 5%,,Indian,
+Veg Pasta - Red,Pastas,Veg,260,GST 5%,,Continental,
+Veg Pasta - Red & White,Pastas,Veg,260,GST 5%,,Continental,
+Veg Pasta - White,Pastas,Veg,260,GST 5%,,Continental,
+Veg Pulao,Main Course,Rice Varieties,170,GST 5%,,Indian,
+Veg Roll,Rolls,Veg ,120,GST 5%,,Indian,
+Veg Sandwich,Sandwiches,Veg ,120,GST 5%,,Continental,
+Veg Sheek Kebab,Appetizers,Veg,130,GST 5%,,Indian,
+Veg Sizzlers,Sizzlers,Veg,280,GST 5%,,Continental,
+Veg Spring Roll,Appetizers,Veg,120,GST 5%,,Indian,
+Veg Supreme Pizza - Large,Pizzas,Veg ,440,GST 5%,Veg Supreme Pizza,Continental,
+Veg Supreme Pizza - Regular,Pizzas,Veg ,180,GST 5%,Veg Supreme Pizza,Continental,
+Veg Supreme Pizza - Small,Pizzas,Veg ,290,GST 5%,Veg Supreme Pizza,Continental,
+Veggie Classic - Large,Pizzas,Veg ,290,GST 5%,Veggie Classic,Continental,
+Veggie Classic - Regular,Pizzas,Veg ,190,GST 5%,Veggie Classic,Continental,
+Veggie Cloud 9 - Large,Pizzas,Veg ,300,GST 5%,Veggie Cloud,Continental,
+Veggie Cloud 9 - Regular,Pizzas,Veg ,200,GST 5%,Veggie Cloud,Continental,
+Water Bottle - 1ltr,Sides,Sides,25,-,,,
+Watermelon Juice,Beverages,Fresh Juice,60,GST 5%,,Indian,
+Wheat Kothu Parotta - Chicken,Main Course,Indian Breads,140,GST 5%,Wheat Kothu Parotta,Indian,Chicken
+Wheat Kothu Parotta - Egg,Main Course,Indian Breads,130,GST 5%,Wheat Kothu Parotta,Indian,Egg
+Wheat Kothu Parotta - Paneer,Main Course,Indian Breads,130,GST 5%,Wheat Kothu Parotta,Indian,Paneer
+Wheat Kothu Parotta - Veg,Main Course,Indian Breads,110,GST 5%,Wheat Kothu Parotta,Indian,
+Wheat Paratha,Main Course,Indian Breads,45,GST 5%,,Indian,
