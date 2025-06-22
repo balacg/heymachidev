@@ -22,4 +22,5 @@ class Product(Base):
 
     business = relationship("BusinessAccount", backref="products")
     subcategory = relationship("Subcategory", back_populates="products")
-    gst = relationship("Tax", foreign_keys=[gst_id], back_populates="products")  # ✅ Fixed: renamed from 'tax' to 'gst'
+    gst = relationship("Tax", foreign_keys=[gst_id], back_populates="products") 
+    tags = relationship("Tag", secondary="product_tags", backref="products")

@@ -1,6 +1,9 @@
 // lib/screens/master/product_master_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:heymachi_dev/models/tag.dart';
+import 'package:heymachi_dev/services/tag_service.dart';
+import 'package:heymachi_dev/utils/app_session.dart';
 import '../../services/api.dart';
 import '../../models/product.dart';
 import '../../models/category.dart';
@@ -8,6 +11,7 @@ import '../../models/subcategory.dart';
 import '../../models/tax.dart';
 import '../../widgets/table_column.dart';
 import '../../widgets/generic_data_table.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class ProductMasterScreen extends StatefulWidget {
   const ProductMasterScreen({Key? key}) : super(key: key);
@@ -23,13 +27,32 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
   List<Subcategory> _subcategories = [];
   List<Tax> _taxes = [];
 
+  List<Tag> _allTags = [];
   bool _loading = true;
   String? _error;
 
   @override
   void initState() {
     super.initState();
+    fetchTags();
     _loadAllData();
+  }
+
+  void fetchTags() async {
+    try {
+      final businessId = AppSession.instance.sessionData['business_id'];
+      if (businessId == null) {
+        debugPrint("❗ businessId is null. Cannot fetch tags.");
+        return;
+      }
+      final tags = await TagService.fetchTags(businessId);
+
+      setState(() {
+        _allTags = tags;
+      }); 
+    } catch (e) {
+      debugPrint("Error fetching tags: $e");
+    }
   }
 
   Future<void> _loadAllData() async {
@@ -99,13 +122,13 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
     final formKey = GlobalKey<FormState>();
     final nameController = TextEditingController(text: product?.name ?? '');
     final priceController = TextEditingController(text: product?.price.toString() ?? '');
-    
     int? selectedGstId = product?.gstId;
     String? selectedCategoryId = product?.categoryId;
     String? selectedSubcategoryId = product?.subcategoryId;
 
+    List<Tag> selectedTags = _allTags.where((tag) => product?.tagIds?.contains(tag.id) ?? false).toList();
+
     if (product != null && product.categoryId != null) {
-      // Pre-load subcategories for the given category
       ApiService.fetchSubcategories(categoryId: product.categoryId!).then((subs) {
         setState(() {
           _subcategories = subs;
@@ -119,13 +142,6 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
         title: Text(product == null ? 'Add Product' : 'Edit Product'),
         content: StatefulBuilder(
           builder: (context, setModalState) {
-            // ✅ Auto-fetch subcategories when opening in edit mode
-            if (_subcategories.isEmpty && selectedCategoryId != null) {
-              ApiService.fetchSubcategories(categoryId: selectedCategoryId).then((subs) {
-                setModalState(() => _subcategories = subs);
-              });
-            }
-
             return Form(
               key: formKey,
               child: SingleChildScrollView(
@@ -149,7 +165,7 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
                       final subs = await ApiService.fetchSubcategories(categoryId: val!);
                       setModalState(() {
                         _subcategories = subs;
-                        selectedSubcategoryId = null; // Clear subcat when category changes
+                        selectedSubcategoryId = null;
                       });
                     },
                     decoration: const InputDecoration(labelText: 'Category'),
@@ -157,9 +173,7 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
                   ),
                   DropdownButtonFormField<String>(
                     value: selectedSubcategoryId?.isEmpty == true ? null : selectedSubcategoryId,
-                    items: _subcategories.map((s) {
-                      return DropdownMenuItem(value: s.id, child: Text(s.name));
-                    }).toList(),
+                    items: _subcategories.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name))).toList(),
                     onChanged: (val) => setModalState(() => selectedSubcategoryId = val),
                     decoration: const InputDecoration(labelText: 'Subcategory'),
                     validator: (val) => val == null || val.isEmpty ? 'Select Subcategory' : null,
@@ -174,6 +188,19 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
                     decoration: const InputDecoration(labelText: 'GST'),
                     validator: (val) => val == null ? 'Select GST' : null,
                   ),
+                  MultiSelectDialogField<Tag>(
+                    items: _allTags.map((tag) => MultiSelectItem<Tag>(tag, tag.tagValue)).toList(),
+                    title: const Text("Tags"),
+                    buttonText: const Text("Select Tags"),
+                    initialValue: selectedTags,
+                    onConfirm: (values) => setModalState(() => selectedTags = values),
+                    chipDisplay: MultiSelectChipDisplay(
+                      onTap: (item) => setModalState(() => selectedTags.remove(item)),
+                    ),
+                    // Optional empty state
+                    searchable: true,
+                    dialogWidth: MediaQuery.of(context).size.width * 0.8,
+                  ),
                 ]),
               ),
             );
@@ -184,20 +211,25 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
           ElevatedButton(
             onPressed: () async {
               if (formKey.currentState?.validate() ?? false) {
-                final newProduct = Product(
+                final productPayload = Product(
                   id: product?.id ?? '',
                   name: nameController.text.trim(),
                   price: double.tryParse(priceController.text) ?? 0,
                   categoryId: selectedCategoryId,
                   subcategoryId: selectedSubcategoryId,
                   gstId: selectedGstId,
-                  categoryName: '',
+                  unitId: null,
+                  isActive: true,
+                  tagIds: selectedTags.map((t) => t.id!).toList(),
+                  businessId: '', // backend assigns
+                  categoryName: '', // not needed in update
                 );
+
                 try {
                   if (product == null) {
-                    await ApiService.createProduct(newProduct);
+                    await ApiService.createProduct(productPayload);
                   } else {
-                    await ApiService.updateProduct(newProduct);
+                    await ApiService.updateProduct(productPayload);
                   }
                   Navigator.pop(context);
                   _loadAllData();
@@ -212,7 +244,6 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
       ),
     );
   }
-
 
   String _getGstLabel(int? gstId) {
     final tax = _taxes.firstWhere((t) => t.id == gstId, orElse: () => Tax(id: 0, type: '', rate: 0));
@@ -267,12 +298,33 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
                       sortable: false,
                       cellBuilder: (p) => Text(p.subcategoryName ?? '-'),
                     ),
-
                     TableColumn<Product>(
                       title: 'GST',
                       field: 'gst',
                       cellBuilder: (p) => Text(_getGstLabel(p.gstId)),
                     ),
+                    TableColumn<Product>(
+                      title: 'Tags',
+                      field: 'tags',
+                      cellBuilder: (p) {
+                        // Prefer hydrated tag list if available
+                        if (p.tags != null && p.tags!.isNotEmpty) {
+                          return Text(p.tags!.map((t) => t.tagValue).join(', '));
+                        }
+
+                        // Fallback to tagIds if tags are not hydrated
+                        if (p.tagIds != null && p.tagIds!.isNotEmpty) {
+                          final tagNames = _allTags
+                              .where((tag) => p.tagIds!.contains(tag.id))
+                              .map((t) => t.tagValue)
+                              .join(', ');
+                          return Text(tagNames);
+                        }
+
+                        return const Text('-');
+                      },
+                    ),
+
                     TableColumn<Product>(
                       title: 'Actions',
                       field: 'actions',

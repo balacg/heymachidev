@@ -1,9 +1,9 @@
 {
-    "restaurant": {
+ "restaurant": {
   "preBillingScreen": "DiningSelectorPage",
   "sessionFields": {
-    "diningType": "Dining Mode",
-    "tableNo": "Table No",
+    "dining_mode": "Dining Mode",
+    "table_no": "Table No",
     "pax": "Guests"
   }
 },

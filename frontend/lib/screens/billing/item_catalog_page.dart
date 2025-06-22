@@ -24,6 +24,7 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
   Map<String, Map<String, dynamic>> _cartItems = {};
   final TextEditingController _searchCtl = TextEditingController();
   bool _initialized = false;
+  String? orderId; // 🆕 track open order ID
 
   @override
   void initState() {
@@ -34,11 +35,28 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     if (!_initialized) {
       final args = ModalRoute.of(context)?.settings.arguments;
-      if (args != null && args is Map<String, Map<String, dynamic>>) {
-        _cartItems = Map.from(args);
+      if (args != null && args is Map) {
+        // Case 1: cartItems explicitly passed
+        if (args.containsKey('cartItems') && args['cartItems'] is Map) {
+          _cartItems = Map<String, Map<String, dynamic>>.from(
+            (args['cartItems'] as Map).map(
+              (key, value) => MapEntry(key.toString(), Map<String, dynamic>.from(value)),
+            ),
+          );
+        }
+
+        // Optional: capture order ID
+        if (args.containsKey('id')) {
+          orderId = args['id']?.toString();
+        }
       }
+      print('📦 Received arguments in ItemCatalog: $args');
+      print('📦 Extracted cartItems: $_cartItems');
+      print('📦 Extracted orderId: $orderId');
+
       _initialized = true;
     }
   }
@@ -69,6 +87,8 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
       } else {
         _cartItems[name] = {'price': p.price, 'qty': 1};
       }
+      print('➕ Added ${p.name}, updated cart: $_cartItems');
+
     });
   }
 
@@ -81,6 +101,7 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
       } else {
         _cartItems.remove(name);
       }
+      print('➖ Removed ${p.name}, updated cart: $_cartItems');
     });
   }
 
@@ -99,7 +120,7 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
     return NumberFormat.decimalPattern().format(amount);
   }
 
-  void _goToCart() {
+  /* void _goToCart() {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -109,6 +130,51 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
             setState(() {
               _cartItems = Map.from(updated);
             });
+          },
+          fromOpenOrder: orderId != null,
+          initialOrder: {
+            ...AppSession.instance.sessionData,
+            if (orderId != null) 'id': orderId,
+            'items': _cartItems.entries.map((e) => {
+              'item': e.key,
+              'qty': e.value['qty'],
+              'price': e.value['price'],
+            }).toList(),
+            'total_amount': _cartItems.entries.fold(
+              0,
+              (sum, e) => sum + ((e.value['price'] as double) * (e.value['qty'] as int)).toInt(),
+            ),
+          },
+        ),
+      ),
+    );
+  } */
+
+  void _goToCart() {
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CartPage(
+          cartItems: _cartItems,
+          onCartUpdated: (updated) {
+            setState(() {
+              _cartItems = Map.from(updated);
+            });
+          },
+          fromOpenOrder: orderId != null,
+          initialOrder: {
+            ...AppSession.instance.sessionData,
+            if (orderId != null) 'id': orderId,
+            'items': _cartItems.entries.map((e) => {
+              'item': e.key,
+              'qty': e.value['qty'],
+              'price': e.value['price'],
+            }).toList(),
+            'total_amount': _cartItems.entries.fold(
+              0,
+              (sum, e) => sum + ((e.value['price'] as double) * (e.value['qty'] as int)).toInt(),
+            ),
           },
         ),
       ),
@@ -124,7 +190,6 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
               child: Row(
@@ -132,7 +197,8 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                   IconButton(
                     icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
                     onPressed: () {
-                      Navigator.pop(context, _cartItems); // return updated cart
+                      print('🔙 Returning from ItemCatalogPage with cart: $_cartItems');
+                      Navigator.pop(context, Map<String, Map<String, dynamic>>.from(_cartItems));
                     },
                   ),
                   const SizedBox(width: 8),
@@ -144,20 +210,32 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                 ],
               ),
             ),
-
-            // Billing Info Display (modular)
-            OrderMetaDisplay(
-              sessionData: AppSession.instance.sessionData.map((k, v) => MapEntry(k, v.toString())),
-              sessionLabels: (IndustryConfig.forIndustry(AppSession.instance.industryId ?? '')?['sessionFields'] as Map?)?.map(
-                    (k, v) => MapEntry(k.toString(), v.toString()),
-                  ) ?? {},
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-
-            // Search Box
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Builder(
+                builder: (_) {
+                  final sessionData = AppSession.instance.sessionData;
+                  final industryConfig = IndustryConfig.forIndustry(AppSession.instance.industryId ?? '');
+                  final sessionLabels = (industryConfig?['sessionFields'] as Map?)?.map(
+                        (k, v) => MapEntry(k.toString(), v.toString()),
+                      ) ?? {};
+
+                  final filteredData = {
+                    for (final entry in sessionData.entries)
+                      if (sessionLabels.containsKey(entry.key) && entry.value.toString().isNotEmpty)
+                        entry.key: entry.value.toString()
+                  };
+
+                  return OrderMetaDisplay(
+                    sessionData: filteredData,
+                    sessionLabels: sessionLabels,
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               child: TextField(
                 controller: _searchCtl,
                 onChanged: _onSearch,
@@ -170,8 +248,6 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                 ),
               ),
             ),
-
-            // Products List
             Expanded(
               child: ListView.builder(
                 itemCount: _filteredProducts.length,
@@ -197,8 +273,7 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                               ),
                               Text('$qty',
                                   style: TextStyle(
-                                      color:
-                                          theme.textTheme.bodyLarge?.color,
+                                      color: theme.textTheme.bodyLarge?.color,
                                       fontWeight: FontWeight.bold)),
                               IconButton(
                                 icon: const Icon(Icons.add),
@@ -216,14 +291,10 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                               }
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [
-                                    Colors.deepOrange,
-                                    Colors.pinkAccent
-                                  ],
+                                  colors: [Colors.deepOrange, Colors.pinkAccent],
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -243,16 +314,13 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
           ],
         ),
       ),
-
-      // Bottom Bar
       bottomNavigationBar: totalItems > 0
           ? SafeArea(
               child: GestureDetector(
                 onTap: _goToCart,
                 child: Container(
                   height: 70,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.deepOrange, Colors.pinkAccent],

@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io' show Platform;
+import 'package:heymachi_dev/utils/app_session.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/customer.dart';
@@ -12,6 +13,7 @@ import '../models/tax.dart';
 import '../models/product.dart';
 import '../models/unit.dart';
 import '../models/vendor.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   static String get _baseHost => Platform.isAndroid ? '10.0.2.2' : 'localhost';
@@ -439,6 +441,11 @@ class ApiService {
 
   // ─── SECURITY (/security/) ────────────────────────────────────────────────────────
 
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('access_token');
+  }
+
   static Future<void> setToken(String token) async {
     _token = token;
   }
@@ -454,9 +461,17 @@ class ApiService {
       headers: headers,
     );
 
-
     if (response.statusCode == 200) {
-      currentUser = json.decode(response.body);
+      final data = jsonDecode(response.body);
+
+      AppSession.instance.sessionData = {
+        'access_token': _token, // ✅ Set token
+        'business_id': data['business_id'], // ✅ Set business
+        'user_id': data['id'], // optional, for future
+        'role': data['role'],  // optional
+      };
+
+      print("SessionData: ${AppSession.instance.sessionData}");
     } else {
       throw Exception("Failed to fetch user session");
     }

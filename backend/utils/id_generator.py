@@ -5,17 +5,20 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 def generate_custom_id(prefix: str, db: Session, model, field: str = "id") -> str:
     """
     Generate a custom unique ID with a given prefix.
-    e.g. PRM-0001, CUS-0002
+    Works with any prefix like 'IND', 'SCAT', 'PROD' etc.
+    E.g., PROD-0001, SCAT-0025, etc.
     """
     latest = (
         db.query(model)
+        .filter(getattr(model, field).like(f"{prefix}-%"))
         .order_by(getattr(model, field).desc())
         .first()
     )
 
-    if latest and getattr(latest, field).startswith(prefix):
+    if latest:
         try:
-            last_num = int(getattr(latest, field).split("-")[1])
+            # Always get last numeric part after final '-'
+            last_num = int(getattr(latest, field).rsplit("-", 1)[-1])
         except:
             last_num = 0
     else:

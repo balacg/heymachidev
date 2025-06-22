@@ -64,6 +64,10 @@ def get_user(db: Session, username: str):
 # -------------------------------------------
 def authenticate_user(db: Session, username: str, password: str):
     user = get_user(db, username)
+    print("Fetched user:", user.username, user.business_id)
+    if user is None:
+        raise credentials_exception
+
     if not user or not verify_password(password, user.hashed_password):
         return False
     return user
@@ -71,12 +75,16 @@ def authenticate_user(db: Session, username: str, password: str):
 # -------------------------------------------
 # ✅ Dependency: Current logged in user context
 # -------------------------------------------
+
+# heymachi_backend/core/security.py
+
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
@@ -87,6 +95,17 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         if user is None:
             raise credentials_exception
 
+        # ✅ Safely inject from token if field is None
+        if not user.business_id:
+            user.business_id = payload.get("business_id")
+        if not user.email:
+            user.email = payload.get("email")
+        if not user.is_admin:
+            user.is_admin = payload.get("is_admin")
+
         return user
+
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.PyJWTError:
         raise credentials_exception

@@ -12,6 +12,9 @@ from utils.id_generator import generate_custom_id
 from models.subcategory import Subcategory
 from models.tax import Tax
 from models.category import Category
+from models.tag import Tag
+from models.product_tag import product_tags
+
 
 router = APIRouter()
 
@@ -39,7 +42,14 @@ def get_products(db: Session = Depends(get_db), current_user: User = Depends(get
         .filter(Product.business_id == current_user.business_id)
     )
     result = stmt.all()
-    return [dict(row._mapping) for row in result]
+    products = []
+    for row in result:
+        row_dict = dict(row._mapping)
+        product = db.query(Product).filter_by(id=row_dict["id"]).first()
+        row_dict["tags"] = [{"id": tag.id, "tag_type": tag.tag_type, "tag_value": tag.tag_value, "business_id": tag.business_id,} for tag in product.tags]
+        row_dict["tag_ids"] = [tag.id for tag in product.tags]
+        products.append(row_dict)
+    return products
 
 
 @router.post("/", response_model=ProductOut)
@@ -48,11 +58,16 @@ def create_product(payload: ProductCreate, db: Session = Depends(get_db), curren
     if existing:
         raise HTTPException(status_code=409, detail="Product with the same name already exists")
 
+    product_data = payload.dict()
+    tag_ids = product_data.pop("tag_ids", [])
+
     new_item = Product(
-        id=generate_custom_id("PRD",db, Product),
-        **payload.dict()
+        id=generate_custom_id("PRD", db, Product),
+        **product_data
     )
     new_item.business_id = current_user.business_id
+    new_item.tags = db.query(Tag).filter(Tag.id.in_(tag_ids)).all()
+
     db.add(new_item)
     db.commit()
     db.refresh(new_item)
@@ -64,8 +79,16 @@ def update_product(product_id: str, updated: ProductUpdate, db: Session = Depend
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    for key, value in updated.dict(exclude_unset=True).items():
+
+    update_data = updated.dict(exclude_unset=True)
+    tag_ids = update_data.pop("tag_ids", None)
+
+    for key, value in update_data.items():
         setattr(product, key, value)
+
+    if tag_ids is not None:
+        product.tags = db.query(Tag).filter(Tag.id.in_(tag_ids)).all()
+
     db.commit()
     db.refresh(product)
     return product
