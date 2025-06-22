@@ -188,19 +188,28 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
                     decoration: const InputDecoration(labelText: 'GST'),
                     validator: (val) => val == null ? 'Select GST' : null,
                   ),
-                  MultiSelectDialogField<Tag>(
-                    items: _allTags.map((tag) => MultiSelectItem<Tag>(tag, tag.tagValue)).toList(),
-                    title: const Text("Tags"),
-                    buttonText: const Text("Select Tags"),
-                    initialValue: selectedTags,
-                    onConfirm: (values) => setModalState(() => selectedTags = values),
-                    chipDisplay: MultiSelectChipDisplay(
-                      onTap: (item) => setModalState(() => selectedTags.remove(item)),
-                    ),
-                    // Optional empty state
-                    searchable: true,
-                    dialogWidth: MediaQuery.of(context).size.width * 0.8,
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.label),
+                    label: const Text("Select Tags"),
+                    onPressed: () {
+                      _showTagSelector(context, _allTags, selectedTags, (selected) {
+                        setModalState(() => selectedTags = selected);
+                      });
+                    },
                   ),
+                  Wrap(
+                    spacing: 6,
+                    children: selectedTags.map((tag) {
+                      return Chip(
+                        label: Text(tag.tagValue),
+                        onDeleted: () => setModalState(() => selectedTags.remove(tag)),
+                      );
+                    }).toList(),
+                  ),
+
+
+
+
                 ]),
               ),
             );
@@ -350,4 +359,126 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
       ),
     );
   }
+
+    void _showTagSelector(
+      BuildContext context,
+      List<Tag> allTags,
+      List<Tag> selected,
+      Function(List<Tag>) onConfirm,
+    ) {
+      final grouped = <String, List<Tag>>{};
+      for (final tag in allTags) {
+        grouped.putIfAbsent(tag.tagType, () => []).add(tag);
+      }
+
+      List<Tag> tempSelected = [...selected];
+      String searchQuery = '';
+
+      showDialog(
+        context: context,
+        builder: (_) {
+          return StatefulBuilder(builder: (context, setState) {
+            final filteredGrouped = {
+              for (var entry in grouped.entries)
+                entry.key: entry.value
+                    .where((tag) =>
+                        tag.tagValue.toLowerCase().contains(searchQuery.toLowerCase()))
+                    .toList()
+            };
+
+            Color _getColor(String tagType) {
+              final t = tagType.toLowerCase();
+              if (t.contains('taste')) return Colors.orange.shade200;
+              if (t.contains('occasion')) return Colors.green.shade200;
+              if (t.contains('spice')) return Colors.red.shade200;
+              if (t.contains('diet')) return Colors.purple.shade200;
+              return Colors.blueGrey.shade200;
+            }
+
+            IconData _getIcon(String tagType) {
+              final t = tagType.toLowerCase();
+              if (t.contains('taste')) return Icons.restaurant;
+              if (t.contains('occasion')) return Icons.event;
+              if (t.contains('spice')) return Icons.whatshot;
+              if (t.contains('diet')) return Icons.local_florist;
+              return Icons.label;
+            }
+
+            return AlertDialog(
+              title: const Text("Select Tags"),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: Column(
+                  children: [
+                    TextField(
+                      decoration: const InputDecoration(hintText: "Search tags"),
+                      onChanged: (val) => setState(() => searchQuery = val),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: ListView(
+                        children: filteredGrouped.entries.map((entry) {
+                          return ExpansionTile(
+                            title: Text(entry.key),
+                            initiallyExpanded: true,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: entry.value.map((tag) {
+                                    final isSelected = tempSelected.any((t) => t.id == tag.id);
+                                    return FilterChip(
+                                      avatar: Icon(
+                                        isSelected ? Icons.check_circle : Icons.label_outline,
+                                        size: 16,
+                                        color: isSelected ? Colors.white : Colors.black54,
+                                      ),
+                                      label: Text(
+                                        tag.tagValue,
+                                        style: TextStyle(
+                                          color: isSelected ? Colors.white : Colors.black,
+                                        ),
+                                      ),
+                                      selected: isSelected,
+                                      backgroundColor: isSelected ? Colors.deepPurple : Colors.grey.shade300,
+                                      selectedColor: Colors.deepPurple,
+                                      onSelected: (selected) {
+                                        setState(() {
+                                          if (selected) {
+                                            tempSelected.add(tag);
+                                          } else {
+                                            tempSelected.removeWhere((t) => t.id == tag.id);
+                                          }
+                                        });
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
+                              )
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+                ElevatedButton(
+                  onPressed: () {
+                    onConfirm(tempSelected);
+                    Navigator.pop(context);
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          });
+        },
+      );
+    }
 }
