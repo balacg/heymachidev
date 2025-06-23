@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, Float, Boolean, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 from .base import Base
 from utils.id_generator import generate_custom_id 
+from .tag import Tag
 
 class Product(Base):
     __tablename__ = "products"
