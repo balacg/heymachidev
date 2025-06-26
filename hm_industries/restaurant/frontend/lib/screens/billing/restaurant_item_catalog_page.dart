@@ -47,14 +47,16 @@ class RestaurantItemCatalogPage extends StatelessWidget {
           // Core Catalog + Patch
           Expanded(
             child: core_catalog.ItemCatalogPage(
-              isSelectorMode: true,
+              isSelectorMode: openOrderId != null,  // ✅ Only go into selector mode when editing an existing order
               initialCartItems: initialCartItems,
-              onCartConfirmed: (List<CartItem> updatedCart) {
-                Navigator.pop(context, {
-                  'cartItems': updatedCart,
-                  'id': openOrderId,
-                });
-              },
+              onCartConfirmed: openOrderId != null
+                  ? (List<CartItem> updatedCart) {
+                      Navigator.pop(context, {
+                        'cartItems': updatedCart,
+                        'id': openOrderId,
+                      });
+                    }
+                  : null,  // ✅ Do not pop when just adding normally
             ),
           ),
         ],
