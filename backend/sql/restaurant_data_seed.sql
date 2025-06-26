@@ -36,7 +36,7 @@ INSERT INTO subcategories (id, name, category_id, gst_id, business_id) VALUES
 INSERT INTO subcategories (id, name, category_id, gst_id, business_id) VALUES
 ('SUBCAT-BIZ-RES-0001-0012', 'Butterscotch', 'CAT-BIZ-RES-0001-0004', 1, 'BIZ-RES-0001');
 INSERT INTO subcategories (id, name, category_id, gst_id, business_id) VALUES
-('SUBCAT-BIZ-RES-0001-0013', 'Chef's Delight Atta Roll', 'CAT-BIZ-RES-0001-0002', 1, 'BIZ-RES-0001');
+('SUBCAT-BIZ-RES-0001-0013', 'Chefs Delight Atta Roll', 'CAT-BIZ-RES-0001-0002', 1, 'BIZ-RES-0001');
 INSERT INTO subcategories (id, name, category_id, gst_id, business_id) VALUES
 ('SUBCAT-BIZ-RES-0001-0014', 'Chettinadu Fry', 'CAT-BIZ-RES-0001-0002', 1, 'BIZ-RES-0001');
 INSERT INTO subcategories (id, name, category_id, gst_id, business_id) VALUES
@@ -229,6 +229,37 @@ INSERT INTO subcategories (id, name, category_id, gst_id, business_id) VALUES
 ('SUBCAT-BIZ-RES-0001-0108', 'Water Bottle', 'CAT-BIZ-RES-0001-0004', 1, 'BIZ-RES-0001');
 INSERT INTO subcategories (id, name, category_id, gst_id, business_id) VALUES
 ('SUBCAT-BIZ-RES-0001-0109', 'Wheat Kothu Parotta', 'CAT-BIZ-RES-0001-0002', 1, 'BIZ-RES-0001');
+
+-- For Curries
+INSERT INTO subcategories (id, name, category_id, business_id)
+VALUES 
+('SUBCAT-VEG-CURRIES', 'Veg', 'CAT-CURRIES', 'BIZ-RES-0001'),
+('SUBCAT-NON_VEG-CURRIES', 'Non Veg', 'CAT-CURRIES', 'BIZ-RES-0001');
+
+-- For Noodles
+INSERT INTO subcategories (id, name, category_id, business_id)
+VALUES 
+('SUBCAT-VEG-NOODLES', 'Veg', 'CAT-NOODLES', 'BIZ-RES-0001'),
+('SUBCAT-NON_VEG-NOODLES', 'Non Veg', 'CAT-NOODLES', 'BIZ-RES-0001');
+
+-- For Soups
+INSERT INTO subcategories (id, name, category_id, business_id)
+VALUES 
+('SUBCAT-VEG-SOUPS', 'Veg', 'CAT-SOUPS', 'BIZ-RES-0001'),
+('SUBCAT-NON_VEG-SOUPS', 'Non Veg', 'CAT-SOUPS', 'BIZ-RES-0001');
+
+-- For Sandwiches
+INSERT INTO subcategories (id, name, category_id, business_id)
+VALUES 
+('SUBCAT-VEG-SANDWICHES', 'Veg', 'CAT-SANDWICHES', 'BIZ-RES-0001'),
+('SUBCAT-NON_VEG-SANDWICHES', 'Non Veg', 'CAT-SANDWICHES', 'BIZ-RES-0001');
+
+-- For Pizzas
+INSERT INTO subcategories (id, name, category_id, business_id)
+VALUES 
+('SUBCAT-VEG-PIZZAS', 'Veg', 'CAT-PIZZAS', 'BIZ-RES-0001'),
+('SUBCAT-NON_VEG-PIZZAS', 'Non Veg', 'CAT-PIZZAS', 'BIZ-RES-0001');
+
 
 -- Insert Products
 INSERT INTO products (id, name, price, category_id, subcategory_id, gst_id, unit_id, is_active, business_id) VALUES

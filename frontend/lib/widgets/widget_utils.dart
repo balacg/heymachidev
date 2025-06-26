@@ -1,15 +1,14 @@
-// heymachi/frontend/lib/utils/widget_utils.dart
+// lib/shared/widget_utils.dart
 
 import 'package:flutter/material.dart';
-import '../screens/billing/item_catalog_page.dart';
+import 'package:heymachi_dev/screens/billing/item_catalog_page.dart';
 
-Future<Map<String, dynamic>?> showItemCatalogPicker(
-  BuildContext context, {
-  Map<String, Map<String, dynamic>>? existingCart,
-}) async {
-  return await Navigator.pushNamed(
+Future<Map<String, dynamic>?> showItemCatalogPicker(BuildContext context) async {
+  final result = await Navigator.push<Map<String, dynamic>>(
     context,
-    '/product-selector',
-    arguments: existingCart,
-  ) as Map<String, dynamic>?;
+    MaterialPageRoute(
+      builder: (_) => const ItemCatalogPage(), // Use correct constructor here
+    ),
+  );
+  return result;
 }

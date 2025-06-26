@@ -2,11 +2,11 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:restaurant_addon/screens/billing/table_selector.dart';
+//import 'package:restaurant_addon/screens/billing/table_selector.dart';
 
 import 'utils/industry_config.dart';
-import 'screens/login/login_screen.dart';
-import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/navigation/main_navigation_screen.dart';
 import 'screens/profile/user_profile_screen.dart';
 import 'screens/settings/business_profile_screen.dart';
 import 'screens/master/master_dashboard_screen.dart';
@@ -15,6 +15,7 @@ import 'screens/admin/admin_center_screen.dart';
 import 'screens/billing/item_catalog_page.dart';
 import 'screens/billing/final_billing_page.dart';
 import 'services/api.dart';
+
 
 /// Global notifier for theme mode
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
@@ -63,7 +64,7 @@ class HeyMachiApp extends StatelessWidget {
                 return const Scaffold(body: Center(child: CircularProgressIndicator()));
               }
               if (snapshot.data == true) {
-                return const DashboardScreen();
+                return const MainNavigationScreen();
               } else {
                 return const LoginScreen();
               }
@@ -71,10 +72,10 @@ class HeyMachiApp extends StatelessWidget {
           ),
           onGenerateRoute: (RouteSettings settings) {
             switch (settings.name) {
-              case '/table-selector':
-                return MaterialPageRoute(builder: (_) => const TableSelectorPage());
+            //  case '/table-selector':
+              //  return MaterialPageRoute(builder: (_) => const TableSelectorPage());
               case '/dashboard':
-                return MaterialPageRoute(builder: (_) => const DashboardScreen());
+                return MaterialPageRoute(builder: (_) => const MainNavigationScreen());
               case '/profile':
                 return MaterialPageRoute(
                   builder: (_) => UserProfileScreen(
@@ -95,7 +96,7 @@ class HeyMachiApp extends StatelessWidget {
               case '/catalog':
                 return MaterialPageRoute(builder: (_) => const ItemCatalogPage());
               case '/finalBilling':
-                final cartItems = settings.arguments as Map<String, dynamic>;
+                final cartItems = settings.arguments as Map<String, Map<String, dynamic>>;
                 return MaterialPageRoute(
                   builder: (_) => FinalBillingPage(cartItems: cartItems),
                 );

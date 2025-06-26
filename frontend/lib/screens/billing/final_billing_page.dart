@@ -17,8 +17,14 @@ import '../../utils/industry_config.dart';
 import '../../widgets/order_meta_display.dart';
 
 class FinalBillingPage extends StatefulWidget {
-  final Map<String, dynamic> cartItems;
-  const FinalBillingPage({Key? key, required this.cartItems}) : super(key: key);
+  final Map<String, Map<String, dynamic>> cartItems;
+  final Widget? metaDisplayOverride;
+
+  const FinalBillingPage({
+  Key? key,
+  required this.cartItems,
+  this.metaDisplayOverride,
+}) : super(key: key);
 
   @override
   State<FinalBillingPage> createState() => _FinalBillingPageState();
@@ -128,6 +134,28 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
       );
     }).toList();
 
+    final builder = AppSession.instance.orderConfirmationBuilder;
+      final screen = builder?.call(
+        customer: cust,
+        paymentMode: _selectedPayment!,
+        totalAmount: _total,
+        orderId: billId,
+        cgst: _cgst,
+        sgst: _sgst,
+        igst: _igst,
+        items: lines.map((l) => {
+          'productName': l.productName,
+          'unitPrice': l.unitPrice,
+          'quantity': l.quantity,
+          'totalAmount': l.totalAmount,
+        }).toList(),
+        promoTitle: _selectedPromo?.title,
+        promoPercentage: _selectedPromo?.discountPercentage,
+        promoDiscount: _discount,
+        sessionData: AppSession.instance.sessionData.map((k, v) => MapEntry(k, v.toString())),
+        sessionLabels: fieldMap,
+      );
+
     await ApiService.postTransaction({
       'bill': {
         'id': billId,
@@ -149,27 +177,7 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => OrderConfirmationScreen(
-          customer: cust,
-          paymentMode: _selectedPayment!,
-          totalAmount: _total,
-          orderId: billId,
-          cgst: _cgst,
-          sgst: _sgst,
-          igst: _igst,
-          items: lines.map((l) => {
-            'productName': l.productName,
-            'unitPrice': l.unitPrice,
-            'quantity': l.quantity,
-            'totalAmount': l.totalAmount,
-          }).toList(),
-          promoTitle: _selectedPromo?.title,
-          promoPercentage: _selectedPromo?.discountPercentage,
-          promoDiscount: _discount,
-          sessionData: session,
-          sessionLabels: fieldMap,
-        ),
-      ),
+        builder: (_) => screen ?? const SizedBox()),
     );
   }
 
@@ -243,11 +251,12 @@ class _FinalBillingPageState extends State<FinalBillingPage> {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            OrderMetaDisplay(
-              style: const TextStyle(fontSize: 14, color: Colors.black),
-              sessionData: AppSession.instance.sessionData.map((k, v) => MapEntry(k, v.toString())),
-              sessionLabels: fieldMap,
-            ),
+            widget.metaDisplayOverride ??
+              OrderMetaDisplay(
+                style: const TextStyle(fontSize: 14, color: Colors.black),
+                sessionData: AppSession.instance.sessionData.map((k, v) => MapEntry(k, v.toString())),
+                sessionLabels: fieldMap,
+              ),
             const SizedBox(height: 4),
             Row(
               children: [

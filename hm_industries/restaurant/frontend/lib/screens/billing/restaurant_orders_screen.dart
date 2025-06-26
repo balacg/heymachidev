@@ -2,23 +2,24 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:restaurant_addon/screens/billing/restaurant_cart_page.dart';
 import 'package:restaurant_addon/widgets/expandable_fab.dart';
 import '../../services/restaurant_api.dart';
 import 'package:heymachi_dev/screens/billing/cart_page.dart';
-import 'package:heymachi_dev/screens/billing/item_catalog_page.dart';
+import 'package:restaurant_addon/screens/billing/restaurant_item_catalog_page.dart';
 import 'package:heymachi_dev/utils/app_session.dart';
 import 'table_selector.dart';
 import 'package:restaurant_addon/services/restaurant_api.dart';
 
 
-class OrdersScreen extends StatefulWidget {
-  const OrdersScreen({super.key});
+class RestaurantOrdersScreen extends StatefulWidget {
+  const RestaurantOrdersScreen({super.key});
 
   @override
-  State<OrdersScreen> createState() => _OrdersScreenState();
+  State<RestaurantOrdersScreen> createState() => _OrdersScreenState();
 }
 
-class _OrdersScreenState extends State<OrdersScreen> {
+class _OrdersScreenState extends State<RestaurantOrdersScreen> {
   List<dynamic> openOrders = [];
   bool isLoading = true;
 
@@ -98,7 +99,7 @@ void initState() {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ItemCatalogPage(),
+            builder: (_) => const RestaurantItemCatalogPage(),
             settings: RouteSettings(arguments: {
               'cartItems': {},
               'id': null,
@@ -117,7 +118,7 @@ void initState() {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const ItemCatalogPage(),
+              builder: (_) => const RestaurantItemCatalogPage(),
               settings: RouteSettings(arguments: {
                 'cartItems': {},
                 'id': null,
@@ -177,7 +178,7 @@ void initState() {
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => CartPage(
+                    builder: (_) => RestaurantCartPage(
                       cartItems: cartMap,
                       onCartUpdated: (_) {},
                       fromOpenOrder: true,
@@ -241,7 +242,7 @@ void initState() {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const ItemCatalogPage(),
+                      builder: (_) => const RestaurantItemCatalogPage(),
                     ),
                   );
                 }
@@ -276,7 +277,7 @@ void initState() {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => CartPage(
+                      builder: (_) => RestaurantCartPage(
                         cartItems: cart,
                         onCartUpdated: (_) {},
                         fromOpenOrder: true,
@@ -313,17 +314,15 @@ void initState() {
             icon: const Icon(Icons.shopping_bag),
             onPressed: () async {
               try {
-                final token = await RestaurantApi.getTokenForType('TK');
                 AppSession.instance.sessionData.clear();
-                AppSession.instance.sessionData.addAll({
-                  'dining_mode': 'Takeaway',
-                  'token_no': token,
-                });
+                AppSession.instance.sessionData['dining_mode'] = 'Takeaway';
+                AppSession.instance.sessionData.remove('table_no');
+                AppSession.instance.sessionData.remove('pax');
 
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const ItemCatalogPage(),
+                    builder: (_) => const RestaurantItemCatalogPage(),
                   ),
                 );
               } catch (e) {
@@ -341,17 +340,15 @@ void initState() {
             icon: const Icon(Icons.delivery_dining),
             onPressed: () async {
               try {
-                final token = await RestaurantApi.getTokenForType('DL');
                 AppSession.instance.sessionData.clear();
-                AppSession.instance.sessionData.addAll({
-                  'dining_mode': 'Delivery',
-                  'token_no': token,
-                });
+                AppSession.instance.sessionData['dining_mode'] = 'Delivery';
+                AppSession.instance.sessionData.remove('table_no');
+                AppSession.instance.sessionData.remove('pax');
 
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const ItemCatalogPage(),
+                    builder: (_) => const RestaurantItemCatalogPage(),
                   ),
                 );
               } catch (e) {
@@ -368,5 +365,3 @@ void initState() {
   }
 
 }
-
-// Note: Implement ExpandableFab as a custom widget or use an available package to get FAB expansion animation.

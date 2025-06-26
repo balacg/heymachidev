@@ -1,6 +1,7 @@
 // lib/screens/billing/item_catalog_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:heymachi_dev/models/cart_item.dart';
 import 'package:heymachi_dev/models/category.dart';
 import 'package:heymachi_dev/models/product.dart';
 import 'package:heymachi_dev/models/subcategory.dart';
@@ -14,8 +15,15 @@ import '../../widgets/order_meta_display.dart';
 
 class ItemCatalogPage extends StatefulWidget {
   final bool isSelectorMode;
+  final List<CartItem>? initialCartItems; 
+  final Function(List<CartItem>)? onCartConfirmed;
 
-  const ItemCatalogPage({Key? key, this.isSelectorMode = false}) : super(key: key);
+  const ItemCatalogPage({
+    super.key,
+    this.isSelectorMode = false,
+    this.initialCartItems,
+    this.onCartConfirmed, // ✅ ADD THIS LINE
+  });
 
   @override
   State<ItemCatalogPage> createState() => _ItemCatalogPageState();
@@ -67,16 +75,16 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
       _filteredProducts = List.from(_products);
       _categories = await ApiService.fetchCategories();
       _subcategories = await ApiService.fetchSubcategories();
-      for (final s in _subcategories) {
-        debugPrint("🔹 Subcategory: ${s.name}, Category ID: ${s.categoryId}");
-      }
+      /* for (final s in _subcategories) {
+       debugPrint("🔹 Subcategory: ${s.name}, Category ID: ${s.categoryId}");
+      } */
       setState(() {});
 
        // ✅ Debug: Print subcategories grouped under each category
       for (final cat in _categories) {
         final subs = _subcategories.where((s) => s.categoryId == cat.id).toList();
         final subNames = subs.map((s) => s.name ?? 'Unnamed').join(', ');
-        debugPrint("🍱 Category: ${cat.name ?? 'Unknown'} → Subcats: $subNames");
+        //debugPrint("🍱 Category: ${cat.name ?? 'Unknown'} → Subcats: $subNames");
       }
     } catch (e) {
       debugPrint('Error fetching products: $e');
@@ -129,6 +137,7 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
   }
 
   void _goToCart() {
+    
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -162,9 +171,16 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final sessionLabels = (IndustryConfig.forIndustry(AppSession.instance.industryId ?? '')?['sessionFields'] as Map?)?.map(
-          (k, v) => MapEntry(k.toString(), v.toString()),
-        ) ?? {};
+    final rawLabels = (IndustryConfig.forIndustry(AppSession.instance.industryId ?? '')?['sessionFields'] as Map?)?.map(
+      (k, v) => MapEntry(k.toString(), v.toString()),
+    ) ?? {};
+
+    // 🧹 Hide fields with no data
+    final sessionLabels = {
+      for (final entry in rawLabels.entries)
+        if (AppSession.instance.sessionData[entry.key]?.toString().isNotEmpty ?? false)
+          entry.key: entry.value
+    };
 
     final filteredSessionData = {
       for (final entry in AppSession.instance.sessionData.entries)
@@ -195,15 +211,15 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   child: Row(
                     children: [
-                      IconButton(
+                      /*IconButton(
                         icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
                         onPressed: () => Navigator.pop(context, _cartItems),
                       ),
-                      const SizedBox(width: 8),
-                      Text('Item Catalog', style: theme.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold)),
+                       const SizedBox(width: 8),
+                      Text('Item Catalog', style: theme.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold)), */
                     ],
                   ),
                 ),
@@ -223,7 +239,8 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
                       final qty = (_cartItems[p.name]?['qty'] as int?) ?? 0;
                       return ListTile(
                         tileColor: theme.cardColor,
-                        title: Text(p.name, style: theme.textTheme.bodyLarge),
+                        contentPadding:EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                        title: Text(p.name, style: theme.textTheme.bodyMedium),
                         subtitle: Text('₹${NumberFormat.decimalPattern().format(p.price)}', style: theme.textTheme.bodyMedium),
                         trailing: qty > 0
                             ? Row(

@@ -1,4 +1,5 @@
-// lib/screens/dashboard/dashboard_screen.dart
+// lib/screens/navigation/main_navigation_screen.dart
+
 import 'package:flutter/material.dart';
 import '../billing/item_catalog_page.dart';
 import '../dashboard/dashboard_home.dart';
@@ -10,16 +11,16 @@ import '../admin/admin_center_screen.dart';
 import '../../utils/app_session.dart';
 import '../../utils/industry_config.dart';
 import '../../utils/industry_registry.dart';
-import 'package:restaurant_addon/screens/billing/orders_screen.dart';
+import 'package:restaurant_addon/screens/billing/restaurant_orders_screen.dart' as restaurant;
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+class MainNavigationScreen extends StatefulWidget {
+  const MainNavigationScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
   late final List<Widget> _pages;
@@ -33,10 +34,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    AppSession.instance.industryId = 'restaurant';
+    final industryId = AppSession.instance.industryId ?? IndustryConfig.defaultIndustryId;
+
     _pages = [
       const DashboardHome(userName: 'Bala G'),
-      const OrdersScreen(),
+      _buildIndustryPage(industryId),
       const LedgerScreen(),
       const UserProfileScreen(
         userName: 'Bala G',
@@ -44,6 +46,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         userRole: 'Admin',
       ),
     ];
+  }
+
+  Widget _buildIndustryPage(String industryId) {
+    switch (industryId) {
+      case 'restaurant':
+        return const restaurant.RestaurantOrdersScreen(); 
+      default:
+        return const SizedBox.shrink(); // or a default OrdersPage
+    }
   }
 
   void _openMoreMenu() {
