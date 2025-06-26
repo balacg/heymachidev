@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:heymachi_dev/utils/app_session.dart';
-import 'package:heymachi_dev/screens/billing/item_catalog_page.dart';
+import 'package:restaurant_addon/screens/billing/restaurant_item_catalog_page.dart';
 import 'package:restaurant_addon/services/restaurant_api.dart';
 
 class TableSelectorPage extends StatefulWidget {
@@ -42,7 +42,7 @@ class _TableSelectorPageState extends State<TableSelectorPage> {
       if (context.mounted) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const ItemCatalogPage()),
+          MaterialPageRoute(builder: (_) => const RestaurantItemCatalogPage()),
         );
       }
     } catch (e) {

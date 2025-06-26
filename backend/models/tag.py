@@ -11,4 +11,4 @@ class Tag(Base):
     tag_value = Column(String)
     is_active = Column(Integer)
 
-   # products = relationship("Product", secondary="product_tags", back_populates="tags")
+    #products = relationship("Product", secondary="product_tags", back_populates="tags")

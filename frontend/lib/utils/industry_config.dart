@@ -5,6 +5,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 class IndustryConfig {
   static late final Map<String, dynamic> _cfg;
+  static const String defaultIndustryId = 'restaurant';
 
   /// Call this once at app startup to load the JSON.
   static Future<void> load() async {

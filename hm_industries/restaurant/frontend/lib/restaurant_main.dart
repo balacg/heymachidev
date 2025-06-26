@@ -1,8 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_addon/utils/bootstrap.dart';
+
+import 'package:heymachi_dev/utils/app_session.dart';
+import 'package:heymachi_dev/models/customer.dart';
+import 'package:restaurant_addon/screens/billing/restaurant_order_confirmation_screen.dart';
+import 'package:restaurant_addon/utils/restaurant_order_utils.dart';
 
 void main() {
-  runApp(const MyApp());
-}
+    patchRestaurantTokenLogic();
+    AppSession.instance.orderSaveHandler = saveRestaurantOrderHandler;
+  // Initialize save and confirmation handlers
+    AppSession.instance.orderSaveHandler = (cartItems) async {
+      print("Saving restaurant order: $cartItems");
+      return Future.value("ORDER_ID_PLACEHOLDER");
+    };
+
+    AppSession.instance.orderConfirmationBuilder = ({
+      required Customer customer,
+      required String paymentMode,
+      required double totalAmount,
+      required String orderId,
+      required double cgst,
+      required double sgst,
+      required double igst,
+      required List<Map<String, dynamic>> items,
+      String? promoTitle,
+      double? promoPercentage,
+      double? promoDiscount,
+      required Map<String, String> sessionData,
+      required Map<String, String> sessionLabels,
+    }) {
+      return RestaurantOrderConfirmationScreen(
+        customer: customer,
+        paymentMode: paymentMode,
+        totalAmount: totalAmount,
+        items: items,
+        orderId: orderId,
+        cgst: cgst,
+        sgst: sgst,
+        igst: igst,
+        promoTitle: promoTitle,
+        promoPercentage: promoPercentage,
+        promoDiscount: promoDiscount,
+        sessionData: sessionData,
+        sessionLabels: sessionLabels,
+      );
+    };
+    runApp(const MyApp());
+  }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

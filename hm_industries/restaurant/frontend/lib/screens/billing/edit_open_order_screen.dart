@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:restaurant_addon/screens/billing/restaurant_item_catalog_page.dart';
 import '../../services/restaurant_api.dart';
 import 'package:heymachi_dev/widgets/widget_utils.dart';
 
@@ -60,7 +61,13 @@ class _EditOpenOrderScreenState extends State<EditOpenOrderScreen> {
   }
 
   Future<void> handleAddItem() async {
-    final selected = await showItemCatalogPicker(context);
+    final selected = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const RestaurantItemCatalogPage(),
+      ),
+    );
+
     if (selected != null && selected['name'] != null) {
       setState(() {
         final existing = items.firstWhere(

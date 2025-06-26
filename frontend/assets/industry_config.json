@@ -4,7 +4,8 @@
   "sessionFields": {
     "dining_mode": "Dining Mode",
     "table_no": "Table No",
-    "pax": "Guests"
+    "pax": "Guests",
+    "token_no": "Token"
   }
 },
     "clinic": {

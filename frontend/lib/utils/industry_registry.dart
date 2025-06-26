@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_addon/screens/dining_selector_page.dart';
 
 class IndustryRegistry {
+  static Map<String, dynamic>? getIndustryById(String industryId) {
+    return getConfig(industryId);
+  }
   static final Map<String, Map<String, dynamic>> _config = {
     "restaurant": {
       "preBillingScreen": "DiningSelectorPage",

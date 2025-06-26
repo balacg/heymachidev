@@ -142,12 +142,15 @@ class OrderConfirmationScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: ListView(
           children: [
-            OrderMetaDisplay(
-              sessionData: sessionData.map((k, v) => MapEntry(k, v.toString())),
-              sessionLabels: sessionLabels,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            const Divider(),
+            if (sessionData.isNotEmpty && sessionLabels.isNotEmpty)
+            ...[
+              OrderMetaDisplay(
+                sessionData: sessionData.map((k, v) => MapEntry(k, v.toString())),
+                sessionLabels: sessionLabels,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              const Divider(),
+            ],
             Text('Customer: ${customer.name}', style: theme.textTheme.titleMedium),
             Text('Phone: ${customer.phone}', style: theme.textTheme.bodyMedium),
             Text('Address: ${customer.address ?? ''}, ${customer.state ?? ''}',
