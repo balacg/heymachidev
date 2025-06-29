@@ -18,6 +18,7 @@ router = APIRouter(prefix="/open-orders", tags=["Open Orders"])
 
 @router.post("/")
 def create_open_order(order: dict, db: Session = Depends(get_db)):
+    print("🛰️ Received order payload:", order) 
     order_id = order.get("id") or str(uuid.uuid4())
     items = json.dumps(order.get("items", []))
 

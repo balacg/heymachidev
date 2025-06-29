@@ -36,22 +36,29 @@ class RestaurantApi {
     }
   }
 
-  static Future<void> saveOpenOrder(Map<String, dynamic> data) async {
+  static Future<String?> saveOpenOrder(Map<String, dynamic> data) async {
     try {
+      debugPrint('📦 Payload sent to API: $data');
       final response = await http.post(
         Uri.parse('$baseUrl/open-orders/'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );
+      debugPrint('📨 Response: ${response.statusCode} → ${response.body}');
 
-      if (response.statusCode != 200 && response.statusCode != 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        return responseData['id']?.toString(); // Assuming the response returns an order ID
+      } else {
         throw Exception('Failed to save open order');
       }
     } catch (e) {
-      debugPrint('Error saving open order: $e');
-      rethrow;
+      debugPrint('❌ Error saving open order: $e');
+      return null;
     }
   }
+
+
 
   static Future<int> getNextTokenSequence(String prefix) async {
     final url = Uri.parse('$baseUrl/token-sequence/next?prefix=$prefix');

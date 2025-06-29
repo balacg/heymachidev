@@ -1,20 +1,20 @@
 // lib/screens/billing/cart_page.dart
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:heymachi_dev/screens/billing/item_catalog_page.dart';
+import 'package:heymachi_dev/utils/app_session.dart';
+import 'package:heymachi_dev/utils/industry_config.dart';
 import 'package:intl/intl.dart';
-import '../../utils/app_session.dart';
-import '../../utils/industry_config.dart';
-import 'final_billing_page.dart';
-import '../../widgets/order_meta_display.dart';
 import '../../services/api.dart';
-import 'package:flutter/foundation.dart';
+import '../../widgets/order_meta_display.dart';
 
 class CartPage extends StatefulWidget {
   final Map<String, Map<String, dynamic>> cartItems;
   final void Function(Map<String, Map<String, dynamic>>)? onCartUpdated;
-  final Future<Map<String, Map<String, dynamic>>?> Function(BuildContext context, Map<String, Map<String, dynamic>> cartItems, String? orderId)? openItemCatalog;
-
+  final Future<Map<String, Map<String, dynamic>>?> Function(
+      BuildContext context,
+      Map<String, Map<String, dynamic>> cartItems,
+      String? orderId)? openItemCatalog;
   final bool fromOpenOrder;
   final Map<String, dynamic>? initialOrder;
   final Widget? metaDisplayOverride;
@@ -37,38 +37,6 @@ class _CartPageState extends State<CartPage> {
   late Map<String, Map<String, dynamic>> _local;
   bool _hasChanges = false;
 
-  void _openItemCatalogWithCart() async {
-    final updatedCart = widget.openItemCatalog != null
-        ? await widget.openItemCatalog!(context, _local, widget.initialOrder?['id'])
-        : await Navigator.push<Map<String, Map<String, dynamic>>>(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const ItemCatalogPage(isSelectorMode: false),
-              settings: RouteSettings(arguments: {
-                'cartItems': _local,
-                'id': widget.initialOrder?['id'],
-              }),
-            ),
-          );
-
-    if (updatedCart != null && mounted) {
-      bool hasChanges = !_deepEquals(_local, updatedCart);
-      setState(() {
-        _local = updatedCart;
-        _hasChanges = hasChanges;
-      });
-    }
-  }
-
-  bool _deepEquals(Map<String, Map<String, dynamic>> a, Map<String, Map<String, dynamic>> b) {
-    if (a.length != b.length) return false;
-    for (final key in a.keys) {
-      if (!b.containsKey(key)) return false;
-      if (!mapEquals(a[key], b[key])) return false;
-    }
-    return true;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -78,11 +46,8 @@ class _CartPageState extends State<CartPage> {
     } else if (widget.fromOpenOrder && widget.initialOrder != null) {
       final items = widget.initialOrder!['items'] as List<dynamic>? ?? [];
       _local = {
-        for (var item in items)
-          item['item']: {
-            'price': item['price'],
-            'qty': item['qty'],
-          }
+        for (var it in items)
+          it['item']: {'price': it['price'], 'qty': it['qty']}
       };
       _hasChanges = false;
     } else {
@@ -91,31 +56,59 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  int get totalAmount {
-    return _local.entries.fold<int>(
-      0,
-      (sum, entry) {
-        final price = entry.value['price'] as double;
-        final qty = entry.value['qty'] as int;
-        return sum + (price * qty).toInt();
-      },
-    );
+  bool _deepEquals(a, b) {
+    if (a.length != b.length) return false;
+    for (var k in a.keys) {
+      if (!b.containsKey(k) || !mapEquals(a[k], b[k])) return false;
+    }
+    return true;
   }
+
+  Future<void> _openItemCatalogWithCart() async {
+    final updated = widget.openItemCatalog != null
+        ? await widget.openItemCatalog!(
+            context, _local, widget.initialOrder?['id'])
+        : await Navigator.push<Map<String, Map<String, dynamic>>>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const ItemCatalogPage(isSelectorMode: false),
+              settings: RouteSettings(
+                arguments: {
+                  'cartItems': _local,
+                  'id': widget.initialOrder?['id'],
+                },
+              ),
+            ),
+          );
+
+    if (updated != null && mounted) {
+      final changed = !_deepEquals(_local, updated);
+      setState(() {
+        _local = updated;
+        _hasChanges = changed;
+      });
+    }
+  }
+
+  int get totalAmount => _local.entries.fold<int>(
+      0,
+      (sum, e) =>
+          sum + ((e.value['price'] as double) * (e.value['qty'] as int)).toInt());
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final numberFormat = NumberFormat.decimalPattern('en_IN');
-    final itemColor = theme.colorScheme.onSurface;
+    final fmt = NumberFormat.decimalPattern('en_IN');
 
-    final sessionData = widget.fromOpenOrder && widget.initialOrder != null
+    final sessionMap = widget.fromOpenOrder && widget.initialOrder != null
         ? widget.initialOrder!.map((k, v) => MapEntry(k, v.toString()))
-        : AppSession.instance.sessionData.map((k, v) => MapEntry(k, v.toString()));
-
-    final industryId = AppSession.instance.industryId ?? '';
-    final fieldMap = (IndustryConfig.forIndustry(industryId)?['sessionFields'] is Map)
-        ? Map<String, String>.from(IndustryConfig.forIndustry(industryId)?['sessionFields'] ?? {})
-        : <String, String>{};
+        : AppSession.instance.sessionData
+            .map((k, v) => MapEntry(k, v.toString()));
+    final fieldMap = (IndustryConfig.forIndustry(
+                    AppSession.instance.industryId ?? '')?['sessionFields']
+                as Map?)
+            ?.cast<String, String>() ??
+        {};
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -126,7 +119,7 @@ class _CartPageState extends State<CartPage> {
           icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
           onPressed: () {
             widget.onCartUpdated?.call(_local);
-            Navigator.pop(context, _local);
+            Navigator.pop<bool>(context, true);
           },
         ),
         title: const Text('Cart'),
@@ -135,7 +128,8 @@ class _CartPageState extends State<CartPage> {
           ? Center(
               child: Text(
                 'Your cart is empty',
-                style: theme.textTheme.bodyMedium!.copyWith(color: theme.hintColor),
+                style: theme.textTheme.bodyMedium!
+                    .copyWith(color: theme.hintColor),
               ),
             )
           : Column(
@@ -144,8 +138,9 @@ class _CartPageState extends State<CartPage> {
                   padding: const EdgeInsets.all(12),
                   child: widget.metaDisplayOverride ??
                       OrderMetaDisplay(
-                        style: const TextStyle(fontSize: 12, color: Colors.black),
-                        sessionData: sessionData,
+                        style: const TextStyle(
+                            fontSize: 12, color: Colors.black),
+                        sessionData: sessionMap,
                         sessionLabels: fieldMap,
                       ),
                 ),
@@ -154,38 +149,43 @@ class _CartPageState extends State<CartPage> {
                     itemCount: _local.length,
                     itemBuilder: (_, i) {
                       final key = _local.keys.elementAt(i);
-                      final item = _local[key]!;
-                      final price = item['price'] as double;
-                      final qty = item['qty'] as int;
+                      final itm = _local[key]!;
+                      final price = itm['price'] as double;
+                      final qty = itm['qty'] as int;
                       return ListTile(
                         tileColor: theme.cardColor,
                         title: Text(key, style: theme.textTheme.bodyLarge),
-                        subtitle: Text('₹${numberFormat.format(price)} x $qty', style: theme.textTheme.bodyMedium),
+                        subtitle: Text(
+                          '₹${fmt.format(price)}  ×  $qty',
+                          style: theme.textTheme.bodyMedium,
+                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
                               icon: const Icon(Icons.remove),
-                              color: itemColor,
                               onPressed: () {
                                 setState(() {
                                   _hasChanges = true;
                                   if (qty > 1) {
-                                    _local[key]!['qty'] = qty - 1;
+                                    itm['qty'] = qty - 1;
                                   } else {
                                     _local.remove(key);
                                   }
                                 });
                               },
                             ),
-                            Text('$qty', style: TextStyle(color: itemColor, fontWeight: FontWeight.bold)),
+                            Text('$qty',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        theme.colorScheme.onSurface)),
                             IconButton(
                               icon: const Icon(Icons.add),
-                              color: itemColor,
                               onPressed: () {
                                 setState(() {
                                   _hasChanges = true;
-                                  _local[key]!['qty'] = qty + 1;
+                                  itm['qty'] = qty + 1;
                                 });
                               },
                             ),
@@ -201,105 +201,135 @@ class _CartPageState extends State<CartPage> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.add),
-                        color: theme.iconTheme.color,
                         onPressed: _openItemCatalogWithCart,
                       ),
                       const SizedBox(width: 8),
+                      // SAVE BUTTON
                       Expanded(
                         child: ElevatedButton(
                           onPressed: (_hasChanges && _local.isNotEmpty)
                               ? () async {
                                   widget.onCartUpdated?.call(_local);
+                                  await AppSession.instance
+                                      .ensureRestaurantTokenIfNeeded();
 
-                                  final sessionMap = Map<String, dynamic>.from(AppSession.instance.sessionData);
-                                  await AppSession.instance.ensureRestaurantTokenIfNeeded();
-
-                                  final orderPayload = {
-                                    ...sessionMap,
+                                  final sessionData =
+                                      Map<String, dynamic>.from(
+                                          AppSession.instance
+                                              .sessionData);
+                                  final payload = {
+                                    ...sessionData,
                                     'items': _local.entries
-                                        .map((e) => {'item': e.key, 'qty': e.value['qty'], 'price': e.value['price']})
+                                        .map((e) => {
+                                              'item': e.key,
+                                              'qty': e.value['qty'],
+                                              'price':
+                                                  e.value['price']
+                                            })
                                         .toList(),
-                                    'total_amount': totalAmount,
+                                    'total_amount':
+                                        totalAmount,
+                                    if (widget.fromOpenOrder &&
+                                        widget.initialOrder?['id'] !=
+                                            null)
+                                      'id':
+                                          widget.initialOrder!['id'],
                                   };
 
-                                  if (widget.fromOpenOrder && widget.initialOrder?['id'] != null) {
-                                    orderPayload['id'] = widget.initialOrder!['id'];
+                                  if (AppSession.instance
+                                          .orderSaveHandler !=
+                                      null) {
+                                    await AppSession.instance
+                                        .orderSaveHandler!
+                                        .call({
+                                      'cartItems': _local,
+                                      'id': widget.initialOrder?[
+                                          'id'],
+                                    });
+                                  } else {
+                                    await ApiService.post(
+                                        '/open-orders/',
+                                        payload);
                                   }
-
-                                  if (AppSession.instance.orderSaveHandler != null) {
-                                    await AppSession.instance.orderSaveHandler!(orderPayload);
-                                  }
-
+                                  debugPrint('🛑 [CartPage] about to pop CartPage → back to Orders (mounted=$mounted)');
+                                  // **THIS POPS BACK TO OrdersScreen**
                                   if (context.mounted) {
-                                    Navigator.pop(context, _local);
+                                    Navigator.pop<bool>(
+                                        context, true);
                                   }
                                 }
                               : null,
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
-                          child: const Text('Save', style: TextStyle(color: Colors.white)),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Colors.deepPurple),
+                          child: const Text('Save',
+                              style: TextStyle(
+                                  color: Colors.white)),
                         ),
                       ),
+
+                      // CLEAR ORDER (only on edits)
                       if (widget.fromOpenOrder) ...[
                         const SizedBox(width: 12),
                         ElevatedButton(
                           onPressed: () async {
-                            final confirm = await showDialog<bool>(
+                            final confirm =
+                                await showDialog<bool>(
                               context: context,
                               builder: (_) => AlertDialog(
-                                title: const Text('Clear this order?'),
-                                content: const Text('Are you sure you want to clear all items from this order?'),
+                                title: const Text(
+                                    'Clear this order?'),
+                                content: const Text(
+                                  'Are you sure you want to clear all items from this order?',
+                                ),
                                 actions: [
-                                  TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                                  TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Clear')),
+                                  TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(
+                                              context,
+                                              false),
+                                      child:
+                                          const Text('Cancel')),
+                                  TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(
+                                              context,
+                                              true),
+                                      child: const Text(
+                                          'Clear')),
                                 ],
                               ),
                             );
-
                             if (confirm == true) {
-                              if (AppSession.instance.orderCancelHandler != null &&
-                                  widget.initialOrder?['id'] != null) {
-                                await AppSession.instance.orderCancelHandler!(context);
+                              if (AppSession.instance
+                                      .orderCancelHandler !=
+                                  null) {
+                                await AppSession.instance
+                                    .orderCancelHandler!(
+                                        context);
                               }
-
                               setState(() {
                                 _local.clear();
                                 _hasChanges = true;
                               });
-
-                              widget.onCartUpdated?.call(_local);
-
+                              widget.onCartUpdated
+                                  ?.call(_local);
                               if (context.mounted) {
-                                Navigator.pop(context, _local);
+                                Navigator.pop<bool>(
+                                    context, true);
                               }
                             }
                           },
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-                          child: const Text('Clear Order', style: TextStyle(color: Colors.white)),
+                          style:
+                              ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.redAccent),
+                          child: const Text(
+                              'Clear Order',
+                              style: TextStyle(
+                                  color: Colors.white)),
                         ),
                       ],
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            widget.onCartUpdated?.call(_local);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) {
-                                  final builderFn = AppSession.instance.finalBillingPageBuilder;
-                                  final page = builderFn?.call(_local);
-                                  return page ?? FinalBillingPage(cartItems: _local);
-                                },
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                          child: Text(
-                            'Billing ₹${numberFormat.format(totalAmount)}',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),

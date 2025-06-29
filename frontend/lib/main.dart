@@ -2,7 +2,10 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:heymachi_dev/utils/app_session.dart';
+import 'package:heymachi_dev/utils/industry_plugin_loader.dart';
 //import 'package:restaurant_addon/screens/billing/table_selector.dart';
+import 'package:restaurant_addon/utils/restaurant_order_utils.dart';
 
 import 'utils/industry_config.dart';
 import 'screens/auth/login_screen.dart';
@@ -23,6 +26,14 @@ ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await IndustryConfig.load();
+
+  // Fake example — replace this with real config fetch
+  final industry = IndustryConfig.defaultIndustryId;
+  
+  AppSession.instance.orderSaveHandler = IndustryPluginLoader.getOrderHandler(industry);
+
+  debugPrint('🧩 Registered order handler for $industry');
+  
   runApp(const HeyMachiApp());
 }
 

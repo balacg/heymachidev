@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:heymachi_dev/utils/app_session.dart';
+import 'package:restaurant_addon/constants/dining_types.dart';
 import 'package:restaurant_addon/screens/billing/restaurant_item_catalog_page.dart';
 import 'package:restaurant_addon/services/restaurant_api.dart';
 
@@ -32,7 +33,7 @@ class _TableSelectorPageState extends State<TableSelectorPage> {
       final token = await RestaurantApi.getTokenForType('DL');
       //print('✅ Received Token: $token');
       AppSession.instance.sessionData.addAll({
-        'dining_mode': 'Dine-In',
+        'dining_mode': DiningTypes.dineIn,
         'table_no': selectedTable,
         'pax': pax,
         'token_no': token,

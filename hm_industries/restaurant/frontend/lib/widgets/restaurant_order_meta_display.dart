@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:heymachi_dev/widgets/order_meta_display.dart';
 import 'package:heymachi_dev/utils/app_session.dart';
+import 'package:restaurant_addon/constants/dining_types.dart';
 
 class RestaurantOrderMetaDisplay extends StatelessWidget {
   final TextStyle? style;
@@ -23,7 +24,7 @@ class RestaurantOrderMetaDisplay extends StatelessWidget {
     // Filter logic: hide table_no and pax if not Dine-In
     final filteredData = {
       for (final entry in sessionData.entries)
-        if (!(diningMode != 'Dine-In' && (entry.key == 'table_no' || entry.key == 'pax')))
+        if (!(diningMode != DiningTypes.dineIn && (entry.key == 'table_no' || entry.key == 'pax')))
           entry.key: entry.value.toString()
     };
 

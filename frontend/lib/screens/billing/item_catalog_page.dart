@@ -50,6 +50,7 @@ class _ItemCatalogPageState extends State<ItemCatalogPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    //loadOccupiedTables();
 
     if (!_initialized) {
       final args = ModalRoute.of(context)?.settings.arguments;

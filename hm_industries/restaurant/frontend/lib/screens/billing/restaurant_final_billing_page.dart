@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:heymachi_dev/screens/billing/final_billing_page.dart';
 import 'package:heymachi_dev/widgets/order_meta_display.dart';
 import 'package:heymachi_dev/utils/app_session.dart';
+import 'package:restaurant_addon/constants/dining_types.dart';
 import '../../services/restaurant_api.dart';
 
 class RestaurantFinalBillingPage extends StatefulWidget {
@@ -18,8 +19,8 @@ class _RestaurantFinalBillingPageState extends State<RestaurantFinalBillingPage>
     final data = AppSession.instance.sessionData;
     final mode = data['dining_mode'];
 
-    if ((mode == 'Takeaway' || mode == 'Delivery') && !data.containsKey('token_no')) {
-      final prefix = mode == 'Takeaway' ? 'TK' : 'DL';
+    if ((mode == DiningTypes.takeaway || mode == DiningTypes.delivery) && !data.containsKey('token_no')) {
+      final prefix = mode == DiningTypes.takeaway ? 'TK' : 'DL';
       final token = await RestaurantApi.getTokenForType(prefix);
       data['token_no'] = token;
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heymachi_dev/utils/app_session.dart';
+import 'package:restaurant_addon/constants/dining_types.dart';
 
 /// Collects diningType, tableNo and pax, then returns them via pop().
 class DiningSelectorPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _DiningSelectorPageState extends State<DiningSelectorPage> {
   void selectDiningType(String type) {
     setState(() {
       selectedType = type;
-      if (type != 'Dine-In') {
+      if (type != DiningTypes.dineIn) {
         selectedTable = null;
         pax = 1;
       }
@@ -40,7 +41,7 @@ class _DiningSelectorPageState extends State<DiningSelectorPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDineIn = selectedType == 'Dine-In';
+    final isDineIn = selectedType == DiningTypes.dineIn;
     return Scaffold(
       appBar: AppBar(title: const Text('Select Dining Mode')),
       body: Padding(
@@ -52,9 +53,9 @@ class _DiningSelectorPageState extends State<DiningSelectorPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: ['Dine-In', 'Takeaway', 'Delivery'].map((type) {
-                final icon = type == 'Dine-In'
+                final icon = type == DiningTypes.dineIn
                     ? Icons.restaurant
-                    : type == 'Takeaway'
+                    : type == DiningTypes.takeaway
                         ? Icons.shopping_bag
                         : Icons.delivery_dining;
                 final sel = selectedType == type;

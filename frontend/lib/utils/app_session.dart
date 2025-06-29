@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:heymachi_dev/models/customer.dart';
 import 'package:heymachi_dev/utils/industry_config.dart';
+typedef OrderHandler = Future<String?> Function(Map<String, dynamic> payload);
 
 class AppSession {
   static final AppSession instance = AppSession._internal();
@@ -11,7 +12,8 @@ class AppSession {
   Map<String, dynamic> sessionData = {};
   Future<void> Function() ensureRestaurantTokenIfNeeded = () async {};
   Widget Function(Map<String, Map<String, dynamic>> cartItems)? finalBillingPageBuilder;
-  late Future<void> Function(Map<String, dynamic>)? orderSaveHandler;
+  Future<String?> Function(Map<String, dynamic>)? orderSaveHandler;
+  
   void Function(BuildContext context)? orderPostSaveRedirect;
   Future<void> Function(BuildContext)? orderCancelHandler;
 

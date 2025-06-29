@@ -1,12 +1,13 @@
 // restaurant/frontend/lib/utils/restaurant_utils.dart
 
 import 'package:heymachi_dev/utils/app_session.dart';
+import 'package:restaurant_addon/constants/dining_types.dart';
 
 Map<String, String> getRestaurantSessionLabels() {
   final mode = AppSession.instance.sessionData['dining_mode'];
   return {
     'dining_mode': 'Mode',
-    if (mode == 'Dine-In') ...{
+    if (mode == DiningTypes.dineIn) ...{
       'table_no': 'Table No',
       'pax': 'Guests',
     } else ...{

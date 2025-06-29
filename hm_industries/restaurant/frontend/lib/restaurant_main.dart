@@ -9,11 +9,16 @@ import 'package:restaurant_addon/utils/restaurant_order_utils.dart';
 void main() {
     patchRestaurantTokenLogic();
     AppSession.instance.orderSaveHandler = saveRestaurantOrderHandler;
+    //AppSession.instance.orderSaveHandler = RestaurantOrderHandler.saveOrder;
+    //AppSession.instance.orderCancelHandler = RestaurantOrderHandler.cancelOrder;
+    //AppSession.instance.finalBillingPageBuilder = (cart) => RestaurantFinalBillingPage(cartItems: cart);
+
+    debugPrint('✅ orderSaveHandler registered');
   // Initialize save and confirmation handlers
-    AppSession.instance.orderSaveHandler = (cartItems) async {
-      print("Saving restaurant order: $cartItems");
-      return Future.value("ORDER_ID_PLACEHOLDER");
-    };
+   // AppSession.instance.orderSaveHandler = (cartItems) async {
+   //   print("Saving restaurant order: $cartItems");
+    //  return Future.value("ORDER_ID_PLACEHOLDER");
+    // };
 
     AppSession.instance.orderConfirmationBuilder = ({
       required Customer customer,
